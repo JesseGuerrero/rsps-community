@@ -58,15 +58,20 @@ public class Home {
 	};
 
 	private static Teleport[] PVP_TELEPORTS = {
-			new Teleport("Revenant caves (level 18)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
-			new Teleport("Dark warrior's fortress (level 15)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
 			new Teleport("Wests (level 10)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
 			new Teleport("Chaos altar (level 12)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
+			new Teleport("Revenant caves (level 18)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
+			new Teleport("Dark warrior's fortress (level 15)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
+
 			new Teleport("Easts (level 19)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
-			new Teleport("Red Dragon Isle (level 43)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
 			new Teleport("West Lava Maze/KBD (level 40)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
+			new Teleport("Red Dragon Isle (level 43)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
 			new Teleport("Agility course (level 49)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
-			new Teleport("Mage bank (level 56)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController()))
+
+			new Teleport("Mage bank (level 56)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
+			null,
+			null,
+			null
 	};
 
 	public static ObjectClickHandler pvpPortal = new ObjectClickHandler(new Object[] { 46935 }, new WorldTile(3093, 3506, 0)) {
@@ -76,8 +81,10 @@ public class Home {
 				@Override
 				public void create() {
 					for (Teleport t : PVP_TELEPORTS)
-						option(t.getName(), new Dialogue().addNext(() -> t.teleport(e.getPlayer())));
-					option("Nowhere.");
+						if (t != null)
+							option(t.getName(), new Dialogue().addNext(() -> t.teleport(e.getPlayer())));
+						else
+							option("Nowhere.");
 				}
 			}));
 		}
