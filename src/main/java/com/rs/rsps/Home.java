@@ -7,12 +7,14 @@ import com.rs.game.object.GameObject;
 import com.rs.game.pathing.Direction;
 import com.rs.game.player.content.dialogue.Dialogue;
 import com.rs.game.player.content.dialogue.Options;
+import com.rs.game.player.controllers.WildernessController;
 import com.rs.lib.game.WorldObject;
 import com.rs.lib.game.WorldTile;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.annotations.ServerStartupEvent;
 import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.ObjectClickHandler;
+import com.rs.rsps.teleports.BossTeleport;
 import com.rs.rsps.teleports.SlayerTeleport;
 import com.rs.rsps.teleports.Teleport;
 import com.rs.utils.shop.ShopsHandler;
@@ -55,17 +57,52 @@ public class Home {
 		}
 	};
 
-	public static ObjectClickHandler todoPortal = new ObjectClickHandler(new Object[] { 46935 }, new WorldTile(3093, 3506, 0)) {
+	private static Teleport[] PVP_TELEPORTS = {
+			new Teleport("Revenant caves (level 18)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
+			new Teleport("Dark warrior's fortress (level 15)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
+			new Teleport("Wests (level 10)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
+			new Teleport("Chaos altar (level 12)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
+			new Teleport("Easts (level 19)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
+			new Teleport("Red Dragon Isle (level 43)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
+			new Teleport("West Lava Maze/KBD (level 40)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
+			new Teleport("Agility course (level 49)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
+			new Teleport("Mage bank (level 56)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController()))
+	};
+
+	public static ObjectClickHandler pvpPortal = new ObjectClickHandler(new Object[] { 46935 }, new WorldTile(3093, 3506, 0)) {
 		@Override
 		public void handle(ObjectClickEvent e) {
-			e.getPlayer().sendMessage("This portal doesn't do anything yet. Maybe wilderness areas later?");
+			e.getPlayer().startConversation(new Dialogue().addSimple("<col=FF0000>THIS PORTAL LEADS TO WILDERNESS LOCATIONS. USE AT YOUR OWN RISK.").addOptions("Where would you like to go?", new Options() {
+				@Override
+				public void create() {
+					for (Teleport t : PVP_TELEPORTS)
+						option(t.getName(), new Dialogue().addNext(() -> t.teleport(e.getPlayer())));
+					option("Nowhere.");
+				}
+			}));
 		}
 	};
 
 	public static ObjectClickHandler bossPortal = new ObjectClickHandler(new Object[] { 46933 }, new WorldTile(3083, 3492, 0)) {
 		@Override
 		public void handle(ObjectClickEvent e) {
-			e.getPlayer().sendMessage("This portal doesn't do anything yet. Have to add boss teleports.");
+			if (e.getPlayer().getBossTask() == null || e.getPlayer().getBossTask().getTask() == null) {
+				e.getPlayer().sendMessage("You don't have a boss task to teleport to currently.");
+				return;
+			}
+			Teleport[] teleports = BossTeleport.forBoss(e.getPlayer().getBossTask().getTask()).getTeleports();
+			if (teleports == null || teleports.length <= 0) {
+				e.getPlayer().sendMessage("Your task doesn't have any teleports configured for it. Suggest it in discord.");
+				return;
+			}
+			e.getPlayer().startConversation(new Dialogue().addOptions("Where would you like to go?", new Options() {
+				@Override
+				public void create() {
+					for (Teleport t : teleports)
+						option(t.getName(), new Dialogue().addNext(() -> t.teleport(e.getPlayer())));
+					option("Nowhere.");
+				}
+			}));
 		}
 	};
 
