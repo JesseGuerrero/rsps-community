@@ -292,7 +292,7 @@ public enum SlayerTeleport {
 	private TaskMonster monster;
 	private Teleport[] teleports;
 	
-	private SlayerTeleport(TaskMonster monster, Teleport... teleports) {
+	SlayerTeleport(TaskMonster monster, Teleport... teleports) {
 		this.monster = monster;
 		this.teleports = teleports;
 	}
