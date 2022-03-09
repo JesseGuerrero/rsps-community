@@ -1,5 +1,779 @@
 [
   {
+    "comment": "Ogre added by jazneta",
+    "npcId": 115,
+    "tile": {
+      "x": 2586,
+      "y": 9612,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Ogre added by jazneta",
+    "npcId": 115,
+    "tile": {
+      "x": 2584,
+      "y": 9607,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Ogre added by jazneta",
+    "npcId": 115,
+    "tile": {
+      "x": 2588,
+      "y": 9605,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Goblin added by jazneta",
+    "npcId": 4276,
+    "tile": {
+      "x": 2605,
+      "y": 9622,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Goblin added by jazneta",
+    "npcId": 4407,
+    "tile": {
+      "x": 2607,
+      "y": 9621,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Goblin added by jazneta",
+    "npcId": 4408,
+    "tile": {
+      "x": 2610,
+      "y": 9620,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Goblin added by jazneta",
+    "npcId": 4408,
+    "tile": {
+      "x": 2601,
+      "y": 9627,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Goblin added by jazneta",
+    "npcId": 4407,
+    "tile": {
+      "x": 2599,
+      "y": 9626,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Giant spider added by jazneta",
+    "npcId": 59,
+    "tile": {
+      "x": 2608,
+      "y": 9635,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Giant spider added by jazneta",
+    "npcId": 59,
+    "tile": {
+      "x": 2606,
+      "y": 9635,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Giant spider added by jazneta",
+    "npcId": 59,
+    "tile": {
+      "x": 2603,
+      "y": 9634,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Giant spider added by jazneta",
+    "npcId": 59,
+    "tile": {
+      "x": 2605,
+      "y": 9636,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Giant spider added by jazneta",
+    "npcId": 59,
+    "tile": {
+      "x": 2607,
+      "y": 9636,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Giant spider added by jazneta",
+    "npcId": 59,
+    "tile": {
+      "x": 2603,
+      "y": 9637,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Giant spider added by jazneta",
+    "npcId": 59,
+    "tile": {
+      "x": 2605,
+      "y": 9638,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Giant spider added by jazneta",
+    "npcId": 59,
+    "tile": {
+      "x": 2609,
+      "y": 9638,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Giant spider added by jazneta",
+    "npcId": 59,
+    "tile": {
+      "x": 2602,
+      "y": 9639,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Giant spider added by jazneta",
+    "npcId": 59,
+    "tile": {
+      "x": 2607,
+      "y": 9640,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Giant spider added by jazneta",
+    "npcId": 59,
+    "tile": {
+      "x": 2608,
+      "y": 9641,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Giant spider added by jazneta",
+    "npcId": 59,
+    "tile": {
+      "x": 2609,
+      "y": 9642,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Giant spider added by jazneta",
+    "npcId": 59,
+    "tile": {
+      "x": 2607,
+      "y": 9643,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Giant spider added by jazneta",
+    "npcId": 59,
+    "tile": {
+      "x": 2606,
+      "y": 9645,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Giant spider added by jazneta",
+    "npcId": 59,
+    "tile": {
+      "x": 2607,
+      "y": 9647,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Dungeon rat added by jazneta",
+    "npcId": 224,
+    "tile": {
+      "x": 2590,
+      "y": 9654,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Dungeon rat added by jazneta",
+    "npcId": 224,
+    "tile": {
+      "x": 2591,
+      "y": 9656,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Dungeon rat added by jazneta",
+    "npcId": 224,
+    "tile": {
+      "x": 2591,
+      "y": 9658,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Dungeon rat added by jazneta",
+    "npcId": 224,
+    "tile": {
+      "x": 2589,
+      "y": 9657,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Dungeon rat added by jazneta",
+    "npcId": 224,
+    "tile": {
+      "x": 2587,
+      "y": 9655,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Dungeon rat added by jazneta",
+    "npcId": 224,
+    "tile": {
+      "x": 2586,
+      "y": 9658,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Dungeon rat added by jazneta",
+    "npcId": 224,
+    "tile": {
+      "x": 2584,
+      "y": 9655,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Dungeon rat added by jazneta",
+    "npcId": 224,
+    "tile": {
+      "x": 2583,
+      "y": 9657,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Dungeon rat added by jazneta",
+    "npcId": 224,
+    "tile": {
+      "x": 2582,
+      "y": 9655,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Dungeon rat added by jazneta",
+    "npcId": 224,
+    "tile": {
+      "x": 2581,
+      "y": 9658,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Dungeon rat added by jazneta",
+    "npcId": 224,
+    "tile": {
+      "x": 2580,
+      "y": 9658,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Dungeon rat added by jazneta",
+    "npcId": 224,
+    "tile": {
+      "x": 2580,
+      "y": 9656,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Dungeon rat added by jazneta",
+    "npcId": 224,
+    "tile": {
+      "x": 2579,
+      "y": 9655,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Goblin added by jazneta",
+    "npcId": 4276,
+    "tile": {
+      "x": 2571,
+      "y": 9653,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Goblin added by jazneta",
+    "npcId": 4408,
+    "tile": {
+      "x": 2567,
+      "y": 9653,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Goblin added by jazneta",
+    "npcId": 4407,
+    "tile": {
+      "x": 2565,
+      "y": 9654,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Goblin added by jazneta",
+    "npcId": 4276,
+    "tile": {
+      "x": 2564,
+      "y": 9653,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Goblin added by jazneta",
+    "npcId": 4408,
+    "tile": {
+      "x": 2562,
+      "y": 9656,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Goblin added by jazneta",
+    "npcId": 4407,
+    "tile": {
+      "x": 2562,
+      "y": 9659,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Goblin added by jazneta",
+    "npcId": 4276,
+    "tile": {
+      "x": 2563,
+      "y": 9662,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Goblin added by jazneta",
+    "npcId": 4408,
+    "tile": {
+      "x": 2565,
+      "y": 9626,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Hobgoblin added by jazneta",
+    "npcId": 2688,
+    "tile": {
+      "x": 2574,
+      "y": 9626,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Hobgoblin added by jazneta",
+    "npcId": 2687,
+    "tile": {
+      "x": 2565,
+      "y": 9630,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Goblin added by jazneta",
+    "npcId": 4408,
+    "tile": {
+      "x": 2568,
+      "y": 9632,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Dungeon rat added by jazneta",
+    "npcId": 88,
+    "tile": {
+      "x": 2573,
+      "y": 9631,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Ice spider added by jazneta",
+    "npcId": 64,
+    "tile": {
+      "x": 2746,
+      "y": 9831,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Ice spider added by jazneta",
+    "npcId": 64,
+    "tile": {
+      "x": 2743,
+      "y": 9841,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Ice spider added by jazneta",
+    "npcId": 64,
+    "tile": {
+      "x": 2735,
+      "y": 9843,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Ice spider added by jazneta",
+    "npcId": 64,
+    "tile": {
+      "x": 2725,
+      "y": 9845,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Ice spider added by jazneta",
+    "npcId": 64,
+    "tile": {
+      "x": 2715,
+      "y": 9844,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Ice spider added by jazneta",
+    "npcId": 64,
+    "tile": {
+      "x": 2708,
+      "y": 9841,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Ice spider added by jazneta",
+    "npcId": 64,
+    "tile": {
+      "x": 2699,
+      "y": 9839,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Ice spider added by jazneta",
+    "npcId": 64,
+    "tile": {
+      "x": 2695,
+      "y": 9830,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Ice spider added by jazneta",
+    "npcId": 64,
+    "tile": {
+      "x": 2695,
+      "y": 9824,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Ice spider added by jazneta",
+    "npcId": 64,
+    "tile": {
+      "x": 2691,
+      "y": 9815,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Giant bat added by jazneta",
+    "npcId": 78,
+    "tile": {
+      "x": 2658,
+      "y": 9812,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Giant bat added by jazneta",
+    "npcId": 78,
+    "tile": {
+      "x": 2662,
+      "y": 9806,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Giant bat added by jazneta",
+    "npcId": 78,
+    "tile": {
+      "x": 2668,
+      "y": 9809,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Giant spider added by jazneta",
+    "npcId": 60,
+    "tile": {
+      "x": 2644,
+      "y": 9765,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Giant spider added by jazneta",
+    "npcId": 60,
+    "tile": {
+      "x": 2653,
+      "y": 9763,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Skeleton added by jazneta",
+    "npcId": 93,
+    "tile": {
+      "x": 2665,
+      "y": 9819,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Skeleton added by jazneta",
+    "npcId": 92,
+    "tile": {
+      "x": 2657,
+      "y": 9824,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Skeleton added by jazneta",
+    "npcId": 92,
+    "tile": {
+      "x": 2661,
+      "y": 9829,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Skeleton added by jazneta",
+    "npcId": 92,
+    "tile": {
+      "x": 2657,
+      "y": 9833,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Skeleton added by jazneta",
+    "npcId": 93,
+    "tile": {
+      "x": 2668,
+      "y": 9828,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Scorpion added by jazneta",
+    "npcId": 107,
+    "tile": {
+      "x": 2645,
+      "y": 9823,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Scorpion added by jazneta",
+    "npcId": 107,
+    "tile": {
+      "x": 2642,
+      "y": 9818,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Scorpion added by jazneta",
+    "npcId": 107,
+    "tile": {
+      "x": 2642,
+      "y": 9812,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Winelda added by jazneta",
+    "npcId": 276,
+    "tile": {
+      "x": 2656,
+      "y": 9875,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Skeleton added by jazneta",
+    "npcId": 92,
+    "tile": {
+      "x": 2661,
+      "y": 9881,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Skeleton added by jazneta",
+    "npcId": 93,
+    "tile": {
+      "x": 2658,
+      "y": 9886,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Skeleton added by jazneta",
+    "npcId": 92,
+    "tile": {
+      "x": 2655,
+      "y": 9892,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Skeleton added by jazneta",
+    "npcId": 92,
+    "tile": {
+      "x": 2651,
+      "y": 9890,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Skeleton added by jazneta",
+    "npcId": 92,
+    "tile": {
+      "x": 2641,
+      "y": 9889,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Skeleton added by jazneta",
+    "npcId": 92,
+    "tile": {
+      "x": 2633,
+      "y": 9888,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Lesser demon added by jazneta",
+    "npcId": 82,
+    "tile": {
+      "x": 2631,
+      "y": 9884,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Lesser demon added by jazneta",
+    "npcId": 82,
+    "tile": {
+      "x": 2635,
+      "y": 9882,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Lesser demon added by jazneta",
+    "npcId": 82,
+    "tile": {
+      "x": 2632,
+      "y": 9877,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Guardian of Armadyl added by jazneta",
+    "npcId": 275,
+    "tile": {
+      "x": 2638,
+      "y": 9899,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Guardian of Armadyl added by jazneta",
+    "npcId": 274,
+    "tile": {
+      "x": 2648,
+      "y": 9904,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Guardian of Armadyl added by jazneta",
+    "npcId": 275,
+    "tile": {
+      "x": 2645,
+      "y": 9908,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Guardian of Armadyl added by jazneta",
+    "npcId": 274,
+    "tile": {
+      "x": 2649,
+      "y": 9913,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Guardian of Armadyl added by jazneta",
+    "npcId": 275,
+    "tile": {
+      "x": 2637,
+      "y": 9910,
+      "plane": 0
+    }
+  },
+  {
     "comment": "Mobilizing Armies: Banker added by jazneta",
     "npcId": 8948,
     "tile": {
