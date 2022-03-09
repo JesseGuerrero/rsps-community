@@ -58,17 +58,17 @@ public class Home {
 	};
 
 	private static Teleport[] PVP_TELEPORTS = {
-			new Teleport("Wests (level 10)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
-			new Teleport("Chaos altar (level 12)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
+			new Teleport("Mage bank (SAFE)", new WorldTile(2539, 4715, 0)),
+			new Teleport("Wests (level 10)", new WorldTile(2976, 3597, 0), p -> p.getControllerManager().startController(new WildernessController())),
+			new Teleport("Chaos altar (level 12)", new WorldTile(3229, 3609, 0), p -> p.getControllerManager().startController(new WildernessController())),
 			new Teleport("Revenant caves (level 18)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
-			new Teleport("Dark warrior's fortress (level 15)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
 
-			new Teleport("Easts (level 19)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
-			new Teleport("West Lava Maze/KBD (level 40)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
-			new Teleport("Red Dragon Isle (level 43)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
-			new Teleport("Agility course (level 49)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
+			new Teleport("Dark warrior's fortress (level 15)", new WorldTile(3007, 3632, 0), p -> p.getControllerManager().startController(new WildernessController())),
+			new Teleport("Easts (level 19)", new WorldTile(3350, 3667, 0), p -> p.getControllerManager().startController(new WildernessController())),
+			new Teleport("West Lava Maze/KBD (level 40)", new WorldTile(3028, 3839, 0), p -> p.getControllerManager().startController(new WildernessController())),
+			new Teleport("Red Dragon Isle (level 43)", new WorldTile(3202, 3860, 0), p -> p.getControllerManager().startController(new WildernessController())),
 
-			new Teleport("Mage bank (level 56)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
+			new Teleport("Agility course (level 49)", new WorldTile(2997, 3909, 0), p -> p.getControllerManager().startController(new WildernessController())),
 			null,
 			null,
 			null
