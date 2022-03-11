@@ -36,7 +36,14 @@ public class Home {
 		spawnNPC(8466, new WorldTile(3096, 3487, 0), Direction.SOUTH, false);
 		spawnNPC(9085, new WorldTile(3097, 3487, 0), Direction.SOUTH, false);
 		spawnNPC(15661, new WorldTile(3082, 3490, 0), Direction.EAST, false);
-		
+
+		/* GE Clarks */
+		spawnNPC(2240, new WorldTile(3096, 3492, 0), Direction.WEST, false);
+		spawnNPC(2241, new WorldTile(3096, 3490, 0), Direction.WEST, false);
+		spawnNPC(2593, new WorldTile(3096, 3494, 0), Direction.NORTHWEST, false);
+		spawnNPC(2240, new WorldTile(3098, 3494, 0), Direction.NORTH, false);
+		spawnNPC(2241, new WorldTile(3096, 3488, 0), Direction.WEST, false);
+
 		/* Loyalty point shop */
 		spawnNPC(13727, new WorldTile(3091, 3505, 0), Direction.SOUTH, false);
 		
@@ -61,9 +68,9 @@ public class Home {
 			new Teleport("Mage bank (SAFE)", new WorldTile(2539, 4715, 0)),
 			new Teleport("Wests (level 10)", new WorldTile(2976, 3597, 0), p -> p.getControllerManager().startController(new WildernessController())),
 			new Teleport("Chaos altar (level 12)", new WorldTile(3229, 3609, 0), p -> p.getControllerManager().startController(new WildernessController())),
-			new Teleport("Revenant caves (level 18)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
-
 			new Teleport("Dark warrior's fortress (level 15)", new WorldTile(3007, 3632, 0), p -> p.getControllerManager().startController(new WildernessController())),
+
+			new Teleport("Revenant caves (level 18)", new WorldTile(3082, 10058, 0), p -> p.getControllerManager().startController(new WildernessController())),
 			new Teleport("Easts (level 19)", new WorldTile(3350, 3667, 0), p -> p.getControllerManager().startController(new WildernessController())),
 			new Teleport("West Lava Maze/KBD (level 40)", new WorldTile(3028, 3839, 0), p -> p.getControllerManager().startController(new WildernessController())),
 			new Teleport("Red Dragon Isle (level 43)", new WorldTile(3202, 3860, 0), p -> p.getControllerManager().startController(new WildernessController())),
@@ -77,16 +84,18 @@ public class Home {
 	public static ObjectClickHandler pvpPortal = new ObjectClickHandler(new Object[] { 46935 }, new WorldTile(3093, 3506, 0)) {
 		@Override
 		public void handle(ObjectClickEvent e) {
-			e.getPlayer().startConversation(new Dialogue().addSimple("<col=FF0000>THIS PORTAL LEADS TO WILDERNESS LOCATIONS. USE AT YOUR OWN RISK.").addOptions("Where would you like to go?", new Options() {
-				@Override
-				public void create() {
-					for (Teleport t : PVP_TELEPORTS)
-						if (t != null)
-							option(t.getName(), new Dialogue().addNext(() -> t.teleport(e.getPlayer())));
-						else
-							option("Nowhere.");
-				}
-			}));
+			e.getPlayer().startConversation(new Dialogue()
+					.addSimple("<col=FF0000><shad=000000>THIS PORTAL LEADS TO WILDERNESS LOCATIONS. USE AT YOUR OWN RISK. THE LEVEL OF WILDERNESS YOU WILL BE TELEPORTED TO ARE DISPLAYED ON EACH TELEPORT.")
+					.addOptions("Where would you like to go?", new Options() {
+						@Override
+						public void create() {
+							for (Teleport t : PVP_TELEPORTS)
+								if (t != null)
+									option(t.getName(), new Dialogue().addNext(() -> t.teleport(e.getPlayer())));
+								else
+									option("Nowhere.");
+						}
+					}));
 		}
 	};
 
