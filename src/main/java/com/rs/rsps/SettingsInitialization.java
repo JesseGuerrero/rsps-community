@@ -1,6 +1,6 @@
 package com.rs.rsps;
 
-import com.rs.game.player.content.skills.farming.FarmPatch;
+import com.rs.game.content.skills.farming.FarmPatch;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.annotations.ServerStartupEvent;
 

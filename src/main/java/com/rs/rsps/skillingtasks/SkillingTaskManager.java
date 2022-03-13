@@ -1,21 +1,21 @@
 package com.rs.rsps.skillingtasks;
 
 import com.rs.cache.loaders.NPCDefinitions;
-import com.rs.game.player.Player;
-import com.rs.game.player.Skills;
-import com.rs.game.player.actions.Action;
-import com.rs.game.player.content.dialogue.Dialogue;
-import com.rs.game.player.content.dialogue.HeadE;
-import com.rs.game.player.content.dialogue.Options;
-import com.rs.game.player.content.skills.Fletching;
-import com.rs.game.player.content.skills.cooking.Cooking;
-import com.rs.game.player.content.skills.crafting.GemCutting;
-import com.rs.game.player.content.skills.farming.HarvestPatch;
-import com.rs.game.player.content.skills.fishing.Fishing;
-import com.rs.game.player.content.skills.herblore.Herblore;
-import com.rs.game.player.content.skills.mining.Mining;
-import com.rs.game.player.content.skills.smithing.Smithing;
-import com.rs.game.player.content.skills.woodcutting.Woodcutting;
+import com.rs.game.content.dialogue.Dialogue;
+import com.rs.game.content.dialogue.HeadE;
+import com.rs.game.content.dialogue.Options;
+import com.rs.game.content.skills.Fletching;
+import com.rs.game.content.skills.cooking.Cooking;
+import com.rs.game.content.skills.crafting.GemCutting;
+import com.rs.game.content.skills.farming.HarvestPatch;
+import com.rs.game.content.skills.fishing.Fishing;
+import com.rs.game.content.skills.herblore.Herblore;
+import com.rs.game.content.skills.mining.Mining;
+import com.rs.game.content.skills.smithing.Smithing;
+import com.rs.game.content.skills.woodcutting.Woodcutting;
+import com.rs.game.model.entity.player.Player;
+import com.rs.game.model.entity.player.Skills;
+import com.rs.game.model.entity.player.actions.PlayerAction;
 import com.rs.lib.game.Item;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
@@ -163,11 +163,11 @@ public class SkillingTaskManager {
 		private int minLevel;
 		private Difficulty difficulty;
 		private int[] minMaxQuantity;
-		private Class<? extends Action> action;
+		private Class<? extends PlayerAction> action;
 		private int skill;
 		private String actionString;
 		
-		private SkillingTask(int itemId, int minLevel, Difficulty difficulty, int min, int max, Class<? extends Action> action, int skill, String actionString) {
+		private SkillingTask(int itemId, int minLevel, Difficulty difficulty, int min, int max, Class<? extends PlayerAction> action, int skill, String actionString) {
 			this.itemId = itemId;
 			this.minLevel = minLevel;
 			this.difficulty = difficulty;
@@ -197,7 +197,7 @@ public class SkillingTaskManager {
 			return minMaxQuantity[1];
 		}
 		
-		public Class<? extends Action> getAction() {
+		public Class<? extends PlayerAction> getAction() {
 			return action;
 		}
 		

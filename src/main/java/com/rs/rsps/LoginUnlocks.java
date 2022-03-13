@@ -1,6 +1,6 @@
 package com.rs.rsps;
 
-import com.rs.game.player.actions.LodestoneAction.Lodestone;
+import com.rs.game.model.entity.actions.LodestoneAction.Lodestone;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.LoginEvent;
 import com.rs.plugin.handlers.LoginHandler;
