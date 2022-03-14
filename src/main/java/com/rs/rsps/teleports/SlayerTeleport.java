@@ -1,9 +1,9 @@
 package com.rs.rsps.teleports;
 
-import com.rs.game.player.content.skills.slayer.TaskMonster;
-import com.rs.game.player.controllers.GodwarsController;
-import com.rs.game.player.controllers.KuradalDungeonController;
-import com.rs.game.player.controllers.UndergroundDungeonController;
+import com.rs.game.content.skills.slayer.TaskMonster;
+import com.rs.game.model.entity.player.controllers.GodwarsController;
+import com.rs.game.model.entity.player.controllers.KuradalDungeonController;
+import com.rs.game.model.entity.player.controllers.UndergroundDungeonController;
 import com.rs.lib.game.WorldTile;
 
 import java.util.HashMap;

@@ -1,8 +1,8 @@
 package com.rs.rsps.teleports;
 
-import com.rs.game.player.content.skills.slayer.BossTask;
-import com.rs.game.player.controllers.GodwarsController;
-import com.rs.game.player.controllers.WildernessController;
+import com.rs.game.content.skills.slayer.BossTask;
+import com.rs.game.model.entity.player.controllers.GodwarsController;
+import com.rs.game.model.entity.player.controllers.WildernessController;
 import com.rs.lib.game.WorldTile;
 
 import java.util.HashMap;
