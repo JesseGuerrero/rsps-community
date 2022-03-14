@@ -1,7 +1,7 @@
 package com.rs.rsps.teleports;
 
-import com.rs.game.player.Player;
-import com.rs.game.player.content.skills.magic.Magic;
+import com.rs.game.content.skills.magic.Magic;
+import com.rs.game.model.entity.player.Player;
 import com.rs.game.tasks.WorldTasks;
 import com.rs.lib.game.WorldTile;
 

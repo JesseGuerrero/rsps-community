@@ -2,12 +2,12 @@ package com.rs.rsps;
 
 import com.rs.cache.loaders.ObjectType;
 import com.rs.game.World;
-import com.rs.game.npc.NPC;
-import com.rs.game.object.GameObject;
-import com.rs.game.pathing.Direction;
-import com.rs.game.player.content.dialogue.Dialogue;
-import com.rs.game.player.content.dialogue.Options;
-import com.rs.game.player.controllers.WildernessController;
+import com.rs.game.content.dialogue.Dialogue;
+import com.rs.game.content.dialogue.Options;
+import com.rs.game.model.entity.npc.NPC;
+import com.rs.game.model.entity.pathing.Direction;
+import com.rs.game.model.entity.player.controllers.WildernessController;
+import com.rs.game.model.object.GameObject;
 import com.rs.lib.game.WorldObject;
 import com.rs.lib.game.WorldTile;
 import com.rs.plugin.annotations.PluginEventHandler;
