@@ -88,6 +88,8 @@ public class Home {
 			e.getPlayer().getPrayer().restorePrayer(e.getPlayer().getSkills().getLevelForXp(Constants.PRAYER) * 10);
 			e.getPlayer().getPoison().reset();
 			e.getPlayer().setHitpoints(e.getPlayer().getMaxHitpoints());
+			e.getPlayer().refreshHitPoints();
+			e.getPlayer().getSkills().set(Constants.SUMMONING, e.getPlayer().getSkills().getLevelForXp(Constants.SUMMONING));
 			e.getPlayer().sendOptionDialogue("Would you like to switch up your prayers or magic?", o1 -> {
 				o1.add("Select new magic book", new Dialogue().addOptions(o2 -> {
 					o2.add("Modern", () -> e.getPlayer().getCombatDefinitions().setSpellBook(0));
