@@ -1,6 +1,6 @@
 [
   {
-    "comment": "TODO portal",
+    "comment": "Wilderness portal",
     "objectId": 46935,
     "type": 10,
     "rotation": 0,
@@ -40,6 +40,17 @@
     "tile": {
       "x": 3095,
       "y": 3499,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Magic well",
+    "objectId": 28715,
+    "type": 10,
+    "rotation": 0,
+    "tile": {
+      "x": 3080,
+      "y": 3487,
       "plane": 0
     }
   }
