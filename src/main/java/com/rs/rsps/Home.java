@@ -8,6 +8,7 @@ import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.pathing.Direction;
 import com.rs.game.model.entity.player.controllers.WildernessController;
 import com.rs.game.model.object.GameObject;
+import com.rs.lib.Constants;
 import com.rs.lib.game.WorldObject;
 import com.rs.lib.game.WorldTile;
 import com.rs.plugin.annotations.PluginEventHandler;
@@ -46,8 +47,6 @@ public class Home {
 
 		/* Loyalty point shop */
 		spawnNPC(13727, new WorldTile(3091, 3505, 0), Direction.SOUTH, false);
-		
-		spawnObject(2640, new WorldTile(3086, 3483, 0));
 	}
 
 	public static ObjectClickHandler handleShops = new ObjectClickHandler(new Object[] { 18789 }, new WorldTile(3095, 3499, 0)) {
@@ -59,6 +58,7 @@ public class Home {
 					option("Melee shop", () -> ShopsHandler.openShop(e.getPlayer(), "gear_shop_melee"));
 					option("Range shop", () -> ShopsHandler.openShop(e.getPlayer(), "gear_shop_range"));
 					option("Magic shop", () -> ShopsHandler.openShop(e.getPlayer(), "gear_shop_magic"));
+					option("Supply shop", () -> ShopsHandler.openShop(e.getPlayer(), "gear_shop_supplies"));
 				}
 			}));
 		}
@@ -79,6 +79,28 @@ public class Home {
 			null,
 			null,
 			null
+	};
+	
+	public static ObjectClickHandler healingWell = new ObjectClickHandler(new Object[] { 28715 }, new WorldTile(3080, 3487, 0)) {
+		@Override
+		public void handle(ObjectClickEvent e) {
+			e.getPlayer().sendMessage("You feel refreshed.");
+			e.getPlayer().getPrayer().restorePrayer(e.getPlayer().getSkills().getLevelForXp(Constants.PRAYER) * 10);
+			e.getPlayer().getPoison().reset();
+			e.getPlayer().setHitpoints(e.getPlayer().getMaxHitpoints());
+			e.getPlayer().sendOptionDialogue("Would you like to switch up your prayers or magic?", o1 -> {
+				o1.add("Select new magic book", new Dialogue().addOptions(o2 -> {
+					o2.add("Modern", () -> e.getPlayer().getCombatDefinitions().setSpellBook(0));
+					o2.add("Ancient", () -> e.getPlayer().getCombatDefinitions().setSpellBook(1));
+					o2.add("Lunar", () -> e.getPlayer().getCombatDefinitions().setSpellBook(2));
+					o2.add("Dungeoneering", () -> e.getPlayer().getCombatDefinitions().setSpellBook(3));
+				}));
+				o1.add("Select new prayer book", new Dialogue().addOptions(o2 -> {
+					o2.add("Modern", () -> e.getPlayer().getPrayer().setPrayerBook(false));
+					o2.add("Ancient curses", () -> e.getPlayer().getPrayer().setPrayerBook(true));
+				}));
+			});
+		}
 	};
 
 	public static ObjectClickHandler pvpPortal = new ObjectClickHandler(new Object[] { 46935 }, new WorldTile(3093, 3506, 0)) {
