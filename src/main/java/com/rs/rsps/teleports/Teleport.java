@@ -2,7 +2,6 @@ package com.rs.rsps.teleports;
 
 import com.rs.game.content.skills.magic.Magic;
 import com.rs.game.model.entity.player.Player;
-import com.rs.game.tasks.WorldTasks;
 import com.rs.lib.game.WorldTile;
 
 import java.util.function.Consumer;
@@ -32,8 +31,7 @@ public class Teleport {
 	}
 	
 	public void teleport(Player player) {
-		if (Magic.sendNormalTeleportSpell(player, tile) && onTeleport != null)
-			WorldTasks.delay(4, () -> onTeleport.accept(player));
+		Magic.sendNormalTeleportSpell(player, tile, onTeleport);
 	}
 
 }
