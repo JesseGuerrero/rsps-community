@@ -95,7 +95,6 @@ public class Home {
 					o2.add("Modern", () -> e.getPlayer().getCombatDefinitions().setSpellBook(0));
 					o2.add("Ancient", () -> e.getPlayer().getCombatDefinitions().setSpellBook(1));
 					o2.add("Lunar", () -> e.getPlayer().getCombatDefinitions().setSpellBook(2));
-					o2.add("Dungeoneering", () -> e.getPlayer().getCombatDefinitions().setSpellBook(3));
 				}));
 				o1.add("Select new prayer book", new Dialogue().addOptions(o2 -> {
 					o2.add("Modern", () -> e.getPlayer().getPrayer().setPrayerBook(false));
