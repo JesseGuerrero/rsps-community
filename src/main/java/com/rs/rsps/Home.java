@@ -52,13 +52,22 @@ public class Home {
 	public static ObjectClickHandler handleShops = new ObjectClickHandler(new Object[] { 18789 }, new WorldTile(3095, 3499, 0)) {
 		@Override
 		public void handle(ObjectClickEvent e) {
-			e.getPlayer().startConversation(new Dialogue().addOptions("Which shop would you like to see?", new Options() {
+			e.getPlayer().startConversation(new Dialogue().addOptions("Which shops would you like to see?", new Options() {
 				@Override
 				public void create() {
-					option("Melee shop", () -> ShopsHandler.openShop(e.getPlayer(), "gear_shop_melee"));
-					option("Range shop", () -> ShopsHandler.openShop(e.getPlayer(), "gear_shop_range"));
-					option("Magic shop", () -> ShopsHandler.openShop(e.getPlayer(), "gear_shop_magic"));
-					option("Supply shop", () -> ShopsHandler.openShop(e.getPlayer(), "gear_shop_supplies"));
+					option("Melee shops", new Dialogue().addOptions("Which shop would you like to see?", ops -> {
+						ops.add("Melee weapons", () -> ShopsHandler.openShop(e.getPlayer(), "hs_melee_weapons"));
+						ops.add("Melee armor", () -> ShopsHandler.openShop(e.getPlayer(), "hs_melee_armor"));
+					}));
+					option("Ranged shops", new Dialogue().addOptions("Which shop would you like to see?", ops -> {
+						ops.add("Ranged weapons", () -> ShopsHandler.openShop(e.getPlayer(), "hs_range_weapons"));
+						ops.add("Ranged armor", () -> ShopsHandler.openShop(e.getPlayer(), "hs_range_armor"));
+					}));
+					option("Magic shops", new Dialogue().addOptions("Which shop would you like to see?", ops -> {
+						ops.add("Magic weapons", () -> ShopsHandler.openShop(e.getPlayer(), "hs_mage_weapons"));
+						ops.add("Magic armor", () -> ShopsHandler.openShop(e.getPlayer(), "hs_mage_armor"));
+					}));
+					option("Supply shop", () -> ShopsHandler.openShop(e.getPlayer(), "hs_supplies"));
 				}
 			}));
 		}
@@ -95,7 +104,6 @@ public class Home {
 					o2.add("Modern", () -> e.getPlayer().getCombatDefinitions().setSpellBook(0));
 					o2.add("Ancient", () -> e.getPlayer().getCombatDefinitions().setSpellBook(1));
 					o2.add("Lunar", () -> e.getPlayer().getCombatDefinitions().setSpellBook(2));
-					o2.add("Dungeoneering", () -> e.getPlayer().getCombatDefinitions().setSpellBook(3));
 				}));
 				o1.add("Select new prayer book", new Dialogue().addOptions(o2 -> {
 					o2.add("Modern", () -> e.getPlayer().getPrayer().setPrayerBook(false));
