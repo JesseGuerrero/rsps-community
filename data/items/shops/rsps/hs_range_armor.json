@@ -1,0 +1,303 @@
+{
+  "name": "Ranged Armor",
+  "generalStore": false,
+  "buyOnly": true,
+  "currency": 995,
+  "items": [
+	{
+	  "item": {
+	    "id": 1169,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 6326,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 12936,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 12943,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},{
+	  "item": {
+	    "id": 12950,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 12957,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 3749,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 1540,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},{
+	  "item": {
+	    "id": 4224,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 1129,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 6322,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 1135,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},{
+	  "item": {
+	    "id": 2499,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 2501,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 2503,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 10498,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},{
+	  "item": {
+	    "id": 10499,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 20068,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 1095,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 6324,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 1099,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},{
+	  "item": {
+	    "id": 2493,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 2495,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 2497,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 4375,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},{
+	  "item": {
+	    "id": 4377,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 4379,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 1063,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 6330,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},{
+	  "item": {
+	    "id": 1065,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 2487,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 2489,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},{
+	  "item": {
+	    "id": 2491,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 4381,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 4383,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 4385,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},{
+	  "item": {
+	    "id": 1061,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	},
+	{
+	  "item": {
+	    "id": 6328,
+	    "amount": 1000
+	  },
+	  "customPrice": -1,
+	  "restockTicks": 0
+	}
+  ] 
+}
