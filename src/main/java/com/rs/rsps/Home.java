@@ -2,11 +2,11 @@ package com.rs.rsps;
 
 import com.rs.cache.loaders.ObjectType;
 import com.rs.game.World;
+import com.rs.game.content.controllers.WildernessController;
 import com.rs.game.content.dialogue.Dialogue;
 import com.rs.game.content.dialogue.Options;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.pathing.Direction;
-import com.rs.game.model.entity.player.controllers.WildernessController;
 import com.rs.game.model.object.GameObject;
 import com.rs.lib.Constants;
 import com.rs.lib.game.WorldObject;
