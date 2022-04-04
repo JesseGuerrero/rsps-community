@@ -1,9 +1,9 @@
 package com.rs.rsps.teleports;
 
+import com.rs.game.content.controllers.GodwarsController;
+import com.rs.game.content.controllers.KuradalDungeonController;
+import com.rs.game.content.controllers.UndergroundDungeonController;
 import com.rs.game.content.skills.slayer.TaskMonster;
-import com.rs.game.model.entity.player.controllers.GodwarsController;
-import com.rs.game.model.entity.player.controllers.KuradalDungeonController;
-import com.rs.game.model.entity.player.controllers.UndergroundDungeonController;
 import com.rs.lib.game.WorldTile;
 
 import java.util.HashMap;
@@ -87,7 +87,10 @@ public enum SlayerTeleport {
 			new Teleport("Ancient Cavern (Brutal)", new WorldTile(1766, 5334, 0))),
 	BLUE_DRAGONS(TaskMonster.BLUE_DRAGONS,
 			new Teleport("Taverley Dungeon", new WorldTile(2905, 9801, 0)),
-			new Teleport("Kuradal's Dungeon", new WorldTile(1608, 5278, 0), p -> p.getControllerManager().startController(new KuradalDungeonController()))),
+			new Teleport("Kuradal's Dungeon", new WorldTile(1608, 5278, 0), p -> {
+				p.getControllerManager().startController(new KuradalDungeonController());
+				p.setNextWorldTile(new WorldTile(1608, 5278, 0));
+			})),
 	RED_DRAGONS(TaskMonster.RED_DRAGONS,
 			new Teleport("Brimhaven Dungeon", new WorldTile(2714, 9502, 0))),
 	BLACK_DRAGONS(TaskMonster.BLACK_DRAGONS,
@@ -98,13 +101,19 @@ public enum SlayerTeleport {
 			new Teleport("Taverley Dungeon", new WorldTile(2935, 9793, 0))),
 	GREATER_DEMONS(TaskMonster.GREATER_DEMONS,
 			new Teleport("Brimhaven Dungeon", new WorldTile(2636, 9502, 2)),
-			new Teleport("Kuradal's Dungeon", new WorldTile(1617, 5259, 0), p -> p.getControllerManager().startController(new KuradalDungeonController()))),
+			new Teleport("Kuradal's Dungeon", new WorldTile(1617, 5259, 0), p -> {
+				p.getControllerManager().startController(new KuradalDungeonController());
+				p.setNextWorldTile(new WorldTile(1617, 5259, 0));
+			})),
 	BLACK_DEMONS(TaskMonster.BLACK_DEMONS,
 			new Teleport("Taverley Dungeon", new WorldTile(2862, 9777, 0)),
 			new Teleport("Brimhaven Dungeon", new WorldTile(2709, 9484, 0))),
 	HELLHOUNDS(TaskMonster.HELLHOUNDS,
 			new Teleport("Taverley Dungeon", new WorldTile(2859, 9839, 0)),
-			new Teleport("Kuradal's Dungeon", new WorldTile(1645, 5256, 0), p -> p.getControllerManager().startController(new KuradalDungeonController()))),
+			new Teleport("Kuradal's Dungeon", new WorldTile(1645, 5256, 0), p -> {
+				p.getControllerManager().startController(new KuradalDungeonController());
+				p.setNextWorldTile(new WorldTile(1645, 5256, 0));
+			})),
 	SHADOW_WARRIORS(TaskMonster.SHADOW_WARRIORS,
 			new Teleport("Legend's Guild Basement", new WorldTile(2700, 9774, 0))),
 	WEREWOLVES(TaskMonster.WEREWOLVES,
@@ -132,7 +141,10 @@ public enum SlayerTeleport {
 			new Teleport("Pollnivneach Slayer Dungeon", new WorldTile(3297, 4350, 0), p -> p.getControllerManager().startController(new UndergroundDungeonController(true, true)))),
 	ABYSSAL_DEMONS(TaskMonster.ABYSSAL_DEMONS,
 			new Teleport("Slayer Tower", new WorldTile(3418, 3566, 2)),
-			new Teleport("Kuradal's Dungeon", new WorldTile(1634, 5302, 0), p -> p.getControllerManager().startController(new KuradalDungeonController()))),
+			new Teleport("Kuradal's Dungeon", new WorldTile(1634, 5302, 0), p -> {
+				p.getControllerManager().startController(new KuradalDungeonController());
+				p.setNextWorldTile(new WorldTile(1634, 5302, 0));
+			})),
 	BASILISKS(TaskMonster.BASILISKS,
 			new Teleport("Rellekka Slayer Dungeon", new WorldTile(2742, 10011, 0))),
 	COCKATRICE(TaskMonster.COCKATRICE,
@@ -141,7 +153,10 @@ public enum SlayerTeleport {
 			new Teleport("Rellekka Slayer Dungeon", new WorldTile(2700, 9998, 0))),
 	GARGOYLES(TaskMonster.GARGOYLES,
 			new Teleport("Slayer Tower", new WorldTile(3441, 3548, 2)),
-			new Teleport("Kuradal's Dungeon", new WorldTile(1613, 5300, 0), p -> p.getControllerManager().startController(new KuradalDungeonController()))),
+			new Teleport("Kuradal's Dungeon", new WorldTile(1613, 5300, 0), p -> {
+				p.getControllerManager().startController(new KuradalDungeonController());
+				p.setNextWorldTile(new WorldTile(1613, 5300, 0));
+			})),
 	PYREFIENDS(TaskMonster.PYREFIENDS,
 			new Teleport("Rellekka Slayer Dungeon", new WorldTile(2760, 10003, 0))),
 	BLOODVELD(TaskMonster.BLOODVELD,
@@ -176,10 +191,16 @@ public enum SlayerTeleport {
 			new Teleport("Chaos Tunnels", new WorldTile(3149, 5514, 0))),
 	IRON_DRAGONS(TaskMonster.IRON_DRAGONS,
 			new Teleport("Brimhaven Dungeon", new WorldTile(2703, 9442, 0)),
-			new Teleport("Kuradal's Dungeon", new WorldTile(1652, 5271, 0), p -> p.getControllerManager().startController(new KuradalDungeonController()))),
+			new Teleport("Kuradal's Dungeon", new WorldTile(1652, 5271, 0), p -> {
+				p.getControllerManager().startController(new KuradalDungeonController());
+				p.setNextWorldTile(new WorldTile(1652, 5271, 0));
+			})),
 	STEEL_DRAGONS(TaskMonster.STEEL_DRAGONS,
 			new Teleport("Brimhaven Dungeon", new WorldTile(2703, 9442, 0)),
-			new Teleport("Kuradal's Dungeon", new WorldTile(1631, 5282, 0), p -> p.getControllerManager().startController(new KuradalDungeonController()))),
+			new Teleport("Kuradal's Dungeon", new WorldTile(1631, 5282, 0), p -> {
+				p.getControllerManager().startController(new KuradalDungeonController());
+				p.setNextWorldTile(new WorldTile(1631, 5282, 0));
+			})),
 	CAVE_SLIMES(TaskMonster.CAVE_SLIMES,
 			new Teleport("Dorgesh-Kaan Dungeon", new WorldTile(2697, 5231, 0)),
 			new Teleport("Lumbridge Swamp Dungeon", new WorldTile(3164, 9589, 0), p -> p.getControllerManager().startController(new UndergroundDungeonController(false, true)))),
@@ -193,7 +214,10 @@ public enum SlayerTeleport {
 			new Teleport("Desert", new WorldTile(3315, 2905, 0))),
 	DARK_BEASTS(TaskMonster.DARK_BEASTS,
 			new Teleport("Temple of Light", new WorldTile(2029, 4662, 0)),
-			new Teleport("Kuradal's Dungeon", new WorldTile(1653, 5290, 0), p -> p.getControllerManager().startController(new KuradalDungeonController()))),
+			new Teleport("Kuradal's Dungeon", new WorldTile(1653, 5290, 0), p -> {
+				p.getControllerManager().startController(new KuradalDungeonController());
+				p.setNextWorldTile(new WorldTile(1653, 5290, 0));
+			})),
 	DESERT_LIZARDS(TaskMonster.DESERT_LIZARDS,
 			new Teleport("Desert", new WorldTile(3419, 3036, 0))),
 	FEVER_SPIDERS(TaskMonster.FEVER_SPIDERS,
