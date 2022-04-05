@@ -20,7 +20,8 @@ public class LoginUnlocks {
 					if (stone == Lodestone.BANDIT_CAMP || stone == Lodestone.LUNAR_ISLE)
 						continue;
 					e.getPlayer().unlockLodestone(stone, null);
-				}	
+				}
+				e.getPlayer().addToolbelt(1265);
 				for (Tools tool : Tools.values()) {
 					if (tool == null)
 						continue;
