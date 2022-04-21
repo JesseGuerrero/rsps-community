@@ -13,9 +13,9 @@ import com.rs.game.content.skills.herblore.Herblore;
 import com.rs.game.content.skills.mining.Mining;
 import com.rs.game.content.skills.smithing.Smithing;
 import com.rs.game.content.skills.woodcutting.Woodcutting;
+import com.rs.game.model.entity.actions.Action;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.entity.player.Skills;
-import com.rs.game.model.entity.player.actions.PlayerAction;
 import com.rs.lib.game.Item;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
@@ -163,11 +163,11 @@ public class SkillingTaskManager {
 		private int minLevel;
 		private Difficulty difficulty;
 		private int[] minMaxQuantity;
-		private Class<? extends PlayerAction> action;
+		private Class<? extends Action> action;
 		private int skill;
 		private String actionString;
 		
-		private SkillingTask(int itemId, int minLevel, Difficulty difficulty, int min, int max, Class<? extends PlayerAction> action, int skill, String actionString) {
+		private SkillingTask(int itemId, int minLevel, Difficulty difficulty, int min, int max, Class<? extends Action> action, int skill, String actionString) {
 			this.itemId = itemId;
 			this.minLevel = minLevel;
 			this.difficulty = difficulty;
@@ -197,7 +197,7 @@ public class SkillingTaskManager {
 			return minMaxQuantity[1];
 		}
 		
-		public Class<? extends PlayerAction> getAction() {
+		public Class<? extends Action> getAction() {
 			return action;
 		}
 		
