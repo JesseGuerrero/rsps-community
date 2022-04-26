@@ -32,6 +32,7 @@ import java.util.Set;
 import com.rs.cache.loaders.Bonus;
 import com.rs.cache.loaders.ItemDefinitions;
 import com.rs.game.World;
+import com.rs.game.content.Effect;
 import com.rs.game.content.combat.PlayerCombat;
 import com.rs.game.content.controllers.StealingCreationController;
 import com.rs.game.content.minigames.creations.Score;
@@ -43,6 +44,7 @@ import com.rs.game.content.skills.farming.PatchType;
 import com.rs.game.content.skills.farming.ProduceType;
 import com.rs.game.content.skills.magic.Magic;
 import com.rs.game.content.skills.summoning.Summoning.ScrollTarget;
+import com.rs.game.content.skills.summoning.combat.impl.BarkerToad;
 import com.rs.game.content.skills.woodcutting.TreeType;
 import com.rs.game.content.skills.woodcutting.Woodcutting;
 import com.rs.game.model.entity.Entity;
@@ -185,8 +187,6 @@ public enum Scroll {
 	FIREBALL(12839, ScrollTarget.COMBAT, "Hits up to 5 nearby targets with a fiery magic attack.", 1.1, 6) {
 		@Override
 		public int attack(Player owner, Familiar familiar, Entity target) {
-			//1394, 1395, 1393
-			
 			familiar.sync(7871, 1396);
 			delayHit(familiar, World.sendProjectile(familiar, target, 1392, 34, 16, 30, 1.5, 16, 0).getTaskDelay(), target, getMagicHit(familiar, getMaxHit(familiar, 80, AttackStyle.MAGE, target)), () -> target.setNextSpotAnim(new SpotAnim(1390)));
 			for (Entity next : PlayerCombat.getMultiAttackTargets(owner, target, 4, 5, false))
@@ -245,7 +245,7 @@ public enum Scroll {
 				owner.putPatch(spot);
 				spot.updateVars(owner);
 			});
-			return false;
+			return true;
 		}
 	},
 	EXPLODE(12834, ScrollTarget.COMBAT, "Allahu Akbar's the target with an AOE range of damage.", 2.9, 3) {
@@ -286,7 +286,7 @@ public enum Scroll {
 			owner.lowerStat(Constants.RANGE, 0.1, 0.0);
 			owner.lowerStat(Constants.MAGIC, 0.1, 0.0);
 			owner.lowerStat(Constants.DEFENSE, 0.1, 0.0);
-			return false;
+			return true;
 		}
 	},
 	MULTICHOP(12429, ScrollTarget.OBJECT, "Sends off the beaver to chop the target tree.", 0.7, 3) {
@@ -304,7 +304,7 @@ public enum Scroll {
 			familiar.faceObject(object);
 			familiar.setNextFaceEntity(null);
 			familiar.walkToAndExecute(object, () -> familiar.getActionManager().setAction(new Woodcutting(object, type)));
-			return false;
+			return true;
 		}
 	},
 	CALL_TO_ARMS(12443, ScrollTarget.CLICK, "Teleports the player to the landers at Pest Control.", 0.7, 3) {
@@ -364,7 +364,7 @@ public enum Scroll {
 				}
 				return true;
 			});
-			return false;
+			return true;
 		}
 	},
 	EVIL_FLAMES(12448, ScrollTarget.COMBAT, "Fires a magic fireball at the target and lowering their magic level.", 2.1, 6) {
@@ -420,7 +420,8 @@ public enum Scroll {
 	THIEVING_FINGERS(12426, ScrollTarget.CLICK, "Temporarily raises the player's thieving level by 2.", 0.9, 12) {
 		@Override
 		public boolean use(Player owner, Familiar familiar) {
-			familiar.sync(8020, 0000); //TODO gfx
+			familiar.sync(8020, 1336);
+			owner.spotAnim(1300);
 			owner.getSkills().adjustStat(2, 0.0, Constants.THIEVING);
 			return true;
 		}
@@ -428,8 +429,9 @@ public enum Scroll {
 	BLOOD_DRAIN(12444, ScrollTarget.CLICK, "Restores the player's stats by 2 + 20% and cures poison. Damages the player for 25 damage, though.", 2.4, 6) {
 		@Override
 		public boolean use(Player owner, Familiar familiar) {
-			familiar.sync(7715, 0000); //TODO gfx
-			owner.spotAnim(0000);
+			familiar.sync(7715, 1419);
+			owner.spotAnim(1420);
+			World.sendProjectile(familiar, owner, 1417, 15, 16, 30, 2.0, 16, 0);
 			owner.applyHit(new Hit(owner, 25, HitLook.TRUE_DAMAGE));
 			owner.getPoison().reset();
 			owner.getSkills().adjustStat(2, 0.20, false, Utils.range(0, Skills.SIZE-1));
@@ -454,15 +456,23 @@ public enum Scroll {
 	ABYSSAL_DRAIN(12454, ScrollTarget.COMBAT, "Fires a magic based attack that lowers the opponent's magic level and prayer points, restoring them to the player.", 1.1, 6) {
 		@Override
 		public int attack(Player owner, Familiar familiar, Entity target) {
-			//TODO
-			return Familiar.CANCEL_SPECIAL;
+			familiar.sync(7675, 1422);
+			Hit hit = delayHit(familiar, World.sendProjectile(familiar, target, 1423, 70, 16, 30, 2.0, 16, 0).getTaskDelay(), target, getMagicHit(familiar, getMaxHit(familiar, 95, AttackStyle.MAGE, target)));
+			if (hit.getDamage() > 0) {
+				target.lowerStat(Constants.MAGIC, 0.1, 0.0);
+				target.lowerStat(Constants.PRAYER, 0.1, 0.0);
+			}
+			return Familiar.DEFAULT_ATTACK_SPEED;
 		}
 	},
 	DISSOLVE(12453, ScrollTarget.COMBAT, "Fires a magical attack that dissolves the opponent and lowers their attack stat.", 5.5, 6) {
 		@Override
 		public int attack(Player owner, Familiar familiar, Entity target) {
-			//TODO
-			return Familiar.CANCEL_SPECIAL;
+			familiar.sync(8514, 1361);
+			Hit hit = delayHit(familiar, World.sendProjectile(familiar, target, 1359, 70, 16, 30, 2.0, 16, 0).getTaskDelay(), target, getMagicHit(familiar, getMaxHit(familiar, 120, AttackStyle.MAGE, target)), () -> target.spotAnim(1360));
+			if (hit.getDamage() > 0)
+				target.lowerStat(Constants.ATTACK, 0.1, 0.0);
+			return Familiar.DEFAULT_ATTACK_SPEED;
 		}
 	},
 	FISH_RAIN(12424, ScrollTarget.CLICK, "Produces a random, low-level fish next to the player.", 1.1, 12) {
@@ -481,26 +491,49 @@ public enum Scroll {
 			return Familiar.DEFAULT_ATTACK_SPEED;
 		}
 	},
-	AMBUSH(12836, ScrollTarget.COMBAT, "Teleports to the target and attacks the target, dealing up to 224 damage.", 5.7, 3) {
+	AMBUSH(12836, ScrollTarget.ENTITY, "Teleports to the target and attacks the target, dealing up to 224 damage.", 5.7, 3) {
 		@Override
-		public int attack(Player owner, Familiar familiar, Entity target) {
-			//TODO
-			//anim 7911 7912
-			return Familiar.CANCEL_SPECIAL;
+		public boolean entity(Player owner, Familiar familiar, Entity target) {
+			if (!owner.lineOfSightTo(target, false)) {
+				owner.sendMessage("Your kyatt can't find a way to get there.");
+				return false;
+			}
+			if (familiar.getTarget() != null) {
+				owner.sendMessage("Your kyatt is already attacking something.");
+				return false;
+			}
+			WorldTile tile = target.getNearestTeleTile(familiar);
+			if (tile == null) {
+				owner.sendMessage("Your kyatt can't find a place to land on that target right now.");
+				return false;
+			}
+			if (!familiar.commandAttack(target))
+				return false;
+			familiar.freeze(2);
+			delayHit(familiar, 0, target, getMeleeHit(familiar, getMaxHit(familiar, 224, AttackStyle.MELEE, target)), () -> {
+				familiar.setNextWorldTile(target.getNearestTeleTile(familiar));
+				familiar.sync(7914, 1366);
+			});
+			return true;
 		}
 	},
 	RENDING(12840, ScrollTarget.COMBAT, "Performs a magic based attack that lowers the opponent's strength.", 5.7, 3) {
 		@Override
 		public int attack(Player owner, Familiar familiar, Entity target) {
-			//TODO
-			return Familiar.CANCEL_SPECIAL;
+			familiar.sync(7919, 1370);
+			Hit hit = delayHit(familiar, World.sendProjectile(familiar, target, 1371, 70, 16, 30, 35, 16, 0).getTaskDelay(), target, getMagicHit(familiar, getMaxHit(familiar, 120, AttackStyle.MAGE, target)), () -> target.spotAnim(1372));
+			if (hit.getDamage() > 0)
+				target.lowerStat(Constants.STRENGTH, 0.1, 0.0);
+			return Familiar.DEFAULT_ATTACK_SPEED;
 		}
 	},
-	GOAD(12835, ScrollTarget.COMBAT, "Gores the opponent with a powerful melee attack. Hits twice for up to 180 damage.", 5.7, 6) {
+	GOAD(12835, ScrollTarget.COMBAT, "Gores the opponent with a powerful melee attack. Hits twice for up to 120 damage each.", 5.7, 6) {
 		@Override
 		public int attack(Player owner, Familiar familiar, Entity target) {
-			//TODO
-			return Familiar.CANCEL_SPECIAL;
+			familiar.anim(7915);
+			delayHit(familiar, 0, target, getMeleeHit(familiar, getMaxHit(familiar, 120, AttackStyle.MELEE, target)));
+			delayHit(familiar, 0, target, getMeleeHit(familiar, getMaxHit(familiar, 120, AttackStyle.MELEE, target)));
+			return Familiar.DEFAULT_ATTACK_SPEED;
 		}
 	},
 	DOOMSPHERE(12455, ScrollTarget.COMBAT, "Attacks the opponent with a strong water spell that hits up to 76 damage and drains the target's magic.", 5.8, 3) {
@@ -516,33 +549,67 @@ public enum Scroll {
 	DUST_CLOUD(12468, ScrollTarget.COMBAT, "Hits up to 6 nearby targets for up to 79 damage with a strong magical dust cloud.", 3, 6) {
 		@Override
 		public int attack(Player owner, Familiar familiar, Entity target) {
-			//TODO
-			//anim 7820
-			return Familiar.CANCEL_SPECIAL;
+			familiar.sync(7820, 1375);
+			delayHit(familiar, World.sendProjectile(familiar, target, 1376, 34, 16, 30, 1.5, 16, 0).getTaskDelay(), target, getMagicHit(familiar, getMaxHit(familiar, 80, AttackStyle.MAGE, target)), () -> target.setNextSpotAnim(new SpotAnim(1377)));
+			for (Entity next : PlayerCombat.getMultiAttackTargets(owner, target, 7, 6, false))
+				delayHit(familiar, World.sendProjectile(familiar, next, 1376, 34, 16, 30, 1.5, 16, 0).getTaskDelay(), next, getMagicHit(familiar, getMaxHit(familiar, 80, AttackStyle.MAGE, next)), () -> next.setNextSpotAnim(new SpotAnim(1377)));
+			return Familiar.DEFAULT_ATTACK_SPEED;
 		}
 	},
 	ABYSSAL_STEALTH(12427, ScrollTarget.CLICK, "Temporarily boosts the player's agility and thieving levels by 4 each.", 1.9, 20) {
 		@Override
 		public boolean use(Player owner, Familiar familiar) {
-			//TODO
-			//anim 7682
-			return false;
+			familiar.sync(7682, 1339);
+			owner.spotAnim(1302);
+			owner.getSkills().adjustStat(4, 0.0, Skills.AGILITY, Skills.THIEVING);
+			return true;
 		}
 	},
 	OPHIDIAN_INCUBATION(12436, ScrollTarget.ITEM, "Transforms a single egg in the player's inventory into a cockatrice variant.", 3.1, 3) {
+		enum Egg {
+			CHICKEN(1944, 12109),
+			BLUE(5077, 12113),
+			RED(5076, 12115),
+			GREEN(5078, 12111),
+			RAVEN(11964, 12119),
+			PENGUIN(12483, 12117),
+			VULTURE(11965, 12121);
+			
+			private int id, toId;
+			
+			Egg(int id, int toId) {
+				this.id = id;
+				this.toId = toId;
+			}
+			
+			static Egg forId(int id) {
+				for (Egg e : Egg.values())
+					if (e.id == id)
+						return e;
+				return null;
+			}
+		}
+		
 		@Override
 		public boolean item(Player owner, Familiar familiar, Item item) {
-			//TODO
-			//anim 8159
-			return false;
+			Egg egg = Egg.forId(item.getId());
+			if (egg == null) {
+				owner.sendMessage("The cobra can only incubate eggs.");
+				return false;
+			}
+			familiar.sync(8159, 1388);
+			item.setId(egg.toId);
+			owner.getInventory().refresh(item.getSlot());
+			WorldTasks.schedule(2, () -> World.sendProjectile(familiar.getMiddleWorldTile(), owner, 1389, 50, 30, 0, 0.15, 16, 0));
+			return true;
 		}
 	},
-	POISONOUS_BLAST(12467, ScrollTarget.COMBAT, "Attacks the target with a magic attack that deals up to 103 damage.", 3.2, 6) {
+	POISONOUS_BLAST(12467, ScrollTarget.COMBAT, "Attacks the target with a magic attack that deals up to 120 damage.", 3.2, 6) {
 		@Override
 		public int attack(Player owner, Familiar familiar, Entity target) {
-			//TODO
-			//anim 8214
-			return Familiar.CANCEL_SPECIAL;
+			familiar.anim(8214);
+			delayHit(familiar, World.sendProjectile(familiar, target, 1508, 34, 16, 30, 35, 16, 0).getTaskDelay(), target, getMagicHit(familiar, getMaxHit(familiar, 120, AttackStyle.MAGE, target)));
+			return Familiar.DEFAULT_ATTACK_SPEED;
 		}
 	},
 	MITHRIL_BULL(12464, ScrollTarget.COMBAT, "Fires a magic based attack at the opponent hitting for up to 160 damage.", 6.6, 6) {
@@ -556,10 +623,8 @@ public enum Scroll {
 	TOAD_BARK(12452, ScrollTarget.COMBAT, "Performs the same attack as if it were loaded with a cannonball.", 1, 6) {
 		@Override
 		public int attack(Player owner, Familiar familiar, Entity target) {
-			//TODO spotanim 1400
-			//anim 7703 shoot
-			//anim 7704 load
-			return Familiar.CANCEL_SPECIAL;
+			BarkerToad.shootCannonball(familiar, target);
+			return Familiar.DEFAULT_ATTACK_SPEED;
 		}
 	},
 	TESTUDO(12439, ScrollTarget.CLICK, "Temporarily boosts the player's defense level by 8 points.", 0.7, 20) {
@@ -624,7 +689,6 @@ public enum Scroll {
 	FRUITFALL(12423, ScrollTarget.CLICK, "Drops from 0-5 random fruit on the ground around the player.", 1.4, 6) {
 		@Override
 		public boolean use(Player owner, Familiar familiar) {
-			//TODO 8320 8321 interaction to search for fruit
 			familiar.anim(8277);
 			int num = Utils.random(7);
 			Set<Integer> spawned = new HashSet<>();
@@ -651,16 +715,22 @@ public enum Scroll {
 	FAMINE(12830, ScrollTarget.COMBAT, "Consumes a piece of the target's food.", 1.5, 12) {
 		@Override
 		public int attack(Player owner, Familiar familiar, Entity target) {
-			//TODO
-			//anim 7998 proj is swarm of bugs
-			return Familiar.CANCEL_SPECIAL;
+			familiar.sync(7998, 1346);
+			World.sendProjectile(familiar, target, 1347, 34, 16, 30, 1.5, 16, 0, proj -> target.spotAnim(1348));
+			if (target instanceof Player) {
+				//TODO should eat player food but let's be real who is gonna pk with this right now
+			}
+			return Familiar.DEFAULT_ATTACK_SPEED;
 		}
 	},
 	ARCTIC_BLAST(12451, ScrollTarget.COMBAT, "Fires a large magic attack at the opponent, hitting up to 130 damage with a chance of stunning them.", 1.1, 6) {
 		@Override
 		public int attack(Player owner, Familiar familiar, Entity target) {
-			//TODO
-			return Familiar.CANCEL_SPECIAL;
+			familiar.sync(8523, 1405);
+			Hit hit = delayHit(familiar, World.sendProjectile(familiar, target, 1406, 34, 16, 30, 1.5, 16, 0).getTaskDelay(), target, getMagicHit(familiar, getMaxHit(familiar, 130, AttackStyle.MAGE, target)), () -> target.spotAnim(1407));
+			if (hit.getDamage() > 0 && Utils.random(5) == 0 && target.getSize() <= 1)
+				target.addEffect(Effect.STUN, 3);
+			return Familiar.DEFAULT_ATTACK_SPEED;
 		}
 	},
 	RISE_FROM_THE_ASHES(14622, ScrollTarget.COMBAT, "This special is a pain in the ass to code.", 8, 5) {
@@ -681,23 +751,29 @@ public enum Scroll {
 	MANTIS_STRIKE(12450, ScrollTarget.COMBAT, "Fires a magic based attack at the opponent dealing up to 100 damage, binding them for 3 seconds, and draining their prayer.", 3.7, 6) {
 		@Override
 		public int attack(Player owner, Familiar familiar, Entity target) {
-			//TODO
-			return Familiar.CANCEL_SPECIAL;
+			familiar.sync(8071, 1379);
+			Hit hit = delayHit(familiar, World.sendProjectile(familiar, target, 1380, 34, 16, 30, 1.5, 16, 0).getTaskDelay(), target, getMagicHit(familiar, getMaxHit(familiar, 100, AttackStyle.MAGE, target)), () -> target.spotAnim(1381));
+			if (hit.getDamage() > 0 && target.getSize() <= 1)
+				target.freeze(3, true);
+			return Familiar.DEFAULT_ATTACK_SPEED;
 		}
 	},
 	CRUSHING_CLAW(12449, ScrollTarget.COMBAT, "Launches a magic based attack at the target dealing up to 96 damage and draining their defense.", 3.7, 6) {
 		@Override
 		public int attack(Player owner, Familiar familiar, Entity target) {
-			//TODO
-			return Familiar.CANCEL_SPECIAL;
+			familiar.sync(8118, 1351);
+			Hit hit = delayHit(familiar, World.sendProjectile(familiar, target, 1352, 34, 16, 30, 1.5, 16, 0).getTaskDelay(), target, getMagicHit(familiar, getMaxHit(familiar, 96, AttackStyle.MAGE, target)), () -> target.spotAnim(1353));
+			if (hit.getDamage() > 0)
+				target.lowerStat(Skills.DEFENSE, 0.05, 0.0);
+			return Familiar.DEFAULT_ATTACK_SPEED;
 		}
 	},
 	INFERNO(12841, ScrollTarget.COMBAT, "Fires a magic based attack that disarms the opponent and deals up to 85 damage.", 1.5, 6) {
 		@Override
 		public int attack(Player owner, Familiar familiar, Entity target) {
-			//TODO
-			//emote 7871
-			return Familiar.CANCEL_SPECIAL;
+			familiar.sync(7871, 1328);
+			delayHit(familiar, World.sendProjectile(familiar, target, 1330, 34, 16, 30, 1.8, 16, 0).getTaskDelay(), target, getMagicHit(familiar, getMaxHit(familiar, 85, AttackStyle.MAGE, target)));
+			return Familiar.DEFAULT_ATTACK_SPEED;
 		}
 	},
 	ADAMANT_BULL(12465, ScrollTarget.COMBAT, "Fires a magic based attack at the opponent hitting for up to 200 damage.", 7.6, 6) {
@@ -711,15 +787,21 @@ public enum Scroll {
 	DEADLY_CLAW(12831, ScrollTarget.COMBAT, "Causes the talon beast to attack with magic instead of melee. Dealing up to 300 damage.", 11.4, 6) {
 		@Override
 		public int attack(Player owner, Familiar familiar, Entity target) {
-			//TODO
-			return Familiar.CANCEL_SPECIAL;
+			familiar.anim(familiar.getCombatDefinitions().getAttackEmote());
+			delayHit(familiar, 0, target, getMagicHit(familiar, getMaxHit(familiar, familiar.getCombatDefinitions().getMaxHit(), AttackStyle.MAGE, target)));
+			delayHit(familiar, 1, target, getMagicHit(familiar, getMaxHit(familiar, familiar.getCombatDefinitions().getMaxHit(), AttackStyle.MAGE, target)));
+			delayHit(familiar, 2, target, getMagicHit(familiar, getMaxHit(familiar, familiar.getCombatDefinitions().getMaxHit(), AttackStyle.MAGE, target)));
+			return Familiar.DEFAULT_ATTACK_SPEED;
 		}
 	},
 	ACORN_MISSILE(12457, ScrollTarget.COMBAT, "Hits anyone around the opponent with a rain of acorns dealing up to 100 damage each.", 1.6, 6) {
 		@Override
 		public int attack(Player owner, Familiar familiar, Entity target) {
-			//TODO
-			return Familiar.CANCEL_SPECIAL;
+			familiar.anim(7858);
+			delayHit(familiar, World.sendProjectile(familiar, target, 1362, 34, 16, 30, 1.5, 16, 0).getTaskDelay(), target, getMagicHit(familiar, getMaxHit(familiar, 100, AttackStyle.MAGE, target)), () -> target.setNextSpotAnim(new SpotAnim(1363)));
+			for (Entity next : PlayerCombat.getMultiAttackTargets(owner, target, 1, 9, false))
+				delayHit(familiar, World.sendProjectile(familiar, next, 1362, 34, 16, 30, 1.5, 16, 0).getTaskDelay(), next, getMagicHit(familiar, getMaxHit(familiar, 100, AttackStyle.MAGE, next)), () -> next.setNextSpotAnim(new SpotAnim(1363)));
+			return Familiar.DEFAULT_ATTACK_SPEED;
 		}
 	},
 	TITANS_CONSTITUTION(12824, ScrollTarget.CLICK, "Boosts the player's defense by 12.5% and restores 10% of their max health.", 7.9, 20) {
@@ -741,14 +823,22 @@ public enum Scroll {
 			}
 			owner.heal((int) ((double) owner.getMaxHitpoints() * 0.10));
 			owner.getSkills().adjustStat(0, 0.125, Constants.DEFENSE);
-			return false;
+			return true;
 		}
 	},
 	REGROWTH(12442, ScrollTarget.OBJECT, "Immediately regrows a tree that has been felled by farming.", 1.6, 6) {
 		@Override
 		public boolean object(Player owner, Familiar familiar, GameObject object) {
-			//TODO spotanim 1487
-			return false;
+			if (object.getAttribs().getI("originalTrunkId", -1) == -1 || object.getAttribs().getI("originalTrunkId", -1) == object.getId()) {
+				owner.sendMessage("You can only cast this on a trunk.");
+				return false;
+			}
+			object.setId(object.getAttribs().getI("originalTrunkId", -1));
+			familiar.setNextFaceEntity(null);
+			familiar.setLockedForTicks(2);
+			familiar.faceObject(object);
+			familiar.sync(7945, 1487);
+			return true;
 		}
 	},
 	SPIKE_SHOT(12456, ScrollTarget.COMBAT, "Fires a magic attack that deals up to 170 damage.", 4.1, 6) {
@@ -901,7 +991,7 @@ public enum Scroll {
 			familiar.sync(9470, 1336);
 			owner.spotAnim(1308);
 			owner.getPrayer().restorePrayer(100);
-			return false;
+			return true;
 		}
 	},
 	
