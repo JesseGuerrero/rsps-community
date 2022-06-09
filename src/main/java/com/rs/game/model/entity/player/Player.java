@@ -1334,7 +1334,7 @@ public class Player extends Entity {
 				p.updateVars(this);
 
 		if (getStarter() > 0) {
-			sendMessage("Welcome to " + Settings.getConfig().getServerName() + ".");
+//			sendMessage("Welcome to " + Settings.getConfig().getServerName() + ".");
 			if (!Settings.getConfig().getLoginMessage().isEmpty())
 				sendMessage(Settings.getConfig().getLoginMessage());
 			processDailyTasks();
@@ -3244,7 +3244,7 @@ public class Player extends Entity {
 		getBank().addItem(new Item(995, 25), false);
 		for (Item item : Settings.getConfig().getStartItems())
 			getInventory().addItem(item);
-		sendMessage("Welcome to " + Settings.getConfig().getServerName() + ".");
+//		sendMessage("Welcome to " + Settings.getConfig().getServerName() + ".");
 		if (!Settings.getConfig().getLoginMessage().isEmpty())
 			sendMessage(Settings.getConfig().getLoginMessage());
 		getAppearance().generateAppearanceData();
