@@ -53,5 +53,16 @@
       "y": 3487,
       "plane": 0
     }
+  },
+  {
+    "comment": "GIM",
+    "objectId": 170,
+    "type": 10,
+    "rotation": 1,
+    "tile": {
+      "x": 3091,
+      "y": 3493,
+      "plane": 0
+    }
   }
 ]

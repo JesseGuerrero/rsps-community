@@ -47,6 +47,9 @@ public class Home {
 
 		/* Loyalty point shop */
 		spawnNPC(13727, new WorldTile(3091, 3505, 0), Direction.SOUTH, false);
+
+		/* GIM */
+		spawnNPC(1512, new WorldTile(3091, 3492, 0), Direction.EAST, false);
 	}
 
 	public static ObjectClickHandler handleShops = new ObjectClickHandler(new Object[] { 18789 }, new WorldTile(3095, 3499, 0)) {
