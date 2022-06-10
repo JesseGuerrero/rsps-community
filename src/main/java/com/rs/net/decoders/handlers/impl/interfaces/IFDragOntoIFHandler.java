@@ -17,6 +17,7 @@
 package com.rs.net.decoders.handlers.impl.interfaces;
 
 import com.rs.game.content.Shop;
+import com.rs.game.model.entity.player.Bank;
 import com.rs.game.model.entity.player.Inventory;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.net.packets.PacketHandler;
@@ -40,8 +41,12 @@ public class IFDragOntoIFHandler implements PacketHandler<Player, IFDragOntoIF> 
 			if (packet.getToSlot() >= player.getInventory().getItemsContainerSize() || packet.getFromSlot() >= player.getInventory().getItemsContainerSize())
 				return;
 			player.getInventory().switchItem(packet.getFromSlot(), packet.getToSlot());
-		} else if (packet.getFromInter() == 762 && packet.getToInter() == 762)
-			player.getBank().switchItem(packet.getFromSlot(), packet.getToSlot(), packet.getFromComp(), packet.getToComp());
+		} else if (packet.getFromInter() == 762 && packet.getToInter() == 762) {
+			Bank bank = player.getBank();
+			if(player.getTempAttribs().getO("GIM Bank") != null)
+				bank = player.getTempAttribs().getO("GIM Bank");
+			bank.switchItem(packet.getFromSlot(), packet.getToSlot(), packet.getFromComp(), packet.getToComp());
+		}
 		else if (packet.getFromInter() == 1265 && packet.getToInter() == 1266 && player.getTempAttribs().getB("shop_buying")) {
 			if (player.getTempAttribs().getB("shop_buying")) {
 				Shop shop = player.getTempAttribs().getO("Shop");

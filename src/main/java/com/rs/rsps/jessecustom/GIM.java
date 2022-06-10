@@ -1,12 +1,16 @@
 package com.rs.rsps.jessecustom;
 
 import com.rs.db.WorldDB;
+import com.rs.game.World;
 import com.rs.game.content.dialogue.Dialogue;
 import com.rs.game.content.dialogue.HeadE;
 import com.rs.game.content.dialogue.Options;
 import com.rs.game.content.quests.Quest;
+import com.rs.game.content.skills.summoning.Familiar;
+import com.rs.game.model.entity.player.Bank;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.WorldTile;
+import com.rs.lib.net.ServerPacket;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.NPCClickEvent;
 import com.rs.plugin.events.ObjectClickEvent;
@@ -66,7 +70,28 @@ public class GIM {
 									);
 									option("Join a group", new Dialogue()
 											.addPlayer(HeadE.HAPPY_TALKING, "I would like to join a group.")
-											.addNPC(NPC, HeadE.CALM_TALK, "Okay have your group founder talk to me")
+											.addNPC(NPC, HeadE.CALM_TALK, "Great! Remember, joining a group is irreversible...")
+											.addNext(()->{
+												e.getPlayer().sendInputName("What group would you like to join?", groupName -> {
+															if (WorldDB.getGIMS().groupExists(groupName)) {
+																WorldDB.getGIMS().getByGroupName(groupName, group -> {
+																	if(group.getPlayers().size() > 5) {
+																		e.getPlayer().sendMessage("This group is full...");
+																		return;
+																	}
+																	Player founder = World.getPlayerByUsername(group.getPlayers().get(0));
+																	founder.getTempAttribs().setB("GIM Join Request_"+e.getPlayer().getUsername(), true);
+																	e.getPlayer().getTempAttribs().setB("GIM Group Request_"+groupName, true);
+																	e.getPlayer().startConversation(
+																			new Dialogue().addNPC(NPC, HeadE.CALM_TALK, "Have the founder talk to me and neither of you log out.")
+																	);
+																});
+																return;
+															}
+															e.getPlayer().sendMessage("This group doesn't exists!");
+														}
+												);
+											})
 									);
 								}
 							}));
@@ -80,11 +105,30 @@ public class GIM {
 							@Override
 							public void create() {
 								option("Accept a new member", new Dialogue()
-										.addPlayer(HeadE.HAPPY_TALKING, "")
+										.addPlayer(HeadE.HAPPY_TALKING, "I would like to accept a new member please...")
+										.addNext(()->{
+											e.getPlayer().sendInputName("What player would you like to accept?", displayname -> {
+												Player member = World.getPlayerByDisplay(displayname);
+														if (member != null && WorldDB.getGIMS().groupExists(e.getPlayer().getO("GIM Team"))
+																&& e.getPlayer().getTempAttribs().getB("GIM Join Request_" +member.getUsername())
+																&& member.getTempAttribs().getB("GIM Group Request_"+e.getPlayer().getO("GIM Team"))) {
+															WorldDB.getGIMS().getByGroupName(e.getPlayer().getO("GIM Team"), group -> {
+																group.addPlayer(member);
+																e.getPlayer().sendMessage(member.getDisplayName() + " has been added to the group...");
+																member.save("GIM Team", group.getGroupName());
+																member.sendMessage("You have joined " + group.getGroupName() + "!");
+																WorldDB.getGIMS().saveSync(group);
+															});
+															return;
+														}
+														e.getPlayer().sendMessage("Either the player is not logged in or there isn't a request!");
+													}
+											);
+										})
 								);
-								option("Leave a group.", new Dialogue()
-										.addPlayer(HeadE.HAPPY_TALKING, "")
-								);
+//								option("Leave a group.", new Dialogue()
+//										.addPlayer(HeadE.HAPPY_TALKING, "")
+//								);
 								option("Nothing.", new Dialogue());
 							}
 						})
@@ -153,6 +197,27 @@ public class GIM {
 		@Override
 		public void handle(ObjectClickEvent e) {
 			if(e.getPlayer().getBool("Group IronMan")) {
+				if(e.getPlayer().getO("GIM Team") == null) {
+					e.getPlayer().sendMessage("You need to be part of a group to access a shared bank...");
+					return;
+				}
+				if(e.getObject().getAttribs().getB("GIM_" + e.getPlayer().getO("GIM Team"))) {
+					e.getPlayer().sendMessage("The group bank is in use.");
+					return;
+				}
+				WorldDB.getGIMS().getByGroupName(e.getPlayer().getO("GIM Team"), group -> {
+					e.getObject().getAttribs().setB("GIM_" + e.getPlayer().getO("GIM Team"), true);
+					group.getBank().setPlayer(e.getPlayer());
+					e.getPlayer().getTempAttribs().setO("GIM Bank", group.getBank());
+					group.getBank().open();
+					e.getPlayer().setCloseInterfacesEvent(() -> {
+						e.getPlayer().getSession().writeToQueue(ServerPacket.TRIGGER_ONDIALOGABORT);
+						Familiar.sendLeftClickOption(e.getPlayer());
+						e.getObject().getAttribs().setB("GIM_" + e.getPlayer().getO("GIM Team"), false);
+						e.getPlayer().getTempAttribs().setO("GIM Bank", null);
+						WorldDB.getGIMS().saveSync(group);
+					});
+				});
 				return;
 			}
 			e.getPlayer().sendMessage("Blocked");

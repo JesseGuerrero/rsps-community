@@ -1,6 +1,7 @@
 package com.rs.rsps.jessecustom;
 
 import com.rs.db.collection.GroupIronmanManager;
+import com.rs.game.model.entity.player.Bank;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.Item;
 
@@ -10,7 +11,7 @@ import java.util.List;
 public class GroupIronMan {
 	private String groupName;//This is the key
 	private List<String> players = new ArrayList<>();
-	private Item[][] bank;
+	private Bank bank = new Bank();
 
 	public GroupIronMan(String groupName, Player founder) {
 		this.groupName = groupName;
@@ -21,7 +22,7 @@ public class GroupIronMan {
 		return players;
 	}
 
-	public Item[][] getBank() {
+	public Bank getBank() {
 		return bank;
 	}
 
