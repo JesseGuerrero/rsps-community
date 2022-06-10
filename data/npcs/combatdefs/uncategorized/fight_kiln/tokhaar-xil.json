@@ -14,7 +14,7 @@
     "ATTACK": 0,
     "RANGE": 140,
     "STRENGTH": 0,
-    "DEFENSE": 150,
+    "DEFENSE": 120,
     "MAGE": 300
   },
   "attackRange": -1,

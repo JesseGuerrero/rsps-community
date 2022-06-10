@@ -1281,7 +1281,7 @@ public class DungeonManager {
 			player.getPackets().sendVarc(1238, (int) (prestigeXP * 10));
 			player.getPackets().sendVarc(1239, (int) (averageXP * 10));
 			player.getSkills().addXp(Constants.DUNGEONEERING, totalXp); //force rs xp, cuz we do * xp rate in calcs to make inter show correct xp
-			player.getDungManager().addTokens(tokens);
+			player.getDungManager().addTokens(tokens*3);
 			player.getMusicsManager().forcePlayMusic(770);
 			player.incrementCount("Dungeons completed");
 			player.incrementCount(DungeonUtils.getFloorTypeName(party.getFloor()) + " floors completed");

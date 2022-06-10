@@ -8,13 +8,13 @@
   "deathDelay": 4,
   "respawnDelay": 59,
   "hitpoints": 1500,
-  "maxHit": 214,
+  "maxHit": 170,
   "attackStyle": "MELEE",
   "combatLevels": {
     "ATTACK": 320,
     "RANGE": 0,
     "STRENGTH": 150,
-    "DEFENSE": 185,
+    "DEFENSE": 150,
     "MAGE": 80
   },
   "attackRange": -1,

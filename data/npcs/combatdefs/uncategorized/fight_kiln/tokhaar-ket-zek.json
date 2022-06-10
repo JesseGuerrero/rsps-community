@@ -7,15 +7,15 @@
   "deathAnim": 16111,
   "deathDelay": 6,
   "respawnDelay": 59,
-  "hitpoints": 2000,
-  "maxHit": 780,
+  "hitpoints": 1800,
+  "maxHit": 550,
   "attackStyle": "RANGE",
   "combatLevels": {
-    "ATTACK": 400,
+    "ATTACK": 300,
     "RANGE": 0,
-    "STRENGTH": 200,
-    "DEFENSE": 350,
-    "MAGE": 320
+    "STRENGTH": 180,
+    "DEFENSE": 200,
+    "MAGE": 200
   },
   "attackRange": -1,
   "attackGfx": -1,
