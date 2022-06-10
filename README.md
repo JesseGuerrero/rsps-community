@@ -12,8 +12,8 @@ A community world server for Darkan that integrates with the community lobby ser
 [bug-link]: https://github.com/titandino/darkan-world-server/issues
 [bug-badge]: https://img.shields.io/github/issues-raw/titandino/darkan-world-server/bug?label=open%20bugs
 
-Features:
--Group Ironman
--Fight kiln nerfed to be doable
--Dung tokens tripled
--Nex slightly nerfed for doability of 5 players
+Features:<br>
+-Group Ironman<br>
+-Fight kiln nerfed to be doable<br>
+-Dung tokens tripled<br>
+-Nex slightly nerfed for doability of 5 players<br>
