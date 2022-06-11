@@ -48,6 +48,7 @@ public class ReaperAssignments  {
 				addNPC(15661, HeadE.CALM, "Immediately.");
 				addNext(() -> {
 					player.save("learnedDeath", true);
+					player.save("death coffer", 0);
 					player.getInventory().addItemDrop(24806, 1);
 					giveNewTask(player);
 				});
@@ -67,6 +68,46 @@ public class ReaperAssignments  {
 
 						option("Are there any rewards for this?", new Dialogue()
 								.addNPC(15661, HeadE.CALM, "Not yet, mortal. I am still thinking about possible reward options. But I will still keep tally of your points regardless."));
+						if(player.getInventory().getAmountOf(995) >= 10_000)
+							option("I would like to add to my death coffer...", new Dialogue().addOptions("Choose an option:", new Options() {
+								@Override
+								public void create() {
+									option("10k", new Dialogue()
+												.addPlayer(HeadE.HAPPY_TALKING, "I would like to add 10k.")
+												.addNext(()->{
+													player.getInventory().deleteItem(995, 10_000);
+													player.save("death coffer", player.getI("death coffer") + 10_000);
+												})
+									);
+									if(player.getInventory().getAmountOf(995) >= 100_000)
+										option("100k", new Dialogue()
+												.addPlayer(HeadE.HAPPY_TALKING, "I would like to add 100k.")
+												.addNext(()->{
+													player.getInventory().deleteItem(995, 100_000);
+													player.save("death coffer", player.getI("death coffer") + 100_000);
+												})
+										);
+									if(player.getInventory().getAmountOf(995) >= 1_000_000)
+										option("1M", new Dialogue()
+												.addPlayer(HeadE.HAPPY_TALKING, "I would like to add 1M.")
+												.addNext(()->{
+													player.getInventory().deleteItem(995, 1_000_000);
+													player.save("death coffer", player.getI("death coffer") + 1_000_000);
+												})
+										);
+									if(player.getInventory().getAmountOf(995) >= 10_000_000)
+										option("10M", new Dialogue()
+												.addPlayer(HeadE.HAPPY_TALKING, "I would like to add 10M.")
+												.addNext(()->{
+													player.getInventory().deleteItem(995, 10_000_000);
+													player.save("death coffer", player.getI("death coffer") + 10_000_000);
+												})
+										);
+								}
+							}));
+						option("How much is in my death coffer?", new Dialogue()
+								.addNPC(15661, HeadE.CALM, player.getI("death coffer")+" coins...")
+						);
 					}
 				});
 			}

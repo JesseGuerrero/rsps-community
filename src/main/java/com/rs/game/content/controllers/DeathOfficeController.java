@@ -18,6 +18,9 @@ package com.rs.game.content.controllers;
 
 import java.util.Arrays;
 
+import com.rs.game.content.dialogue.Dialogue;
+import com.rs.game.content.dialogue.HeadE;
+import com.rs.game.content.dialogue.Options;
 import com.rs.game.content.skills.magic.Magic;
 import com.rs.game.model.entity.npc.others.GraveStone;
 import com.rs.game.model.entity.player.Player;
@@ -195,6 +198,29 @@ public class DeathOfficeController extends Controller {
 	@Override
 	public boolean processObjectClick1(GameObject object) {
 		if (object.getId() == 45803) {
+			if(player.getI("death coffer") > 10_000) {
+				player.startConversation(new Dialogue().addOptions("Choose an option:", new Options() {
+					@Override
+					public void create() {
+						option("Use 10K to overwrite death?", new Dialogue()
+								.addPlayer(HeadE.HAPPY_TALKING, "I want to overwrite my death!")
+								.addNPC(15661, HeadE.CALM, "Okay but it will cost you!")
+								.addNext(()->{
+									player.save("death is saved", true);
+									player.sendMessage("You will keep your items!");
+									getReadyToRespawn();
+								})
+						);
+						option("Just respawn me...", new Dialogue()
+								.addNPC(15661, HeadE.CALM, "Are you sure you want to leave a gravestone?")
+								.addPlayer(HeadE.HAPPY_TALKING, "Yes I am sure")
+								.addNext(()->{getReadyToRespawn();})
+						);
+					}
+				}));
+				return false;
+			}
+			player.sendMessage("Your death coffer was empty!");
 			getReadyToRespawn();
 			return false;
 		}
@@ -243,8 +269,10 @@ public class DeathOfficeController extends Controller {
 		player.setCloseInterfacesEvent(() -> {
 			WorldTile respawnTile = currentHub >= 256 ? RESPAWN_LOCATIONS[currentHub - 256] : HUBS[currentHub];
 			synchronized (slots) {
-				if (!player.hasRights(Rights.ADMIN))
+				if (!player.hasRights(Rights.ADMIN) || player.getBool("death is saved")) {
+					player.delete("death is saved");
 					player.sendItemsOnDeath(null, getDeathTile(), respawnTile, false, slots);
+				}
 				else
 					player.sendMessage("Slots saved: " + Arrays.deepToString(GraveStone.getItemsKeptOnDeath(player, slots)));
 			}
