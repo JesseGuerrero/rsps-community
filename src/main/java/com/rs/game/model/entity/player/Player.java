@@ -1341,10 +1341,7 @@ public class Player extends Entity {
 		}
 
 		if (!isChosenAccountType()) {
-			if (!Settings.getConfig().isDebug())
-				getControllerManager().startController(new TutorialIslandController());
-			else
-				setStarter(1);
+			setStarter(1);
 			PlayerLook.openCharacterCustomizing(this);
 			setIronMan(true);
 			startConversation(new Dialogue().addSimple("This is a dedicated Group IronMan server").addNext(()->{

@@ -13,7 +13,9 @@ import com.rs.lib.game.WorldObject;
 import com.rs.lib.game.WorldTile;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.annotations.ServerStartupEvent;
+import com.rs.plugin.events.LoginEvent;
 import com.rs.plugin.events.ObjectClickEvent;
+import com.rs.plugin.handlers.LoginHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
 import com.rs.rsps.teleports.BossTeleport;
 import com.rs.rsps.teleports.SlayerTeleport;
@@ -52,27 +54,27 @@ public class Home {
 		spawnNPC(1512, new WorldTile(3083, 3495, 0), Direction.EAST, false);
 	}
 
-	public static ObjectClickHandler handleShops = new ObjectClickHandler(new Object[] { 18789 }, new WorldTile(3095, 3499, 0)) {
+	public static ObjectClickHandler handleShops = new ObjectClickHandler(new Object[] { 18789 }, new WorldTile(3090, 3497, 0)) {
 		@Override
 		public void handle(ObjectClickEvent e) {
-			e.getPlayer().startConversation(new Dialogue().addOptions("Which shops would you like to see?", new Options() {
-				@Override
-				public void create() {
-					option("Melee shops", new Dialogue().addOptions("Which shop would you like to see?", ops -> {
-						ops.add("Melee weapons", () -> ShopsHandler.openShop(e.getPlayer(), "hs_melee_weapons"));
-						ops.add("Melee armor", () -> ShopsHandler.openShop(e.getPlayer(), "hs_melee_armor"));
-					}));
-					option("Ranged shops", new Dialogue().addOptions("Which shop would you like to see?", ops -> {
-						ops.add("Ranged weapons", () -> ShopsHandler.openShop(e.getPlayer(), "hs_range_weapons"));
-						ops.add("Ranged armor", () -> ShopsHandler.openShop(e.getPlayer(), "hs_range_armor"));
-					}));
-					option("Magic shops", new Dialogue().addOptions("Which shop would you like to see?", ops -> {
-						ops.add("Magic weapons", () -> ShopsHandler.openShop(e.getPlayer(), "hs_mage_weapons"));
-						ops.add("Magic armor", () -> ShopsHandler.openShop(e.getPlayer(), "hs_mage_armor"));
-					}));
-					option("Supply shop", () -> ShopsHandler.openShop(e.getPlayer(), "hs_supplies"));
-				}
-			}));
+//			e.getPlayer().startConversation(new Dialogue().addOptions("Which shops would you like to see?", new Options() {
+//				@Override
+//				public void create() {
+//					option("Melee shops", new Dialogue().addOptions("Which shop would you like to see?", ops -> {
+//						ops.add("Melee weapons", () -> ShopsHandler.openShop(e.getPlayer(), "hs_melee_weapons"));
+//						ops.add("Melee armor", () -> ShopsHandler.openShop(e.getPlayer(), "hs_melee_armor"));
+//					}));
+//					option("Ranged shops", new Dialogue().addOptions("Which shop would you like to see?", ops -> {
+//						ops.add("Ranged weapons", () -> ShopsHandler.openShop(e.getPlayer(), "hs_range_weapons"));
+//						ops.add("Ranged armor", () -> ShopsHandler.openShop(e.getPlayer(), "hs_range_armor"));
+//					}));
+//					option("Magic shops", new Dialogue().addOptions("Which shop would you like to see?", ops -> {
+//						ops.add("Magic weapons", () -> ShopsHandler.openShop(e.getPlayer(), "hs_mage_weapons"));
+//						ops.add("Magic armor", () -> ShopsHandler.openShop(e.getPlayer(), "hs_mage_armor"));
+//					}));
+//					option("Supply shop", () -> ShopsHandler.openShop(e.getPlayer(), "hs_supplies"));
+//				}
+//			}));
 		}
 	};
 
@@ -92,7 +94,7 @@ public class Home {
 			null,
 			null
 	};
-	
+
 	public static ObjectClickHandler healingWell = new ObjectClickHandler(new Object[] { 28715 }, new WorldTile(3080, 3487, 0)) {
 		@Override
 		public void handle(ObjectClickEvent e) {

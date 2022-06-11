@@ -942,7 +942,7 @@ public final class Skills {
 			return 0.0;
 
 		if (Settings.getConfig().getXpRate() > 1)
-			exp *= Settings.getConfig().getXpRate();
+			exp *= (Settings.getConfig().getXpRate()/(player.getI("prestige") > 0 ? (player.getI("prestige") + 1) : (1)));
 
 		xp[skill] += exp;
 		int newLevel = getLevelForXp(skill);
@@ -993,7 +993,7 @@ public final class Skills {
 			return;
 
 		if (Settings.getConfig().getXpRate() > 1)
-			exp *= Settings.getConfig().getXpRate();
+			exp *= (Settings.getConfig().getXpRate()/(player.getI("prestige") > 0 ? (player.getI("prestige") + 1) : (1)));
 
 		int oldLevel = getLevelForXp(skill);
 		double oldXp = xp[skill];
@@ -1048,7 +1048,7 @@ public final class Skills {
 			return;
 
 		if (Settings.getConfig().getXpRate() > 1)
-			exp *= Settings.getConfig().getXpRate();
+			exp *= (Settings.getConfig().getXpRate()/(player.getI("prestige") > 0 ? (player.getI("prestige") + 1) : (1)));
 
 		double modifier = 1.0;
 

@@ -1,5 +1,6 @@
 package com.rs.rsps.jessecustom;
 
+import com.rs.Settings;
 import com.rs.db.WorldDB;
 import com.rs.game.World;
 import com.rs.game.content.dialogue.Dialogue;
@@ -7,12 +8,16 @@ import com.rs.game.content.dialogue.HeadE;
 import com.rs.game.content.dialogue.Options;
 import com.rs.game.content.quests.Quest;
 import com.rs.game.content.skills.summoning.Familiar;
+import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.player.Player;
+import com.rs.lib.Constants;
 import com.rs.lib.game.WorldTile;
 import com.rs.lib.net.ServerPacket;
 import com.rs.plugin.annotations.PluginEventHandler;
+import com.rs.plugin.events.LoginEvent;
 import com.rs.plugin.events.NPCClickEvent;
 import com.rs.plugin.events.ObjectClickEvent;
+import com.rs.plugin.handlers.LoginHandler;
 import com.rs.plugin.handlers.NPCClickHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
 
@@ -21,7 +26,15 @@ import java.util.List;
 
 @PluginEventHandler
 public class GIM {
-	public static List<GroupIronMan> IRONMAN_GROUPS = new ArrayList<>();
+	private static boolean isMaxedSilent(Player player) {
+		boolean maxed = true;
+		for (int i = 0; i < 25; i++)
+			if (player.getSkills().getLevelForXp(i) < 99)
+				maxed = false;
+		if (player.getSkills().getLevelForXp(Constants.DUNGEONEERING) < 120)
+			maxed = false;
+		return maxed;
+	}
 
 	private static void resetPlayer(Player p) {
 		for (int skill = 0; skill < 25; skill++)
@@ -125,9 +138,63 @@ public class GIM {
 											);
 										})
 								);
-//								option("Leave a group.", new Dialogue()
-//										.addPlayer(HeadE.HAPPY_TALKING, "")
-//								);
+								option("What is my group name?", new Dialogue()
+										.addNPC(NPC, HeadE.CALM_TALK, "It is...")
+										.addNPC(NPC, HeadE.CALM_TALK, "\"" + e.getPlayer().getO("GIM Team") + "\"")
+								);
+
+								if(isMaxedSilent(e.getPlayer())) {
+									option("I'd like to prestige", new Dialogue()
+											.addNPC(NPC, HeadE.CALM_TALK, "Wow!")
+											.addPlayer(HeadE.HAPPY_TALKING, "What??")
+											.addNPC(NPC, HeadE.CALM_TALK, "You are epic!")
+											.addPlayer(HeadE.HAPPY_TALKING, "Thanks.")
+											.addNPC(NPC, HeadE.CALM_TALK, "Great, if all of you come to me and say you want to prestige I will do it.")
+											.addPlayer(HeadE.HAPPY_TALKING, "Then, I want to prestige please.")
+											.addNPC(NPC, HeadE.CALM_TALK, "Okay, I will note you down to prestige. Don't logout.")
+											.addNext(()->{
+												e.getPlayer().getTempAttribs().setB("wants to prestige", true);
+												if(WorldDB.getGIMS().groupExists(e.getPlayer().getO("GIM Team"))) {
+													WorldDB.getGIMS().getByGroupName(e.getPlayer().getO("GIM Team"), group -> {
+														boolean canPrestige = true;
+														for(String username : group.getPlayers()) {
+															Player p = World.getPlayerByUsername(username);
+															p.sendMessage(e.getPlayer().getDisplayName() + " wants to prestige...");
+															if(p == null || !p.getTempAttribs().getB("wants to prestige")) {
+																canPrestige = false;
+															}
+														}
+														if(canPrestige) {
+															for(String username : group.getPlayers()) {
+																Player p = World.getPlayerByUsername(username);
+																p.save("prestige", p.getI("prestige", 0) + 1);
+																for (int skill = 0; skill < 25; skill++)
+																	p.getSkills().setXp(skill, 0);
+																p.getSkills().init();
+																p.sendMessage("<col=00FFFF>You have prestiged!</col>");
+															}
+														}
+
+													});
+												} else
+													e.getPlayer().sendMessage("Your team doesn't exist, contact an admin...");
+											})
+									);
+
+								}
+
+								option("What is my prestige and XP rate?", new Dialogue()
+										.addNPC(NPC, HeadE.CALM_TALK, "Your prestige is " + String.valueOf(e.getPlayer().getI("prestige", 0))
+												+ " and your xp rate is " + String.valueOf((Settings.getConfig().getXpRate()/(e.getPlayer().getI("prestige") > 0 ? (e.getPlayer().getI("prestige") + 1) : (1)))))
+								);
+
+								option("Tell me about prestige.", new Dialogue()
+										.addPlayer(HeadE.HAPPY_TALKING, "I heard a rumor there is a group prestige?")
+										.addNPC(NPC, HeadE.CALM_TALK, "Yes, you can prestige your group to get rewards.")
+										.addNPC(NPC, HeadE.CALM_TALK, "You will be able to do it here after your entire team says they want to do it.", () -> {
+											e.getPlayer().getSkills().isMaxed(true);
+										})
+								);
 								option("Nothing.", new Dialogue());
 							}
 						})
@@ -170,6 +237,7 @@ public class GIM {
 																			resetPlayer(e.getPlayer());
 																			e.getPlayer().setIronMan(true);
 																			e.getPlayer().save("Group IronMan", true);
+																			e.getPlayer().getHintIconsManager().removeAll();
 																		})
 																		.addNPC(NPC, HeadE.CALM_TALK, "Congratulations! You are a Group IronMan...")
 																		.addPlayer(HeadE.HAPPY_TALKING, "Really?")
@@ -189,6 +257,19 @@ public class GIM {
 				return;
 			}
 			e.getPlayer().startConversation(new Dialogue().addNPC(e.getNPCId(), HeadE.CALM_TALK, "You must be on an Iron Man account to access Group IronMan."));
+		}
+	};
+
+	public static LoginHandler updateHintGIM = new LoginHandler() {
+		@Override
+		public void handle(LoginEvent e) {
+			if(!e.getPlayer().getBool("Group IronMan")) {
+				if(e.getPlayer().getRegionId() == 12342) {
+					for(NPC npc : World.getNPCsInRegion(12342))
+						if(npc.getId() == 1512)
+							e.getPlayer().getHintIconsManager().addHintIcon(6, npc, 0, -1, true);
+				}
+			}
 		}
 	};
 
