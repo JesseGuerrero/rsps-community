@@ -17,3 +17,4 @@ Features:<br>
 -Fight kiln nerfed to be doable<br>
 -Dung tokens tripled<br>
 -Nex slightly nerfed for doability of 5 players<br>
+-Death coffers
