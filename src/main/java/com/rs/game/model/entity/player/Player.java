@@ -1346,7 +1346,11 @@ public class Player extends Entity {
 			else
 				setStarter(1);
 			PlayerLook.openCharacterCustomizing(this);
-			getDialogueManager().execute(new StartDialogue());
+			setIronMan(true);
+			startConversation(new Dialogue().addSimple("This is a dedicated Group IronMan server").addNext(()->{
+				setChosenAccountType(true);
+				getAppearance().generateAppearanceData();
+			}));
 		}
 		//getPackets().write(new UpdateRichPresence("state", "Logged in as " + getDisplayName()));
 		PluginManager.handle(new LoginEvent(this));

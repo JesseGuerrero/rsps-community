@@ -26,6 +26,9 @@ import com.rs.cache.loaders.EnumDefinitions;
 import com.rs.cache.loaders.ItemDefinitions;
 import com.rs.cache.loaders.interfaces.IFEvents;
 import com.rs.cache.loaders.interfaces.IFEvents.UseFlag;
+import com.rs.db.WorldDB;
+import com.rs.game.content.dialogue.Dialogue;
+import com.rs.game.content.dialogue.Options;
 import com.rs.game.content.holidayevents.easter.easter22.Easter2022;
 import com.rs.game.content.skills.runecrafting.Runecrafting;
 import com.rs.game.content.skills.summoning.Familiar;
@@ -588,9 +591,7 @@ public class Bank {
 		}
 	};
 
-	public void open() {
-		if (!checkPin())
-			return;
+	private void openBank() {
 		player.getTempAttribs().removeB("viewingOtherBank");
 		player.getVars().setVar(638, 0);
 		player.getVars().setVarBit(8348, 0);
@@ -609,6 +610,83 @@ public class Bank {
 		player.setCloseInterfacesEvent(() -> {
 			player.getSession().writeToQueue(ServerPacket.TRIGGER_ONDIALOGABORT);
 			Familiar.sendLeftClickOption(player);
+		});
+	}
+
+	public void open() {
+		if(player.getO("GIM Team") == null) {
+			player.sendMessage("You need to be part of a group to access a bank...");
+			return;
+		}
+		if (!checkPin())
+			return;
+		WorldDB.getGIMS().getByGroupName(player.getO("GIM Team"), group -> {
+			player.startConversation(new Dialogue().addOptions("Choose an option:", new Options() {
+				@Override
+				public void create() {
+					option("Bank 1", new Dialogue()
+							.addNext(()->{
+								if(group.isBank1Open()) {
+									player.sendMessage("The group bank is in use.");
+									return;
+								}
+								group.setBank1Open(true);
+								group.getBank1().setPlayer(player);
+								player.getTempAttribs().setO("GIM Bank", group.getBank1());
+								group.getBank1().openBank();
+								WorldDB.getGIMS().saveSync(group);
+								player.setCloseInterfacesEvent(() -> {
+									player.getSession().writeToQueue(ServerPacket.TRIGGER_ONDIALOGABORT);
+									Familiar.sendLeftClickOption(player);
+									group.setBank1Open(false);
+									player.getTempAttribs().setO("GIM Bank", null);
+									WorldDB.getGIMS().saveSync(group);
+								});
+							})
+					);
+					option("Bank 2", new Dialogue()
+							.addNext(()->{
+								if(group.isBank2Open()) {
+									player.sendMessage("The group bank is in use.");
+									return;
+								}
+								group.setBank2Open(true);
+								group.getBank2().setPlayer(player);
+								player.getTempAttribs().setO("GIM Bank", group.getBank2());
+								group.getBank2().openBank();
+								WorldDB.getGIMS().saveSync(group);
+								player.setCloseInterfacesEvent(() -> {
+									player.getSession().writeToQueue(ServerPacket.TRIGGER_ONDIALOGABORT);
+									Familiar.sendLeftClickOption(player);
+									group.setBank2Open(false);
+									player.getTempAttribs().setO("GIM Bank", null);
+									WorldDB.getGIMS().saveSync(group);
+								});
+							})
+					);
+					option("Bank 3", new Dialogue()
+							.addNext(()->{
+								if(group.isBank3Open()) {
+									player.sendMessage("The group bank is in use.");
+									return;
+								}
+								group.setBank3Open(true);
+								group.getBank3().setPlayer(player);
+								player.getTempAttribs().setO("GIM Bank", group.getBank3());
+								group.getBank3().openBank();
+								WorldDB.getGIMS().saveSync(group);
+								player.setCloseInterfacesEvent(() -> {
+									player.getSession().writeToQueue(ServerPacket.TRIGGER_ONDIALOGABORT);
+									Familiar.sendLeftClickOption(player);
+									group.setBank3Open(false);
+									player.getTempAttribs().setO("GIM Bank", null);
+									WorldDB.getGIMS().saveSync(group);
+								});
+							})
+					);
+				}
+			}));
+
 		});
 	}
 

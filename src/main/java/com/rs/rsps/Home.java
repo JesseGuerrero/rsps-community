@@ -29,27 +29,27 @@ public class Home {
 		//spawnNPC(14858, new WorldTile(3090, 3494, 0), "Cadet Cassandra", Direction.WEST, false);
 		
 		/* Slayer Masters */
-		spawnNPC(8480, new WorldTile(3091, 3487, 0), Direction.SOUTH, false);
-		spawnNPC(8481, new WorldTile(3092, 3487, 0), Direction.SOUTH, false);
-		spawnNPC(1597, new WorldTile(3093, 3487, 0), Direction.SOUTH, false);
-		spawnNPC(1598, new WorldTile(3094, 3487, 0), Direction.SOUTH, false);
-		spawnNPC(7779, new WorldTile(3095, 3487, 0), Direction.SOUTH, false);
-		spawnNPC(8466, new WorldTile(3096, 3487, 0), Direction.SOUTH, false);
-		spawnNPC(9085, new WorldTile(3097, 3487, 0), Direction.SOUTH, false);
-		spawnNPC(15661, new WorldTile(3082, 3490, 0), Direction.EAST, false);
+//		spawnNPC(8480, new WorldTile(3091, 3487, 0), Direction.SOUTH, false);
+//		spawnNPC(8481, new WorldTile(3092, 3487, 0), Direction.SOUTH, false);
+//		spawnNPC(1597, new WorldTile(3093, 3487, 0), Direction.SOUTH, false);
+//		spawnNPC(1598, new WorldTile(3094, 3487, 0), Direction.SOUTH, false);
+//		spawnNPC(7779, new WorldTile(3095, 3487, 0), Direction.SOUTH, false);
+//		spawnNPC(8466, new WorldTile(3096, 3487, 0), Direction.SOUTH, false);
+		spawnNPC(9085, new WorldTile(3088, 3483, 0), Direction.NORTH, false);
+		spawnNPC(15661, new WorldTile(3085, 3483, 0), Direction.NORTH, false);
 
 		/* GE Clarks */
-		spawnNPC(2240, new WorldTile(3096, 3492, 0), Direction.WEST, false);
-		spawnNPC(2241, new WorldTile(3096, 3490, 0), Direction.WEST, false);
-		spawnNPC(2593, new WorldTile(3096, 3494, 0), Direction.NORTHWEST, false);
-		spawnNPC(2240, new WorldTile(3098, 3494, 0), Direction.NORTH, false);
-		spawnNPC(2241, new WorldTile(3096, 3488, 0), Direction.WEST, false);
+//		spawnNPC(2240, new WorldTile(3096, 3492, 0), Direction.WEST, false);
+//		spawnNPC(2241, new WorldTile(3096, 3490, 0), Direction.WEST, false);
+//		spawnNPC(2593, new WorldTile(3096, 3494, 0), Direction.NORTHWEST, false);
+//		spawnNPC(2240, new WorldTile(3098, 3494, 0), Direction.NORTH, false);
+//		spawnNPC(2241, new WorldTile(3096, 3488, 0), Direction.WEST, false);
 
 		/* Loyalty point shop */
-		spawnNPC(13727, new WorldTile(3091, 3505, 0), Direction.SOUTH, false);
+		spawnNPC(13727, new WorldTile(3090, 3493, 0), Direction.WEST, false);
 
 		/* GIM */
-		spawnNPC(1512, new WorldTile(3091, 3492, 0), Direction.EAST, false);
+		spawnNPC(1512, new WorldTile(3083, 3495, 0), Direction.EAST, false);
 	}
 
 	public static ObjectClickHandler handleShops = new ObjectClickHandler(new Object[] { 18789 }, new WorldTile(3095, 3499, 0)) {

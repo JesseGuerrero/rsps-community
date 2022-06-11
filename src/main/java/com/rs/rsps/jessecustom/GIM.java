@@ -7,7 +7,6 @@ import com.rs.game.content.dialogue.HeadE;
 import com.rs.game.content.dialogue.Options;
 import com.rs.game.content.quests.Quest;
 import com.rs.game.content.skills.summoning.Familiar;
-import com.rs.game.model.entity.player.Bank;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.WorldTile;
 import com.rs.lib.net.ServerPacket;
@@ -196,31 +195,13 @@ public class GIM {
 	public static ObjectClickHandler openChest = new ObjectClickHandler(new Object[] { 170 }, new WorldTile[]{new WorldTile(3091, 3493, 0)}) {
 		@Override
 		public void handle(ObjectClickEvent e) {
-			if(e.getPlayer().getBool("Group IronMan")) {
-				if(e.getPlayer().getO("GIM Team") == null) {
+			if (e.getPlayer().getBool("Group IronMan")) {
+				if (e.getPlayer().getO("GIM Team") == null) {
 					e.getPlayer().sendMessage("You need to be part of a group to access a shared bank...");
 					return;
 				}
-				if(e.getObject().getAttribs().getB("GIM_" + e.getPlayer().getO("GIM Team"))) {
-					e.getPlayer().sendMessage("The group bank is in use.");
-					return;
-				}
-				WorldDB.getGIMS().getByGroupName(e.getPlayer().getO("GIM Team"), group -> {
-					e.getObject().getAttribs().setB("GIM_" + e.getPlayer().getO("GIM Team"), true);
-					group.getBank().setPlayer(e.getPlayer());
-					e.getPlayer().getTempAttribs().setO("GIM Bank", group.getBank());
-					group.getBank().open();
-					e.getPlayer().setCloseInterfacesEvent(() -> {
-						e.getPlayer().getSession().writeToQueue(ServerPacket.TRIGGER_ONDIALOGABORT);
-						Familiar.sendLeftClickOption(e.getPlayer());
-						e.getObject().getAttribs().setB("GIM_" + e.getPlayer().getO("GIM Team"), false);
-						e.getPlayer().getTempAttribs().setO("GIM Bank", null);
-						WorldDB.getGIMS().saveSync(group);
-					});
-				});
-				return;
+				e.getPlayer().getBank().open();
 			}
-			e.getPlayer().sendMessage("Blocked");
 		}
 	};
 }

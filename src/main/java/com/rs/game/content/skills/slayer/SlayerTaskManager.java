@@ -23,6 +23,7 @@ import com.rs.game.content.dialogues_matrix.MatrixDialogue;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.Constants;
+import com.rs.lib.game.WorldTile;
 import com.rs.lib.util.Utils;
 import com.rs.utils.shop.ShopsHandler;
 
@@ -140,7 +141,16 @@ public class SlayerTaskManager {
 		killsLeft = Utils.random(chosenTask.getMin(), chosenTask.getMax());
 	}
 
-	public void getTaskFrom(Player player, final Master master) {
+	public void getTaskFrom(Player player, Master masterfill) {
+		if(player.withinDistance(new WorldTile(3088, 3484, 0)))
+			for(int i = Master.values().length-1; i >= 0; i--) {
+				 if(player.getSkills().getCombatLevelWithSummoning() >= Master.values()[i].requiredCombatLevel
+					&& player.getSkills().getLevelForXp(Constants.SLAYER) >= Master.values()[i].reqSlayerLevel) {
+					 masterfill = Master.values()[i];
+					 break;
+				 }
+			}
+		final Master master = masterfill;
 		if (player.hasSlayerTask()) {
 			if ((master == Master.Turael) && (player.getSlayer().getTask().getMaster().name().indexOf("Turael") == -1)) {
 				MatrixDialogue.sendNPCDialogue(player, master.npcId, MatrixDialogue.HAPPY_TALKING, "You already have a task of " + player.getSlayer().getTask().getMonster().getName() + "" + (master == getMaster() ? "" : (" from "+ player.getSlayer().getTask().getMaster().name())) + ".");

@@ -1,9 +1,7 @@
 package com.rs.rsps.jessecustom;
 
-import com.rs.db.collection.GroupIronmanManager;
 import com.rs.game.model.entity.player.Bank;
 import com.rs.game.model.entity.player.Player;
-import com.rs.lib.game.Item;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +9,12 @@ import java.util.List;
 public class GroupIronMan {
 	private String groupName;//This is the key
 	private List<String> players = new ArrayList<>();
-	private Bank bank = new Bank();
+	private Bank bank1 = new Bank();
+	private Bank bank2 = new Bank();
+	private Bank bank3 = new Bank();
+	private boolean bank1Open = false;
+	private boolean bank2Open = false;
+	private boolean bank3Open = false;
 
 	public GroupIronMan(String groupName, Player founder) {
 		this.groupName = groupName;
@@ -22,8 +25,26 @@ public class GroupIronMan {
 		return players;
 	}
 
-	public Bank getBank() {
-		return bank;
+	public Bank getBank1() {
+		return bank1;
+	}
+	public Bank getBank2() {
+		return bank2;
+	}
+	public Bank getBank3() {
+		return bank3;
+	}
+
+	public boolean isBank1Open() {
+		return bank1Open;
+	}
+
+	public boolean isBank2Open() {
+		return bank2Open;
+	}
+
+	public boolean isBank3Open() {
+		return bank3Open;
 	}
 
 	public String getGroupName() {
@@ -36,5 +57,17 @@ public class GroupIronMan {
 
 	public void addPlayer(Player p) {
 		players.add(p.getUsername());
+	}
+
+	public void setBank2Open(boolean bank2Open) {
+		this.bank2Open = bank2Open;
+	}
+
+	public void setBank3Open(boolean bank3Open) {
+		this.bank3Open = bank3Open;
+	}
+
+	public void setBank1Open(boolean bank1Open) {
+		this.bank1Open = bank1Open;
 	}
 }
