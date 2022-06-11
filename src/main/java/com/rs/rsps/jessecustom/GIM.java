@@ -13,6 +13,7 @@ import com.rs.game.model.entity.player.Player;
 import com.rs.lib.Constants;
 import com.rs.lib.game.WorldTile;
 import com.rs.lib.net.ServerPacket;
+import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.LoginEvent;
 import com.rs.plugin.events.NPCClickEvent;
@@ -36,15 +37,14 @@ public class GIM {
 		return maxed;
 	}
 
+	private static boolean groupNamesMatch(String group1, String group2) {
+		return Utils.formatPlayerNameForProtocol(group1).equals(Utils.formatPlayerNameForProtocol(group2));
+	}
+
 	private static void resetPlayer(Player p) {
 		for (int skill = 0; skill < 25; skill++)
 			p.getSkills().setXp(skill, 0);
 		p.getSkills().init();
-		for (Quest quest : Quest.values())
-			if (quest.isImplemented()) {
-				p.getQuestManager().resetQuest(quest);
-				p.sendMessage("Reset quest: " + quest.name());
-			}
 		p.getBank().clear();
 		p.getEquipment().reset();
 		p.getInventory().reset();
@@ -66,8 +66,11 @@ public class GIM {
 								public void create() {
 									option("Start a group", new Dialogue()
 											.addPlayer(HeadE.HAPPY_TALKING, "I would like to start a group.")
+											.addNPC(NPC, HeadE.CALM_TALK, "Great! Remember, starting a group is irreversible...")
 											.addNext(()->{
-												e.getPlayer().sendInputName("What group name would you like?", groupName -> {
+												e.getPlayer().sendInputName("What group name would you like?", groupNameDisplay -> {
+															groupNameDisplay = Utils.formatPlayerNameForProtocol(groupNameDisplay);
+															final String groupName = groupNameDisplay;
 															if (!WorldDB.getGIMS().groupExists(groupName)) {
 																WorldDB.getGIMS().save(new GroupIronMan(groupName, e.getPlayer()), () -> {
 																	e.getPlayer().sendMessage("Group created!");
@@ -82,9 +85,11 @@ public class GIM {
 									);
 									option("Join a group", new Dialogue()
 											.addPlayer(HeadE.HAPPY_TALKING, "I would like to join a group.")
-											.addNPC(NPC, HeadE.CALM_TALK, "Great! Remember, joining a group is irreversible...")
+											.addNPC(NPC, HeadE.CALM_TALK, "Great! Remember, joining a group is reversible...")
 											.addNext(()->{
-												e.getPlayer().sendInputName("What group would you like to join?", groupName -> {
+												e.getPlayer().sendInputName("What group would you like to join?", groupNameDisplay -> {
+															groupNameDisplay = Utils.formatPlayerNameForProtocol(groupNameDisplay);
+															final String groupName = groupNameDisplay;
 															if (WorldDB.getGIMS().groupExists(groupName)) {
 																WorldDB.getGIMS().getByGroupName(groupName, group -> {
 																	if(group.getPlayers().size() > 5) {
@@ -94,6 +99,7 @@ public class GIM {
 																	Player founder = World.getPlayerByUsername(group.getPlayers().get(0));
 																	founder.getTempAttribs().setB("GIM Join Request_"+e.getPlayer().getUsername(), true);
 																	e.getPlayer().getTempAttribs().setB("GIM Group Request_"+groupName, true);
+																	group.broadcastMessage("<col=00FFFF>" + e.getPlayer().getDisplayName() + " wishes to join your group...</col>");
 																	e.getPlayer().startConversation(
 																			new Dialogue().addNPC(NPC, HeadE.CALM_TALK, "Have the founder talk to me and neither of you log out.")
 																	);
@@ -125,10 +131,18 @@ public class GIM {
 																&& e.getPlayer().getTempAttribs().getB("GIM Join Request_" +member.getUsername())
 																&& member.getTempAttribs().getB("GIM Group Request_"+e.getPlayer().getO("GIM Team"))) {
 															WorldDB.getGIMS().getByGroupName(e.getPlayer().getO("GIM Team"), group -> {
+																if(group.getPrestige() < 0)
+																	group.setPrestige(0);
+																if(group.getPrestige() != member.getI("prestige", 0)) {
+																	group.broadcastMessage(member.getDisplayName() + " has a prestige of "
+																			+ member.getI("prestige", 0) + " while your group has a prestige of "
+																			+ group.getPrestige() + " and cannot join.");
+																	return;
+																}
 																group.addPlayer(member);
 																e.getPlayer().sendMessage(member.getDisplayName() + " has been added to the group...");
 																member.save("GIM Team", group.getGroupName());
-																member.sendMessage("You have joined " + group.getGroupName() + "!");
+																member.sendMessage("<col=00FFFF>You have joined " + group.getGroupName() + "!</col>");
 																WorldDB.getGIMS().saveSync(group);
 															});
 															return;
@@ -138,9 +152,21 @@ public class GIM {
 											);
 										})
 								);
-								option("What is my group name?", new Dialogue()
-										.addNPC(NPC, HeadE.CALM_TALK, "It is...")
-										.addNPC(NPC, HeadE.CALM_TALK, "\"" + e.getPlayer().getO("GIM Team") + "\"")
+								option("What is my group name & members?", new Dialogue()
+										.addNPC(NPC, HeadE.CALM_TALK, "Your group name is...")
+										.addNPC(NPC, HeadE.CALM_TALK, "\"" + Utils.formatPlayerNameForDisplay(e.getPlayer().getO("GIM Team")) + "\"")
+										.addNext(()->{
+											WorldDB.getGIMS().getByGroupName(e.getPlayer().getO("GIM Team"), group -> {
+												String membersListing = "";
+												for(String member : group.getPlayers())
+													membersListing = membersListing + "\"" + member + "\"<br>";
+												e.getPlayer().startConversation(new Dialogue()
+														.addNPC(NPC, HeadE.CALM_TALK, "You group members are...")
+														.addNPC(NPC, HeadE.CALM_TALK, membersListing)
+												);
+											});
+
+										})
 								);
 
 								if(isMaxedSilent(e.getPlayer())) {
@@ -195,7 +221,95 @@ public class GIM {
 											e.getPlayer().getSkills().isMaxed(true);
 										})
 								);
-								option("Nothing.", new Dialogue());
+//								option("Rename my team", new Dialogue()
+//										.addNPC(NPC, HeadE.CALM_TALK, "So you want to rename your team do you?")
+//										.addNext(()->{
+//											e.getPlayer().sendInputName("What group name would you like?", groupNameDisplay -> {
+//												WorldDB.getGIMS().getByGroupName(e.getPlayer().getO("GIM Team"), group -> {
+//													if(!group.isGroupLeader(e.getPlayer())) {
+//														e.getPlayer().sendMessage("Only the group leader can do this...");
+//														return;
+//													}
+//													String groupName = Utils.formatPlayerNameForProtocol(groupNameDisplay);
+//													group.setGroupName(groupName);
+//													WorldDB.getGIMS().saveSync(group);
+//												});
+//											});
+//										})
+//								);
+								option("Kick a member.", new Dialogue()
+										.addNext(()->{
+											e.getPlayer().sendInputName("What player would you like to kick?", displayname -> {
+												if (!WorldDB.getGIMS().groupExists(e.getPlayer().getO("GIM Team"))) {
+													e.getPlayer().sendMessage("Your group doesn't exist! This is not expected, contact an admin");
+													return;
+												}
+												World.forceGetPlayerByDisplay(displayname, member -> {
+													if(groupNamesMatch(member.getO("GIM Team"), e.getPlayer().getO("GIM Team"))) {
+														WorldDB.getGIMS().getByGroupName(e.getPlayer().getO("GIM Team"), group -> {
+															if(group.getPlayers().size() < 2) {
+																e.getPlayer().sendMessage("You can't delete a group entirely!");
+																return;
+															}
+															if(group.isGroupLeader(member)) {
+																e.getPlayer().sendMessage("You can't kick the group leader!");
+																return;
+															}
+															int i = group.getPlayers().indexOf(member.getUsername());
+															e.getPlayer().getTempAttribs().setI("kick member", i);
+															for(String groupMember : group.getPlayers()) {
+																Player player = World.getPlayerByUsername(groupMember);
+																player.sendMessage(e.getPlayer().getDisplayName() + " wants to kick " + member.getDisplayName());
+																if(player.getUsername() != member.getUsername() && player.getTempAttribs().getI("kick member") != i)
+																	return;
+															}
+
+
+															member.delete("GIM Team");
+															group.getPlayers().remove(member.getUsername());
+															group.broadcastMessage(member.getDisplayName() + " has left group \"" + group.getGroupName() + "\"");
+															member.sendMessage("You left group \"" + group.getGroupName() + "\"");
+															WorldDB.getGIMS().saveSync(group);
+														});
+														return;
+													}
+													e.getPlayer().sendMessage(displayname + " is not in the same group as you!");
+												});
+
+											});
+										})
+										.addNext(()->{
+											e.getPlayer().getTempAttribs().setB("wants to prestige", true);
+											if(WorldDB.getGIMS().groupExists(e.getPlayer().getO("GIM Team"))) {
+												WorldDB.getGIMS().getByGroupName(e.getPlayer().getO("GIM Team"), group -> {
+													boolean canPrestige = true;
+													for(String username : group.getPlayers()) {
+														Player p = World.getPlayerByUsername(username);
+														p.sendMessage(e.getPlayer().getDisplayName() + " wants to prestige...");
+														if(p == null || !p.getTempAttribs().getB("wants to prestige")) {
+															canPrestige = false;
+														}
+													}
+													if(canPrestige) {
+														for(String username : group.getPlayers()) {
+															Player p = World.getPlayerByUsername(username);
+															p.save("prestige", p.getI("prestige", 0) + 1);
+
+															for (int skill = 0; skill < 25; skill++)
+																p.getSkills().setXp(skill, 0);
+															p.getSkills().init();
+															p.sendMessage("<col=00FFFF>You have prestiged!</col>");
+														}
+														if(group.getPrestige() < 0 )
+															group.setPrestige(0);
+														group.setPrestige(group.getPrestige() + 1);
+													}
+
+												});
+											} else
+												e.getPlayer().sendMessage("Your team doesn't exist, contact an admin...");
+										})
+								);
 							}
 						})
 				);

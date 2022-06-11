@@ -1,6 +1,7 @@
 package com.rs.db.collection;
 
 import com.google.gson.JsonIOException;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.FindOneAndReplaceOptions;
 import com.mongodb.client.model.Indexes;
 import com.rs.game.World;
@@ -59,6 +60,18 @@ public class GroupIronmanManager extends DBItemManager  {
 			Logger.handle(e);
 			return null;
 		}
+	}
+
+	public void remove(GroupIronMan group, Runnable done) {
+		execute(() -> {
+			removeSync(group);
+			if (done != null)
+				done.run();
+		});
+	}
+
+	public void removeSync(GroupIronMan group) {
+		getDocs().findOneAndDelete(Filters.eq("groupName", group.getGroupName()));
 	}
 
 	public boolean groupExists(String groupName) {

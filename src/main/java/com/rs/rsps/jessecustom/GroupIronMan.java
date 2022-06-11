@@ -1,5 +1,6 @@
 package com.rs.rsps.jessecustom;
 
+import com.rs.game.World;
 import com.rs.game.model.entity.player.Bank;
 import com.rs.game.model.entity.player.Player;
 
@@ -15,6 +16,7 @@ public class GroupIronMan {
 	private boolean bank1Open = false;
 	private boolean bank2Open = false;
 	private boolean bank3Open = false;
+	private int prestige = 0;
 
 	public GroupIronMan(String groupName, Player founder) {
 		this.groupName = groupName;
@@ -55,8 +57,20 @@ public class GroupIronMan {
 		return players.size();
 	}
 
+	public int getPrestige() {
+		return prestige;
+	}
+
 	public void addPlayer(Player p) {
 		players.add(p.getUsername());
+	}
+
+	public void setGroupName(String groupName) {
+		for(String member : getPlayers())
+			World.forceGetPlayerByDisplay(member, player -> {
+				player.save("GIM Team", groupName);
+			});
+		this.groupName = groupName;
 	}
 
 	public void setBank2Open(boolean bank2Open) {
@@ -69,5 +83,21 @@ public class GroupIronMan {
 
 	public void setBank1Open(boolean bank1Open) {
 		this.bank1Open = bank1Open;
+	}
+
+	public void setPrestige(int prestige) {
+		this.prestige = prestige;
+	}
+
+	public void broadcastMessage(String message) {
+		for(String member : players) {
+			Player p = World.getPlayerByUsername(member);
+			if(p != null)
+				p.sendMessage(message);
+		}
+	}
+
+	public boolean isGroupLeader(Player p) {
+		return players.get(0).equalsIgnoreCase(p.getUsername());
 	}
 }

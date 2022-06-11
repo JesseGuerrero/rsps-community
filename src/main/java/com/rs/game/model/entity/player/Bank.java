@@ -33,6 +33,9 @@ import com.rs.game.content.holidayevents.easter.easter22.Easter2022;
 import com.rs.game.content.skills.runecrafting.Runecrafting;
 import com.rs.game.content.skills.summoning.Familiar;
 import com.rs.game.model.entity.player.managers.InterfaceManager.Sub;
+import com.rs.game.tasks.WorldTask;
+import com.rs.game.tasks.WorldTasks;
+import com.rs.lib.Constants;
 import com.rs.lib.game.Item;
 import com.rs.lib.net.ClientPacket;
 import com.rs.lib.net.ServerPacket;
@@ -68,23 +71,33 @@ public class Bank {
 	public static ButtonClickHandler handleDepositBox = new ButtonClickHandler(11) {
 		@Override
 		public void handle(ButtonClickEvent e) {
-			if (e.getComponentId() == 17) {
-				if (e.getPacket() == ClientPacket.IF_OP1)
-					e.getPlayer().getBank().depositItem(e.getSlotId(), 1, false);
-				else if (e.getPacket() == ClientPacket.IF_OP2)
-					e.getPlayer().getBank().depositItem(e.getSlotId(), 5, false);
-				else if (e.getPacket() == ClientPacket.IF_OP3)
-					e.getPlayer().getBank().depositItem(e.getSlotId(), 10, false);
-				else if (e.getPacket() == ClientPacket.IF_OP4)
-					e.getPlayer().getBank().depositItem(e.getSlotId(), Integer.MAX_VALUE, false);
-				else if (e.getPacket() == ClientPacket.IF_OP5)
-					e.getPlayer().sendInputInteger("How many would you like to deposit?", (integer) -> e.getPlayer().getBank().depositItem(e.getSlotId(), integer, true));
-				else if (e.getPacket() == ClientPacket.IF_OP6)
-					e.getPlayer().getInventory().sendExamine(e.getSlotId());
-			} else if (e.getComponentId() == 18)
-				e.getPlayer().getBank().depositAllInventory(false);
-			else if (e.getComponentId() == 22)
-				e.getPlayer().getBank().depositAllEquipment(false);
+			WorldDB.getGIMS().getByGroupName(e.getPlayer().getO("GIM Team"), group -> {
+				if(group.isBank1Open()) {
+					e.getPlayer().sendMessage("The group bank is in use.");
+					return;
+				}
+				group.setBank1Open(true);
+				group.getBank1().setPlayer(e.getPlayer());
+				if (e.getComponentId() == 17) {
+					if (e.getPacket() == ClientPacket.IF_OP1)
+						group.getBank1().depositItem(e.getSlotId(), 1, false);
+					else if (e.getPacket() == ClientPacket.IF_OP2)
+						group.getBank1().depositItem(e.getSlotId(), 5, false);
+					else if (e.getPacket() == ClientPacket.IF_OP3)
+						group.getBank1().depositItem(e.getSlotId(), 10, false);
+					else if (e.getPacket() == ClientPacket.IF_OP4)
+						group.getBank1().depositItem(e.getSlotId(), Integer.MAX_VALUE, false);
+					else if (e.getPacket() == ClientPacket.IF_OP5)
+						e.getPlayer().sendInputInteger("How many would you like to deposit?", (integer) -> group.getBank1().depositItem(e.getSlotId(), integer, true));
+					else if (e.getPacket() == ClientPacket.IF_OP6)
+						e.getPlayer().getInventory().sendExamine(e.getSlotId());
+				} else if (e.getComponentId() == 18)
+					group.getBank1().depositAllInventory(false);
+				else if (e.getComponentId() == 22)
+					group.getBank1().depositAllEquipment(false);
+				group.setBank1Open(false);
+				WorldDB.getGIMS().saveSync(group);
+			});
 		}
 	};
 
@@ -437,7 +450,7 @@ public class Bank {
 		player.getInterfaceManager().removeSubs(Sub.TAB_INVENTORY, Sub.TAB_EQUIPMENT);
 		player.getInterfaceManager().openTab(Sub.TAB_FRIENDS);
 		sendBoxInterItems();
-		player.getPackets().setIFText(11, 13, "Bank Of " + Settings.getConfig().getServerName() + " - Deposit Box");
+		player.getPackets().setIFText(11, 13, "Bank Of " + Settings.getConfig().getServerName() + " - Deposit to Bank 1");
 		player.setCloseInterfacesEvent(() -> {
 			player.getSession().writeToQueue(ServerPacket.TRIGGER_ONDIALOGABORT);
 			player.getInterfaceManager().sendSubDefaults(Sub.TAB_INVENTORY, Sub.TAB_EQUIPMENT);
@@ -635,6 +648,18 @@ public class Bank {
 								player.getTempAttribs().setO("GIM Bank", group.getBank1());
 								group.getBank1().openBank();
 								WorldDB.getGIMS().saveSync(group);
+								WorldTasks.schedule(new WorldTask() {
+									@Override
+									public void run() {
+										if(!group.isBank1Open())
+											stop();
+										if(player.hasFinished() || player.getTempAttribs().getO("GIM Bank") == null) {
+											group.setBank1Open(false);
+											WorldDB.getGIMS().saveSync(group);
+											stop();
+										}
+									}
+								}, 10, 5);
 								player.setCloseInterfacesEvent(() -> {
 									player.getSession().writeToQueue(ServerPacket.TRIGGER_ONDIALOGABORT);
 									Familiar.sendLeftClickOption(player);
@@ -655,6 +680,18 @@ public class Bank {
 								player.getTempAttribs().setO("GIM Bank", group.getBank2());
 								group.getBank2().openBank();
 								WorldDB.getGIMS().saveSync(group);
+								WorldTasks.schedule(new WorldTask() {
+									@Override
+									public void run() {
+										if(!group.isBank2Open())
+											stop();
+										if(player.hasFinished() || player.getTempAttribs().getO("GIM Bank") == null) {
+											group.setBank2Open(false);
+											WorldDB.getGIMS().saveSync(group);
+											stop();
+										}
+									}
+								}, 10, 5);
 								player.setCloseInterfacesEvent(() -> {
 									player.getSession().writeToQueue(ServerPacket.TRIGGER_ONDIALOGABORT);
 									Familiar.sendLeftClickOption(player);
@@ -675,6 +712,18 @@ public class Bank {
 								player.getTempAttribs().setO("GIM Bank", group.getBank3());
 								group.getBank3().openBank();
 								WorldDB.getGIMS().saveSync(group);
+								WorldTasks.schedule(new WorldTask() {
+									@Override
+									public void run() {
+										if(!group.isBank3Open())
+											stop();
+										if(player.hasFinished() || player.getTempAttribs().getO("GIM Bank") == null) {
+											group.setBank3Open(false);
+											WorldDB.getGIMS().saveSync(group);
+											stop();
+										}
+									}
+								}, 10, 5);
 								player.setCloseInterfacesEvent(() -> {
 									player.getSession().writeToQueue(ServerPacket.TRIGGER_ONDIALOGABORT);
 									Familiar.sendLeftClickOption(player);
