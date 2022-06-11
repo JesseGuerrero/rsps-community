@@ -263,7 +263,7 @@ public enum Quest {
 	}
 
 	public boolean isImplemented() {
-		return false;
+		return handler != null;
 	}
 
 	public QuestOutline getHandler() {
