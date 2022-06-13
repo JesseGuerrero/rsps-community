@@ -95,7 +95,7 @@ public class Home {
 			null
 	};
 
-	public static ObjectClickHandler healingWell = new ObjectClickHandler(new Object[] { 28715 }, new WorldTile(3080, 3487, 0)) {
+	public static ObjectClickHandler healingWell = new ObjectClickHandler(new Object[] { 28715 }, new WorldTile(3082, 3489, 0)) {
 		@Override
 		public void handle(ObjectClickEvent e) {
 			e.getPlayer().sendMessage("You feel refreshed.");
