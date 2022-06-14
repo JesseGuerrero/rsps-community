@@ -653,7 +653,7 @@ public class Bank {
 									public void run() {
 										if(!group.isBank1Open())
 											stop();
-										if(player.hasFinished() || player.getTempAttribs().getO("GIM Bank") == null) {
+										if(!player.getInterfaceManager().topOpen(762) || player.hasFinished() || player.getTempAttribs().getO("GIM Bank") == null) {
 											group.setBank1Open(false);
 											WorldDB.getGIMS().saveSync(group);
 											stop();
