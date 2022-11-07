@@ -2,12 +2,11 @@ package com.rs.game.content.minigames.pyramidplunder;
 
 import com.rs.cache.loaders.ObjectType;
 import com.rs.game.World;
-import com.rs.game.content.controllers.PyramidPlunderController;
 import com.rs.game.content.dialogue.Dialogue;
 import com.rs.game.content.dialogue.Options;
 import com.rs.game.model.entity.ForceMovement;
 import com.rs.game.model.entity.Hit;
-import com.rs.game.model.entity.npc.others.OwnedNPC;
+import com.rs.game.model.entity.npc.OwnedNPC;
 import com.rs.game.model.entity.pathing.Direction;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.entity.player.Skills;

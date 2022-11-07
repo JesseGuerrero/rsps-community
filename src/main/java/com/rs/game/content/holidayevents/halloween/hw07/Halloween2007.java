@@ -23,7 +23,6 @@ import java.util.Set;
 
 import com.rs.cache.loaders.ObjectType;
 import com.rs.game.World;
-import com.rs.game.content.controllers.Halloween2007Controller;
 import com.rs.game.content.dialogue.Dialogue;
 import com.rs.game.content.dialogue.HeadE;
 import com.rs.game.model.entity.ForceMovement;
@@ -38,6 +37,7 @@ import com.rs.lib.game.SpotAnim;
 import com.rs.lib.game.WorldTile;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.annotations.ServerStartupEvent;
+import com.rs.plugin.annotations.ServerStartupEvent.Priority;
 import com.rs.plugin.events.ItemClickEvent;
 import com.rs.plugin.events.ItemOnObjectEvent;
 import com.rs.plugin.events.ObjectClickEvent;
@@ -52,7 +52,7 @@ import com.rs.utils.spawns.ObjectSpawns;
 public class Halloween2007 {
 
 	public static String STAGE_KEY = "hw2022";
-	public static boolean ENABLED = false;
+	public static boolean ENABLED = true;
 
 	public static WorldTile START_LOCATION = new WorldTile(1697, 4814, 0);
 
@@ -111,7 +111,7 @@ public class Halloween2007 {
 		SPRINGBOARD_PAIRS.put(t2, t1);
 	}
 
-	@ServerStartupEvent
+	@ServerStartupEvent(Priority.FILE_IO)
 	public static void loadPortal() {
 		if (ENABLED)
 			ObjectSpawns.add(new ObjectSpawn(31845, 10, 0, new WorldTile(3210, 3425, 0), "Portal to enter Death's House."));
@@ -540,8 +540,8 @@ public class Halloween2007 {
 					e.getPlayer().faceObject(e.getObject());
 					e.getPlayer().addWalkSteps(e.getPlayer().transform(0, -1, 0), 1, false);
 					WorldTile camTile = new WorldTile(1638, 4827, 0);
-					e.getPlayer().getPackets().sendCameraPos(e.getPlayer(), camTile, 2000);
-					e.getPlayer().getPackets().sendCameraLook(e.getPlayer(), e.getPlayer().transform(-2, 0, 0), 2000);
+					e.getPlayer().getPackets().sendCameraPos(camTile, 2000);
+					e.getPlayer().getPackets().sendCameraLook(e.getPlayer().transform(-2, 0, 0), 2000);
 				} else if (stage == 1)
 					e.getPlayer().setNextAnimation(new Animation(7274));
 				else if (stage == 9) {

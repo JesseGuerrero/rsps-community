@@ -3,9 +3,12 @@
     "Saradomin priest"
   ],
   "attackAnim": 811,
+  "attackSound": -1,
   "defenceAnim": 424,
+  "defendSound": -1,
   "deathAnim": 836,
   "deathDelay": 8,
+  "deathSound": -1,
   "respawnDelay": 29,
   "hitpoints": 890,
   "maxHit": 200,
@@ -21,7 +24,7 @@
   "attackGfx": -1,
   "attackProjectile": 76,
   "agressivenessType": "AGGRESSIVE",
-  "aggroDistance": 16,
+  "aggroDistance": 8,
   "deAggroDistance": -1,
   "maxDistFromSpawn": -1
 }

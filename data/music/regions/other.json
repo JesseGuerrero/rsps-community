@@ -63,6 +63,23 @@
     "songs": []
   },
   {
+    "genre": "Pest Control",
+    "comment": "",
+    "isActive": false,
+    "regionIds": [],
+    "songs": []
+  },
+  {
+    "genre": "Void Knight Outpost",
+    "comment": "",
+    "isActive": false,
+    "regionIds": [
+      10793,
+      10537
+    ],
+    "songs": []
+  },
+  {
     "genre": "Dorgesh-kaan",
     "comment": "",
     "isActive": true,
@@ -175,7 +192,11 @@
       14385,
       14642,
       14641,
-      14643
+      14643,
+      14233,
+      14232,
+      14488,
+      14487
     ],
     "songs": [
       1000,
@@ -585,6 +606,12 @@
     "genre": "Daemonheim, Dungeoneering",
     "comment": "",
     "isActive": true,
+    "chunkIds": [
+      5868880,
+      5852496,
+      5852488,
+      5868872
+    ],
     "regionIds": [
       13627,
       13883,

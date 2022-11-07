@@ -17,13 +17,13 @@
 package com.rs.game.model.entity.npc.combat;
 
 import com.rs.game.content.Effect;
+import com.rs.game.content.bosses.godwars.zaros.Nex;
 import com.rs.game.content.combat.PlayerCombat;
 import com.rs.game.content.skills.summoning.Familiar;
 import com.rs.game.content.skills.summoning.Summoning.ScrollTarget;
 import com.rs.game.model.entity.Entity;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.npc.combat.NPCCombatDefinitions.AttackStyle;
-import com.rs.game.model.entity.npc.godwars.zaros.Nex;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.Animation;
 import com.rs.lib.util.Utils;
@@ -139,13 +139,8 @@ public final class NPCCombat {
 			distanceX = target.getX() - npc.getX();
 			distanceY = target.getY() - npc.getY();
 		}
-		// checks for no multi area :)
-		if (npc instanceof Familiar familiar && !familiar.canAttack(target))
+		if (!npc.canAttackMulti(target) || !target.canAttackMulti(npc))
 			return false;
-		if (!npc.isForceMultiAttacked())
-			if (!target.isAtMultiArea() || !npc.isAtMultiArea())
-				if ((npc.getAttackedBy() != target && npc.inCombat()) || (target.getAttackedBy() != npc && target.inCombat()))
-					return false;
 		int targetSize = target.getSize();
 		boolean colliding = WorldUtil.collides(npc.getX(), npc.getY(), size, target.getX(), target.getY(), targetSize);
 		if (!npc.isCantFollowUnderCombat()) {

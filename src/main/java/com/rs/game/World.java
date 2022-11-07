@@ -33,11 +33,11 @@ import com.rs.cores.CoresManager;
 import com.rs.cores.WorldThread;
 import com.rs.db.WorldDB;
 import com.rs.game.content.ItemConstants;
-import com.rs.game.content.controllers.DuelController;
-import com.rs.game.content.controllers.PuroPuroController;
-import com.rs.game.content.controllers.WildernessController;
+import com.rs.game.content.minigames.duel.DuelController;
 import com.rs.game.content.minigames.partyroom.PartyRoom;
-import com.rs.game.content.world.regions.dungeons.LivingRockCavern;
+import com.rs.game.content.skills.hunter.PuroPuroController;
+import com.rs.game.content.world.areas.dungeons.LivingRockCavern;
+import com.rs.game.content.world.areas.wilderness.WildernessController;
 import com.rs.game.model.WorldProjectile;
 import com.rs.game.model.entity.Entity;
 import com.rs.game.model.entity.EntityList;
@@ -59,6 +59,8 @@ import com.rs.lib.game.Item;
 import com.rs.lib.game.Rights;
 import com.rs.lib.game.SpotAnim;
 import com.rs.lib.game.WorldTile;
+import com.rs.lib.net.packets.encoders.Sound;
+import com.rs.lib.net.packets.encoders.Sound.SoundType;
 import com.rs.lib.util.Logger;
 import com.rs.lib.util.MapUtils;
 import com.rs.lib.util.MapUtils.Structure;
@@ -68,14 +70,13 @@ import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.annotations.ServerStartupEvent;
 import com.rs.plugin.events.EnterChunkEvent;
 import com.rs.plugin.events.NPCInstanceEvent;
-import com.rs.utils.AntiFlood;
+import com.rs.utils.AccountLimiter;
 import com.rs.utils.Areas;
 import com.rs.utils.Ticks;
+import com.rs.utils.WorldPersistentData;
 import com.rs.utils.WorldUtil;
 import com.rs.utils.music.Music;
 import com.rs.utils.shop.ShopsHandler;
-
-
 
 @PluginEventHandler
 public final class World {
@@ -111,7 +112,7 @@ public final class World {
 						PartyRoom.spawnBalloons();
 				}
 			} catch (Throwable e) {
-				Logger.handle(e);
+				Logger.handle(World.class, "processPartyRoom", e);
 			}
 		}, 2, 2);
 	}
@@ -125,7 +126,7 @@ public final class World {
 						player.getPhasmatysBrewery().process();
 					}
 			} catch (Throwable e) {
-				Logger.handle(e);
+				Logger.handle(World.class, "addBrewingProcessTask", e);
 			}
 		}, Ticks.fromHours(1), Ticks.fromHours(1));
 	}
@@ -135,7 +136,7 @@ public final class World {
 			try {
 				ShopsHandler.restoreShops();
 			} catch (Throwable e) {
-				Logger.handle(e);
+				Logger.handle(World.class, "addRestoreShopItemsTask", e);
 			}
 		}, 0, 1);
 	}
@@ -147,7 +148,7 @@ public final class World {
 					continue;
 				WorldDB.getPlayers().save(player);
 			}
-			PartyRoom.save();
+			WorldPersistentData.save();
 		}, 0, Ticks.fromSeconds(30));
 	}
 
@@ -192,14 +193,14 @@ public final class World {
 		PLAYER_MAP_USERNAME.put(player.getUsername(), player);
 		PLAYER_MAP_DISPLAYNAME.put(player.getDisplayName(), player);
 		if (player.getSession() != null)
-			AntiFlood.add(player.getSession().getIP());
+			AccountLimiter.add(player.getSession().getIP());
 	}
 
 	public static void removePlayer(Player player) {
 		PLAYERS.remove(player);
 		PLAYER_MAP_USERNAME.remove(player.getUsername(), player);
 		PLAYER_MAP_DISPLAYNAME.remove(player.getDisplayName(), player);
-		AntiFlood.remove(player.getSession().getIP());
+		AccountLimiter.remove(player.getSession().getIP());
 	}
 
 	public static final void addNPC(NPC npc) {
@@ -300,7 +301,7 @@ public final class World {
 		int regionId = entity.getRegionId();
 		if (entity.getLastRegionId() != regionId || entity.isForceUpdateEntityRegion()) {
 			if (entity instanceof Player player) {
-				if(Settings.getConfig().isDebug() && player.hasStarted() && Music.getGenre(regionId) == null
+				if(Settings.getConfig().isDebug() && player.hasStarted() && Music.getGenre(player) == null
                         && !(World.getRegion(player.getRegionId()) instanceof DynamicRegion))
 					player.sendMessage(regionId + " has no music genre!");
 				if (entity.getLastRegionId() > 0)
@@ -322,8 +323,8 @@ public final class World {
                  * if there is no controller and the region and playing genres don't match, play a song
                  * same if there is a controller but check if the controller allows region play.
                  */
-				if(player.hasStarted() && (Music.getGenre(regionId) == null || player.getMusicsManager().getPlayingGenre() == null
-                        || !player.getMusicsManager().getPlayingGenre().matches(Music.getGenre(regionId)))) {//tested, looks good.
+				if(player.hasStarted() && (Music.getGenre(player) == null || player.getMusicsManager().getPlayingGenre() == null
+                        || !player.getMusicsManager().getPlayingGenre().matches(Music.getGenre(player)))) {//tested, looks good.
                     if (player.getControllerManager().getController() == null) {
                         player.getMusicsManager().nextAmbientSong();
                     } else if (player.getControllerManager().getController().playAmbientOnControllerRegionEnter() && !player.getDungManager().isInsideDungeon()) { //if we start the dungeon controller before the region enter we can get rid of that inside dungeon thing.
@@ -933,21 +934,24 @@ public final class World {
 				continue;
 			player.getPackets().sendSystemUpdate(delay);
 		}
-		Launcher.pullAndCompile();
 		CoresManager.schedule(() -> {
 			try {
 				for (Player player : World.getPlayers()) {
 					if (player == null || !player.hasStarted())
 						continue;
-					player.getPackets().sendLogout(player, true);
+					player.getPackets().sendLogout(true);
 					player.realFinish();
 				}
-				PartyRoom.save();
+				WorldPersistentData.save();
 				Launcher.shutdown();
 			} catch (Throwable e) {
-				Logger.handle(e);
+				Logger.handle(World.class, "safeShutdown", e);
 			}
 		}, delay);
+	}
+	
+	public static WorldPersistentData getData() {
+		return WorldPersistentData.get();
 	}
 
 	public static final boolean isSpawnedObject(GameObject object) {
@@ -980,7 +984,7 @@ public final class World {
 						return;
 					removeObject(object);
 				} catch (Throwable e) {
-					Logger.handle(e);
+					Logger.handle(World.class, "spawnObjectTemporary", e);
 				}
 			}
 		}, Utils.clampI(ticks - 1, 0, Integer.MAX_VALUE));
@@ -1000,10 +1004,10 @@ public final class World {
 				try {
 					spawnObject(object);
 				} catch (Throwable e) {
-					Logger.handle(e);
+					Logger.handle(World.class, "removeObjectTemporary", e);
 				}
 			}
-		}, Utils.clampI(ticks - 1, 0, Integer.MAX_VALUE));
+		}, Utils.clampI(ticks, 0, Integer.MAX_VALUE));
 		return true;
 	}
 
@@ -1016,7 +1020,7 @@ public final class World {
 					removeObject(object);
 					addGroundItem(new Item(replaceId), object, null, false, 180);
 				} catch (Throwable e) {
-					Logger.handle(e);
+					Logger.handle(World.class, "spawnTempGroundObject", e);
 				}
 			}
 		}, Utils.clampI(ticks - 1, 0, Integer.MAX_VALUE));
@@ -1110,16 +1114,16 @@ public final class World {
 		NORMAL, TURN_UNTRADEABLES_TO_COINS
 	}
 
-	public static final void addGroundItem(Item item, WorldTile tile) {
-		addGroundItem(item, tile, null, false, -1, DropMethod.NORMAL, -1);
+	public static final GroundItem addGroundItem(Item item, WorldTile tile) {
+		return addGroundItem(item, tile, null, false, -1, DropMethod.NORMAL, -1);
 	}
 
-	public static final void addGroundItem(Item item, WorldTile tile, Player owner) {
-		addGroundItem(item, tile, owner, true, 60);
+	public static final GroundItem addGroundItem(Item item, WorldTile tile, Player owner) {
+		return addGroundItem(item, tile, owner, true, 60);
 	}
 
-	public static final void addGroundItem(Item item, WorldTile tile, Player owner, boolean invisible, int hiddenSecs) {
-		addGroundItem(item, tile, owner, invisible, hiddenSecs, DropMethod.NORMAL, 150);
+	public static final GroundItem addGroundItem(Item item, WorldTile tile, Player owner, boolean invisible, int hiddenSecs) {
+		return addGroundItem(item, tile, owner, invisible, hiddenSecs, DropMethod.NORMAL, 150);
 	}
 
 	public static final GroundItem addGroundItem(Item item, WorldTile tile, Player owner, boolean invisible, int hiddenSecs, DropMethod type) {
@@ -1149,7 +1153,7 @@ public final class World {
 		if (floorItem.getAmount() > 1 && !item.getDefinitions().isStackable() && floorItem.getMetaData() == null)
 			for (int i = 0; i < floorItem.getAmount(); i++) {
 				Item oneItem = new Item(item.getId(), 1);
-				GroundItem newItem = new GroundItem(oneItem, tile, owner.getUsername(), invisible ? GroundItemType.INVISIBLE : GroundItemType.NORMAL);
+				GroundItem newItem = new GroundItem(oneItem, tile, owner == null ? null : owner.getUsername(), invisible ? GroundItemType.INVISIBLE : GroundItemType.NORMAL);
 				finalizeGroundItem(newItem, tile, owner, hiddenTime, type, deleteTime);
 			}
 		else
@@ -1203,7 +1207,7 @@ public final class World {
 					try {
 						addGroundItemForever(groundItem, groundItem.getTile());
 					} catch (Throwable e) {
-						Logger.handle(e);
+						Logger.handle(World.class, "removeGroundItem", e);
 					}
 				}, Ticks.fromSeconds(15));
 			return true;
@@ -1327,7 +1331,7 @@ public final class World {
 					event.run();
 					stop();
 				} catch (Throwable e) {
-					Logger.handle(e);
+					Logger.handle(World.class, "executeAfterLoadRegion", e);
 				}
 			}
 
@@ -1349,6 +1353,60 @@ public final class World {
 	public static boolean isPvpArea(Player player) {
 		return WildernessController.isAtWild(player.getTile());
 	}
+	
+	public static Sound playSound(Entity source, Sound sound) {
+		for (int regionId : source.getMapRegionsIds()) {
+			Set<Integer> playerIndexes = World.getRegion(regionId).getPlayerIndexes();
+			if (playerIndexes != null)
+				for (int playerIndex : playerIndexes) {
+					Player player = World.getPlayers().get(playerIndex);
+					if (player == null || !player.isRunning() || !source.withinDistance(player.getTile()))
+						continue;
+					player.playSound(sound);
+				}
+		}
+		return sound;
+	}
+	
+	private static Sound playSound(Entity source, int soundId, int delay, SoundType type) {
+		return playSound(source, new Sound(soundId, delay, type));
+	}
+	
+	public static void jingle(Entity source, int jingleId, int delay) {
+		playSound(source, jingleId, delay, SoundType.JINGLE);
+	}
+	
+	public static void jingle(Entity source, int jingleId) {
+		playSound(source, jingleId, 0, SoundType.JINGLE);
+	}
+	
+	public static void musicTrack(Entity source, int trackId, int delay, int volume) {
+		playSound(source, trackId, delay, SoundType.MUSIC).volume(volume);
+	}
+	
+	public static void musicTrack(Entity source, int trackId, int delay) {
+		playSound(source, trackId, delay, SoundType.MUSIC);
+	}
+	
+	public static void musicTrack(Entity source, int trackId) {
+		musicTrack(source, trackId, 100);
+	}
+	
+	public static void soundEffect(Entity source, int soundId, int delay) {
+		playSound(source, soundId, delay, SoundType.EFFECT);
+	}
+	
+	public static void soundEffect(Entity source, int soundId) {
+		soundEffect(source, soundId, 0);
+	}
+	
+	public static void voiceEffect(Entity source, int voiceId, int delay) {
+		playSound(source, voiceId, delay, SoundType.VOICE);
+	}
+	
+	public static void voiceEffect(Entity source, int voiceId) {
+		voiceEffect(source, voiceId, 0);
+	}
 
 	public static GameObject getClosestObject(int objectId, WorldTile tile) {
 		for (int dist = 0;dist < 16;dist++)
@@ -1365,8 +1423,19 @@ public final class World {
 		for (int dist = 0;dist < 16;dist++)
 			for (int x = -dist;x < dist;x++)
 				for (int y = -dist; y < dist;y++) {
-					GameObject object = World.getObject(tile.transform(x, y));
+					GameObject object = World.getObject(tile.transform(x, y), type);
 					if (object != null && object.getType() == type)
+						return object;
+				}
+		return null;
+	}
+	
+	public static GameObject getClosestObject(ObjectType type, int objectId, WorldTile tile) {
+		for (int dist = 0;dist < 16;dist++)
+			for (int x = -dist;x < dist;x++)
+				for (int y = -dist; y < dist;y++) {
+					GameObject object = World.getObject(tile.transform(x, y), type);
+					if (object != null && object.getId() == objectId)
 						return object;
 				}
 		return null;

@@ -3,9 +3,12 @@
     "Warped fly"
   ],
   "attackAnim": 7242,
+  "attackSound": -1,
   "defenceAnim": 7243,
+  "defendSound": -1,
   "deathAnim": 7244,
   "deathDelay": 6,
+  "deathSound": -1,
   "respawnDelay": 59,
   "hitpoints": 67,
   "maxHit": 19,
@@ -14,7 +17,7 @@
   "attackGfx": -1,
   "attackProjectile": -1,
   "agressivenessType": "PASSIVE",
-  "aggroDistance": 16,
+  "aggroDistance": 4,
   "deAggroDistance": -1,
   "maxDistFromSpawn": -1
 }

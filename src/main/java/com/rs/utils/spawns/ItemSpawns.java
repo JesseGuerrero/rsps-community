@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.lang.SuppressWarnings;
 
 import com.google.gson.JsonIOException;
 import com.rs.cache.loaders.ItemDefinitions;
@@ -34,6 +35,7 @@ import com.rs.lib.game.WorldTile;
 import com.rs.lib.util.Logger;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.annotations.ServerStartupEvent;
+import com.rs.plugin.annotations.ServerStartupEvent.Priority;
 
 @PluginEventHandler
 public final class ItemSpawns {
@@ -61,9 +63,9 @@ public final class ItemSpawns {
 		}
 	}
 
-	@ServerStartupEvent
+	@ServerStartupEvent(Priority.FILE_IO)
 	public static final void init() throws JsonIOException, IOException {
-		Logger.log("ItemSpawns", "Loading item spawns...");
+		Logger.info(ItemSpawns.class, "init", "Loading item spawns...");
 		File[] spawnFiles = new File(PATH).listFiles();
 		for (File f : spawnFiles) {
 			ItemSpawn[] spawns = (ItemSpawn[]) JsonFileManager.loadJsonFile(f, ItemSpawn[].class);
@@ -78,7 +80,7 @@ public final class ItemSpawns {
 						ITEM_SPAWNS.put(spawn.getTile().getRegionId(), regionSpawns);
 					}
 		}
-		Logger.log("ItemSpawns", "Loaded " + ALL_SPAWNS.size() + " item spawns...");
+		Logger.info(ItemSpawns.class, "init", "Loaded " + ALL_SPAWNS.size() + " item spawns...");
 	}
 
 	public static final void loadItemSpawns(int regionId) {

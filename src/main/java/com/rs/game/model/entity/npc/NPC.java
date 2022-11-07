@@ -27,16 +27,16 @@ import com.rs.cache.loaders.Bonus;
 import com.rs.cache.loaders.NPCDefinitions;
 import com.rs.cache.loaders.interfaces.IFEvents;
 import com.rs.cores.CoresManager;
-import com.rs.db.WorldDB;
 import com.rs.game.World;
 import com.rs.game.content.Effect;
+import com.rs.game.content.bosses.godwars.GodwarsController;
 import com.rs.game.content.combat.PolyporeStaff;
-import com.rs.game.content.controllers.GodwarsController;
-import com.rs.game.content.controllers.WildernessController;
+import com.rs.game.content.minigames.treasuretrails.TreasureTrailsManager;
 import com.rs.game.content.skills.hunter.BoxHunterType;
 import com.rs.game.content.skills.slayer.SlayerMonsters;
 import com.rs.game.content.skills.summoning.Familiar;
-import com.rs.game.content.world.regions.dungeons.TzHaar;
+import com.rs.game.content.world.areas.dungeons.TzHaar;
+import com.rs.game.content.world.areas.wilderness.WildernessController;
 import com.rs.game.model.entity.Entity;
 import com.rs.game.model.entity.Hit;
 import com.rs.game.model.entity.Hit.HitLook;
@@ -53,13 +53,16 @@ import com.rs.game.model.entity.pathing.RouteEvent;
 import com.rs.game.model.entity.pathing.RouteFinder;
 import com.rs.game.model.entity.player.Bank;
 import com.rs.game.model.entity.player.Player;
-import com.rs.game.model.entity.player.managers.TreasureTrailsManager;
 import com.rs.game.model.item.ItemsContainer;
 import com.rs.game.tasks.WorldTasks;
 import com.rs.lib.Constants;
 import com.rs.lib.game.Animation;
+import com.rs.lib.game.GroundItem;
 import com.rs.lib.game.Item;
 import com.rs.lib.game.WorldTile;
+import com.rs.lib.net.packets.encoders.Sound;
+import com.rs.lib.net.packets.encoders.Sound.SoundType;
+import com.rs.lib.util.Logger;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.PluginManager;
 import com.rs.plugin.events.NPCDeathEvent;
@@ -83,6 +86,7 @@ public class NPC extends Entity {
 	private transient boolean ignoreNPCClipping;
 	public WorldTile forceWalk;
 	private int size;
+	private boolean hidden = false;
 
 	private long lastAttackedByTarget;
 	private boolean cantInteract;
@@ -100,6 +104,7 @@ public class NPC extends Entity {
 
 	// npc masks
 	private transient Transformation nextTransformation;
+	private transient NPCBodyMeshModifier bodyMeshModifier;
 	protected transient ConcurrentHashMap<Object, Object> temporaryAttributes;
 	// name changing masks
 	private String name;
@@ -183,7 +188,7 @@ public class NPC extends Entity {
 
 	@Override
 	public boolean needMasksUpdate() {
-		return super.needMasksUpdate() || nextTransformation != null || changedCombatLevel || changedName || maskTest || permName;
+		return super.needMasksUpdate() || nextTransformation != null || bodyMeshModifier != null || getBas() != -1 || changedCombatLevel || changedName || maskTest || permName;
 	}
 
 	public void resetLevels() {
@@ -220,6 +225,10 @@ public class NPC extends Entity {
 		super.resetMasks();
 		nextTransformation = null;
 		changedName = false;
+		if (bodyMeshModifier == NPCBodyMeshModifier.RESET)
+			bodyMeshModifier = null;
+		if (getBas() == -2)
+			setBasNoReset(-1);
 	}
 
 	public NPCDefinitions getDefinitions(Player player) {
@@ -248,12 +257,26 @@ public class NPC extends Entity {
 			return true;
 		return World.checkNPCClip(this, dir);
 	}
+	
+	private void restoreTick() {
+		for (Skill skill : Skill.values()) {
+			int currentLevel = getLevel(skill);
+			int normalLevel = getCombatDefinitions().getLevel(skill);
+			if (currentLevel > normalLevel)
+				setStat(skill, currentLevel - 1);
+			else if (currentLevel < normalLevel)
+				setStat(skill, Utils.clampI(currentLevel + 1, 0, normalLevel));
+		}
+	}
 
 	public void processNPC() {
 		if (isDead() || locked || World.getPlayersInRegionRange(getRegionId()).isEmpty())
 			return;
-		if (!combat.process() && routeEvent == null)
-			if (!isForceWalking() && !cantInteract && !checkAggressivity() && !hasEffect(Effect.FREEZE))
+		//Restore combat stats
+		if (getTickCounter() % 100 == 0)
+			restoreTick();
+		if (!combat.process() && routeEvent == null) {
+			if (!isForceWalking() && !cantInteract && !checkAggressivity() && !hasEffect(Effect.FREEZE)) {
 				if (!hasWalkSteps() && shouldRandomWalk()) {
 					boolean can = Math.random() > 0.9;
 					if (can) {
@@ -269,6 +292,8 @@ public class NPC extends Entity {
 							DumbRouteFinder.addDumbPathfinderSteps(this, respawnTile, getDefinitions().hasAttackOption() ? 7 : 3, getClipType());
 					}
 				}
+			}
+		}
 		if (isForceWalking())
 			if (!hasEffect(Effect.FREEZE))
 				if (getX() != forceWalk.getX() || getY() != forceWalk.getY()) {
@@ -295,7 +320,7 @@ public class NPC extends Entity {
 			super.processEntity();
 			processNPC();
 		} catch (Throwable e) {
-			WorldDB.getLogs().logError(e);
+			Logger.handle(NPC.class, "processEntityNPC", e);
 		}
 	}
 
@@ -425,25 +450,29 @@ public class NPC extends Entity {
 	public NPCCombat getCombat() {
 		return combat;
 	}
+	
+	public int getLevel(Skill skill) {
+		return combatLevels == null ? 1 : combatLevels.get(skill);
+	}
 
 	public int getAttackLevel() {
-		return combatLevels == null ? 0 : combatLevels.get(Skill.ATTACK);
+		return getLevel(Skill.ATTACK);
 	}
 
 	public int getDefenseLevel() {
-		return combatLevels == null ? 0 : combatLevels.get(Skill.DEFENSE);
+		return getLevel(Skill.DEFENSE);
 	}
 
 	public int getStrengthLevel() {
-		return combatLevels == null ? 0 : combatLevels.get(Skill.STRENGTH);
+		return getLevel(Skill.STRENGTH);
 	}
 
 	public int getRangeLevel() {
-		return combatLevels == null ? 0 : combatLevels.get(Skill.RANGE);
+		return getLevel(Skill.RANGE);
 	}
 
 	public int getMagicLevel() {
-		return combatLevels == null ? 0 : combatLevels.get(Skill.MAGE);
+		return getLevel(Skill.MAGE);
 	}
 
 	@Override
@@ -451,6 +480,8 @@ public class NPC extends Entity {
 		final NPCCombatDefinitions defs = getCombatDefinitions();
 		getInteractionManager().forceStop();
 		resetWalkSteps();
+		if (combat.getTarget() != null)
+			combat.getTarget().setAttackedByDelay(0);
 		combat.removeTarget();
 		if (source.getAttackedBy() == NPC.this) {
 			source.setAttackedBy(null);
@@ -459,8 +490,11 @@ public class NPC extends Entity {
 		setNextAnimation(null);
 		PluginManager.handle(new NPCDeathEvent(this, source));
 		WorldTasks.scheduleTimer(loop -> {
-			if (loop == 0)
+			if (loop == 0) {
 				setNextAnimation(new Animation(defs.getDeathEmote()));
+				if (source instanceof Player p)
+					soundEffect(getCombatDefinitions().getDeathSound(), 1);
+			}
 			else if (loop >= defs.getDeathDelay()) {
 				if (source instanceof Player player)
 					player.getControllerManager().processNPCDeath(NPC.this);
@@ -621,13 +655,7 @@ public class NPC extends Entity {
 			World.broadcastLoot(dropTo.getDisplayName() + " has just received a " + item.getName() + " drop from " + getDefinitions().getName() + "!");
 
 		final int size = getSize();
-
-		//final WorldTile tile = new WorldTile(getCoordFaceX(size), getCoordFaceY(size), getPlane());
-		int value = item.getDefinitions().getValue() * item.getAmount();
-		if (value > player.getI("lootbeamThreshold", 90000) || item.getDefinitions().name.contains("Scroll box") || item.getDefinitions().name.contains(" defender") || yellDrop(item.getId()))
-			player.sendMessage("<col=cc0033>You received: "+ item.getAmount() + " " + item.getDefinitions().getName()); //
-		//player.getPackets().sendTileMessage("<shad=000000>"+item.getDefinitions().getName() + " (" + item.getAmount() + ")", tile, 20000, 50, 0xFF0000);
-
+		
 		PluginManager.handle(new NPCDropEvent(dropTo, this, item));
 		if (item.getId() != -1 && dropTo.getNSV().getB("sendingDropsToBank")) {
 			if (item.getDefinitions().isNoted())
@@ -635,7 +663,10 @@ public class NPC extends Entity {
 			sendDropDirectlyToBank(dropTo, item);
 			return;
 		}
-		World.addGroundItem(item, new WorldTile(getCoordFaceX(size), getCoordFaceY(size), getPlane()), dropTo, true, 60);
+		GroundItem gItem = World.addGroundItem(item, new WorldTile(getCoordFaceX(size), getCoordFaceY(size), getPlane()), dropTo, true, 60);
+		int value = item.getDefinitions().getValue() * item.getAmount();
+		if (gItem != null && (value > player.getI("lootbeamThreshold", 90000) || item.getDefinitions().name.contains("Scroll box") || item.getDefinitions().name.contains(" defender") || yellDrop(item.getId())))
+			player.getPackets().sendGroundItemMessage(50, 0xFF0000, gItem, "<shad=000000><col=cc0033>You received: "+ item.getAmount() + " " + item.getDefinitions().getName());
 	}
 
 	public static void sendDropDirectlyToBank(Player player, Item item) {
@@ -958,7 +989,7 @@ public class NPC extends Entity {
 	}
 
 	public boolean checkAggressivity() {
-		if (this instanceof Familiar || !getDefinitions().hasAttackOption())
+		if ((this instanceof Familiar || !getDefinitions().hasAttackOption()) && !forceAgressive)
 			return false;
 		List<Entity> possibleTarget = getPossibleTargets();
 		if (!possibleTarget.isEmpty()) {
@@ -1110,7 +1141,7 @@ public class NPC extends Entity {
 	}
 
 	public boolean withinDistance(Player tile, int distance) {
-		return super.withinDistance(tile.getTile(), distance);
+		return !hidden && super.withinDistance(tile.getTile(), distance);
 	}
 
 	/**
@@ -1281,5 +1312,79 @@ public class NPC extends Entity {
 
 	public void setIgnoreNPCClipping(boolean ignoreNPCClipping) {
 		this.ignoreNPCClipping = ignoreNPCClipping;
+	}
+	
+	private Sound playSound(Sound sound) {
+		World.playSound(this, sound);
+		return sound;
+	}
+	
+	private Sound playSound(int soundId, int delay, SoundType type) {
+		return playSound(new Sound(soundId, delay, type));
+	}
+	
+	public void jingle(int jingleId, int delay) {
+		playSound(jingleId, delay, SoundType.JINGLE);
+	}
+	
+	public void jingle(int jingleId) {
+		playSound(jingleId, 0, SoundType.JINGLE);
+	}
+	
+	public void musicTrack(int trackId, int delay, int volume) {
+		playSound(trackId, delay, SoundType.MUSIC).volume(volume);
+	}
+	
+	public void musicTrack(int trackId, int delay) {
+		playSound(trackId, delay, SoundType.MUSIC);
+	}
+	
+	public void musicTrack(int trackId) {
+		musicTrack(trackId, 100);
+	}
+	
+	public void soundEffect(int soundId, int delay) {
+		playSound(soundId, delay, SoundType.EFFECT);
+	}
+	
+	public void soundEffect(int soundId) {
+		soundEffect(soundId, 0);
+	}
+	
+	public void voiceEffect(int voiceId, int delay) {
+		playSound(voiceId, delay, SoundType.VOICE);
+	}
+	
+	public void voiceEffect(int voiceId) {
+		voiceEffect(voiceId, 0);
+	}
+
+	public NPCBodyMeshModifier getBodyMeshModifier() {
+		return bodyMeshModifier;
+	}
+
+	public void setBodyMeshModifier(NPCBodyMeshModifier meshModifier) {
+		if (meshModifier == null) {
+			bodyMeshModifier = NPCBodyMeshModifier.RESET;
+			return;
+		}
+		bodyMeshModifier = meshModifier;
+	}
+	
+	public NPCBodyMeshModifier modifyMesh() {
+		bodyMeshModifier = new NPCBodyMeshModifier(getDefinitions());
+		return bodyMeshModifier;
+	}
+	
+	public void resetMesh() {
+		setBodyMeshModifier(NPCBodyMeshModifier.RESET);
+	}
+
+	public boolean isHidden() {
+		return hidden;
+	}
+
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
 	}
 }

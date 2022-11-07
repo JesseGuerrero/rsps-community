@@ -16,59 +16,48 @@
 //
 package com.rs.net.decoders.handlers;
 
-import com.rs.Settings;
 import com.rs.game.content.Effect;
 import com.rs.game.content.PlayerLook;
 import com.rs.game.content.Skillcapes;
 import com.rs.game.content.Statuettes;
+import com.rs.game.content.death.GraveStone;
 import com.rs.game.content.dialogue.Conversation;
 import com.rs.game.content.dialogue.Dialogue;
 import com.rs.game.content.dialogue.HeadE;
+import com.rs.game.content.dialogue.impl.ClanItemClaim;
+import com.rs.game.content.dialogue.impl.DrogoDwarf;
 import com.rs.game.content.dialogue.impl.FredaD;
+import com.rs.game.content.dialogue.impl.FremennikShipmaster;
+import com.rs.game.content.dialogue.impl.GeneralStore;
+import com.rs.game.content.dialogue.impl.Nurmof;
 import com.rs.game.content.dialogue.impl.OsmanD;
+import com.rs.game.content.dialogue.impl.TanningD;
+import com.rs.game.content.dialogue.impl.TzHaarMejJal;
+import com.rs.game.content.dialogue.impl.TzHaarMejKah;
 import com.rs.game.content.dialogue.impl.skillmasters.AjjatD;
 import com.rs.game.content.dialogue.impl.skillmasters.GenericSkillcapeOwnerD;
-import com.rs.game.content.dialogues_matrix.BoatingDialogue;
-import com.rs.game.content.dialogues_matrix.ClanCloak;
-import com.rs.game.content.dialogues_matrix.ClanVex;
-import com.rs.game.content.dialogues_matrix.DrogoDwarf;
-import com.rs.game.content.dialogues_matrix.FatherAereck;
-import com.rs.game.content.dialogues_matrix.FremennikShipmaster;
-import com.rs.game.content.dialogues_matrix.GeneralStore;
-import com.rs.game.content.dialogues_matrix.Jossik;
-import com.rs.game.content.dialogues_matrix.MamboJamboD;
-import com.rs.game.content.dialogues_matrix.Max;
-import com.rs.game.content.dialogues_matrix.MiningGuildDwarf;
-import com.rs.game.content.dialogues_matrix.Nurmof;
-import com.rs.game.content.dialogues_matrix.SorceressGardenNPCs;
-import com.rs.game.content.dialogues_matrix.TanningD;
-import com.rs.game.content.dialogues_matrix.TzHaarMejJal;
-import com.rs.game.content.dialogues_matrix.TzHaarMejKah;
-import com.rs.game.content.dialogues_matrix.UgiDialogue;
 import com.rs.game.content.minigames.creations.StealingCreationShop;
 import com.rs.game.content.minigames.ectofuntus.Ectofuntus;
 import com.rs.game.content.minigames.pest.CommendationExchange;
+import com.rs.game.content.pet.Pet;
 import com.rs.game.content.quests.Quest;
 import com.rs.game.content.quests.handlers.piratestreasure.CustomsOfficerPiratesTreasureD;
 import com.rs.game.content.quests.handlers.piratestreasure.PiratesTreasure;
+import com.rs.game.content.quests.handlers.restlessghost.FatherAereckD;
 import com.rs.game.content.skills.construction.EstateAgentDialogue;
 import com.rs.game.content.skills.construction.ServantDialogue;
-import com.rs.game.content.skills.dungeoneering.dialogues.DungeoneeringTutor;
 import com.rs.game.content.skills.hunter.FlyingEntityHunter;
+import com.rs.game.content.skills.slayer.npcs.ConditionalDeath;
+import com.rs.game.content.skills.slayer.npcs.MutatedZygomite;
 import com.rs.game.content.skills.summoning.Familiar;
 import com.rs.game.content.skills.thieving.PickPocketAction;
 import com.rs.game.content.skills.thieving.PickPocketableNPC;
+import com.rs.game.content.transportation.BoatingD;
 import com.rs.game.content.transportation.TravelMethods;
 import com.rs.game.content.transportation.TravelMethods.Carrier;
 import com.rs.game.ge.GE;
 import com.rs.game.model.entity.interactions.StandardEntityInteraction;
 import com.rs.game.model.entity.npc.NPC;
-import com.rs.game.model.entity.npc.others.ConditionalDeath;
-import com.rs.game.model.entity.npc.others.FireSpirit;
-import com.rs.game.model.entity.npc.others.GraveStone;
-import com.rs.game.model.entity.npc.others.MutatedZygomite;
-import com.rs.game.model.entity.npc.pet.Pet;
-import com.rs.game.model.entity.npc.slayer.Strykewyrm;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.Animation;
 import com.rs.lib.game.Item;
@@ -80,7 +69,6 @@ import com.rs.plugin.events.NPCClickEvent;
 import com.rs.plugin.events.NPCInteractionDistanceEvent;
 import com.rs.utils.NPCExamines;
 import com.rs.utils.Ticks;
-import com.rs.utils.shop.ShopsHandler;
 
 public class NPCHandler {
 
@@ -93,7 +81,7 @@ public class NPCHandler {
 			if (npc.getDefinitions().transformTo != null)
 				player.sendMessage(npc.getDefinitions().getConfigInfoString());
 		}
-		player.getPackets().sendNPCMessage(player, 0, 0xFFFFFF, npc, NPCExamines.getExamine(npc, player) + " ("+npc.getId()+")");
+		player.getPackets().sendNPCMessage(0, 0xFFFFFF, npc, NPCExamines.getExamine(npc, player) + " ("+npc.getId()+")");
 		if (npc.getDefinitions().hasAttackOption() || npc.getDefinitions().hasOption("Investigate"))
 			player.sendOptionDialogue("Would you like to check the drops on this monster?", ops -> {
 				ops.add("Show drops (1,000 kills)", () -> NPC.displayDropsFor(player, npc.getId(), 1000));
@@ -101,8 +89,7 @@ public class NPCHandler {
 				ops.add("Show drops (10,000 kills)", () -> NPC.displayDropsFor(player, npc.getId(), 10000));
 				ops.add("Nevermind");
 			});
-		if (Settings.getConfig().isDebug())
-			Logger.log("NPCHandler", "examined npc: " + npc.getIndex() + ", " + npc.getId());
+		Logger.debug(NPCHandler.class, "handleExamine", "Examined NPC: index: " + npc.getIndex() + ", id: " + npc.getId());
 	}
 
 	public static void handleOption1(final Player player, final NPC npc) {
@@ -122,9 +109,9 @@ public class NPCHandler {
 			player.faceEntity(npc);
 			npc.faceEntity(player);
 
-			Object[] shipAttributes = BoatingDialogue.getBoatForShip(player, npc.getId());
+			Object[] shipAttributes = BoatingD.getBoatForShip(player, npc.getId());
 			if (shipAttributes != null) {
-				player.getDialogueManager().execute(new BoatingDialogue(), npc.getId());
+				player.startConversation(new BoatingD(player, npc.getId()));
 				return;
 			}
 			if (npc instanceof GraveStone grave) {
@@ -143,20 +130,6 @@ public class NPCHandler {
 				player.startConversation(new OsmanD(player, npc.getId()));
 			else if (npc.getId() == 15099)
 				player.startConversation(new FredaD(player, npc.getId()));
-			else if (npc.getId() == 5532)
-				player.getDialogueManager().execute(new SorceressGardenNPCs(), npc);
-			else if (npc.getId() == 5141)
-				player.getDialogueManager().execute(new UgiDialogue(), npc);
-			else if (npc.getId() == 9712)
-				player.getDialogueManager().execute(new DungeoneeringTutor());
-			else if (npc.getId() == 5563)
-				player.getDialogueManager().execute(new SorceressGardenNPCs(), npc);
-			else if (npc.getId() == 3373 || npc.getId() == 3705)
-				player.getDialogueManager().execute(new Max(), npc.getId());
-			else if (npc.getId() == 15451 && npc instanceof FireSpirit spirit)
-				spirit.giveReward(player);
-			else if (npc.getId() == 9462 || npc.getId() == 9464 || npc.getId() == 9466)
-				Strykewyrm.handleStomping(player, npc);
 			else if (npc.getId() == 2825)
 				player.sendOptionDialogue("Would you like to travel to Braindeath Island?", ops -> {
 					ops.add("Yes", () -> player.setNextWorldTile(new WorldTile(2163, 5112, 1)));
@@ -168,7 +141,7 @@ public class NPCHandler {
 					ops.add("No");
 				});
 			else if (npc.getId() == 9707)
-				player.getDialogueManager().execute(new FremennikShipmaster(), npc.getId(), true);
+				player.startConversation(new FremennikShipmaster(player, npc.getId(), true));
 			else if (npc.getId() == 4288)
 				player.startConversation(new AjjatD(player));
 			else if (npc.getId() == 8269)
@@ -197,8 +170,6 @@ public class NPCHandler {
 				player.startConversation(new GenericSkillcapeOwnerD(player, 805, Skillcapes.Crafting));
 			else if (npc.getId() == 3295)
 				player.startConversation(new GenericSkillcapeOwnerD(player, 3295, Skillcapes.Mining));
-			//			else if (npc.getId() == 455)
-			//				player.startConversation(new GenericSkillcapeOwnerD(player, 455, Skillcapes.Herblore));
 			else if (npc.getId() == 437)
 				player.startConversation(new GenericSkillcapeOwnerD(player, 437, Skillcapes.Agility));
 			else if (npc.getId() == 2270)
@@ -224,41 +195,35 @@ public class NPCHandler {
 						.addNPC(8649, HeadE.CHEERFUL_EXPOSITION, "I love bees!")
 						.finish()));
 			else if (npc.getId() == 9708 || npc.getId() == 14847)
-				player.getDialogueManager().execute(new FremennikShipmaster(), npc.getId(), false);
+				player.startConversation(new FremennikShipmaster(player, npc.getId(), false));
 			else if (npc.getId() == 579)
-				player.getDialogueManager().execute(new DrogoDwarf(), npc.getId());
+				player.startConversation(new DrogoDwarf(player, npc));
 			else if (npc.getId() == 528 || npc.getId() == 529)
-				player.getDialogueManager().execute(new GeneralStore(), npc.getId(), "edgeville_general_store");
+				player.startConversation(new GeneralStore(player, npc, "edgeville_general_store"));
 			else if (npc.getId() == 522 || npc.getId() == 523)
-				player.getDialogueManager().execute(new GeneralStore(), npc.getId(), "varrock_general_store");
+				player.startConversation(new GeneralStore(player, npc, "varrock_general_store"));
 			else if (npc.getId() == 520 || npc.getId() == 521)
-				player.getDialogueManager().execute(new GeneralStore(), npc.getId(), "lumbridge_general_store");
+				player.startConversation(new GeneralStore(player, npc, "lumbridge_general_store"));
 			else if (npc.getId() == 594)
-				player.getDialogueManager().execute(new Nurmof(), npc);
-			else if (npc.getId() == 3122)
-				player.getDialogueManager().execute(new MamboJamboD(), npc.getId());
-			else if (npc.getId() == 382 || npc.getId() == 3294 || npc.getId() == 4316)
-				player.getDialogueManager().execute(new MiningGuildDwarf(), npc.getId(), false);
+				player.startConversation(new Nurmof(player, npc));
 			else if (npc.getId() == 2617)
-				player.getDialogueManager().execute(new TzHaarMejJal(), npc.getId());
+				player.startConversation(new TzHaarMejJal(player, npc));
 			else if (npc.getId() == 2618)
-				player.getDialogueManager().execute(new TzHaarMejKah(), npc.getId());
+				player.startConversation(new TzHaarMejKah(player, npc.getId()));
 			else if (npc.getId() == 6715 || npc.getId() == 14862)
 				player.startConversation(new EstateAgentDialogue(player, npc.getId()));
 			else if (npc.getId() == 3344 || npc.getId() == 3345)
 				MutatedZygomite.transform(player, npc);
 			else if (npc.getId() == 4236 || npc.getId() == 4238 || npc.getId() == 4240 || npc.getId() == 4242 || npc.getId() == 4244)
-				player.getDialogueManager().execute(new ServantDialogue(), npc.getId());
-			else if (npc.getId() == 1334)
-				player.getDialogueManager().execute(new Jossik(), npc.getId());
+				player.startConversation(new ServantDialogue(player, npc));
 			else if (npc.getId() == 456)
-				player.getDialogueManager().execute(new FatherAereck(), npc.getId());
+				player.startConversation(new FatherAereckD(player));
 			else if (npc.getId() == 13633)
-				player.getDialogueManager().execute(new ClanCloak(), false);
+				player.startConversation(new ClanItemClaim(player, 20708));
 			else if (npc.getId() == 5915)
-				player.getDialogueManager().execute(new ClanVex(), false);
+				player.startConversation(new ClanItemClaim(player, 20709));
 			else if (npc.getId() == 2824 || npc.getId() == 1041 || npc.getId() == 804)
-				player.getDialogueManager().execute(new TanningD(), npc.getId());
+				player.startConversation(new TanningD(player, npc.getId() == 1041));
 			else if (npc.getName().toLowerCase().contains("impling"))
 				FlyingEntityHunter.captureFlyingEntity(player, npc);
 			else if (PluginManager.handle(new NPCClickEvent(player, npc, 1, true))) {
@@ -272,8 +237,7 @@ public class NPCHandler {
 				pet.pickup();
 			} else {
 				player.sendMessage("Nothing interesting happens." + npc.getId());
-				if (Settings.getConfig().isDebug())
-					System.out.println("cliked 1 at npc id : " + npc.getId() + ", " + npc.getX() + ", " + npc.getY() + ", " + npc.getPlane());
+				Logger.debug(NPCHandler.class, "handleOption1", "NPC: " + npc.getId() + ", (" + npc.getX() + ", " + npc.getY() + ", " + npc.getPlane() + ")");
 			}
 		}));
 	}
@@ -318,7 +282,7 @@ public class NPCHandler {
 
 			npc.resetWalkSteps();
 
-			Object[] shipAttributes = BoatingDialogue.getBoatForShip(player, npc.getId());
+			Object[] shipAttributes = BoatingD.getBoatForShip(player, npc.getId());
 			if (shipAttributes != null) {
 				if(npc.getId() == 380 && player.getQuestManager().getStage(Quest.PIRATES_TREASURE) == PiratesTreasure.SMUGGLE_RUM) {
 					player.startConversation(new CustomsOfficerPiratesTreasureD(player).getStart());
@@ -375,11 +339,11 @@ public class NPCHandler {
 			else if (npc.getId() == 14849 && npc instanceof ConditionalDeath cd)
 				cd.useHammer(player);
 			else if (npc.getId() == 13633)
-				player.getDialogueManager().execute(new ClanCloak(), true);
+				player.startConversation(new ClanItemClaim(player, 20708));
 			else if (npc.getId() == 5915)
-				player.getDialogueManager().execute(new ClanVex(), true);
+				player.startConversation(new ClanItemClaim(player, 20709));
 			else if (npc.getId() == 2824 || npc.getId() == 1041)
-				player.getDialogueManager().execute(new TanningD(), npc.getId());
+				player.startConversation(new TanningD(player, npc.getId() == 1041));
 			else if (npc.getId() == 1843)
 				player.setNextWorldTile(new WorldTile(2836, 10142, 0));
 			else if (npc.getId() == 1844)
@@ -401,8 +365,7 @@ public class NPCHandler {
 				return;
 			else {
 				player.sendMessage("Nothing interesting happens." + npc.getId());
-				if (Settings.getConfig().isDebug())
-					System.out.println("cliked 2 at npc id : " + npc.getId() + ", " + npc.getX() + ", " + npc.getY() + ", " + npc.getPlane());
+				Logger.debug(NPCHandler.class, "handleOption2", "NPC: " + npc.getId() + ", (" + npc.getX() + ", " + npc.getY() + ", " + npc.getPlane() + ")");
 			}
 		}));
 	}
@@ -434,16 +397,12 @@ public class NPCHandler {
 				PlayerLook.openThessaliasMakeOver(player);
 			else if (npc.getId() == 1526)
 				player.getInterfaceManager().sendInterface(60);
-			else if (npc.getId() == 1334)
-				ShopsHandler.openShop(player, "book_shop");
 			else if (PluginManager.handle(new NPCClickEvent(player, npc, 4, true)))
 				return;
 			else
 				player.sendMessage("Nothing interesting happens." + npc.getId());
 		}));
-
-		if (Settings.getConfig().isDebug())
-			System.out.println("cliked 3 at npc id : " + npc.getId() + ", " + npc.getX() + ", " + npc.getY() + ", " + npc.getPlane());
+		Logger.debug(NPCHandler.class, "handleOption4", "NPC: " + npc.getId() + ", (" + npc.getX() + ", " + npc.getY() + ", " + npc.getPlane() + ")");
 	}
 
 	public static void handleOption5(final Player player, final NPC npc) {
@@ -472,9 +431,7 @@ public class NPCHandler {
 			if (PluginManager.handle(new NPCClickEvent(player, npc, 5, true)))
 				return;
 			player.sendMessage("Nothing interesting happens. " + npc.getId());
-
-			if (Settings.getConfig().isDebug())
-				System.out.println("cliked 4 at npc id : " + npc.getId() + ", " + npc.getX() + ", " + npc.getY() + ", " + npc.getPlane());
+			Logger.debug(NPCHandler.class, "handleOption5", "NPC: " + npc.getId() + ", (" + npc.getX() + ", " + npc.getY() + ", " + npc.getPlane() + ")");
 		}));
 	}
 

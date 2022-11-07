@@ -24,17 +24,15 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
+import java.lang.SuppressWarnings;
 
-import com.rs.Settings;
 import com.rs.cache.loaders.ItemDefinitions;
 import com.rs.cache.loaders.NPCDefinitions;
 import com.rs.cache.loaders.ObjectDefinitions;
 import com.rs.cache.loaders.ObjectType;
 import com.rs.cores.CoresManager;
 import com.rs.game.World;
-import com.rs.game.content.controllers.DamonheimController;
-import com.rs.game.content.controllers.DungeonController;
-import com.rs.game.content.dialogues_matrix.SimpleMessage;
+import com.rs.game.content.combat.CombatDefinitions.Spellbook;
 import com.rs.game.content.skills.dungeoneering.DungeonConstants.GuardianMonster;
 import com.rs.game.content.skills.dungeoneering.DungeonConstants.KeyDoors;
 import com.rs.game.content.skills.dungeoneering.DungeonConstants.MapRoomIcon;
@@ -100,8 +98,6 @@ import com.rs.lib.game.Item;
 import com.rs.lib.game.WorldTile;
 import com.rs.lib.util.Logger;
 import com.rs.lib.util.Utils;
-
-
 
 public class DungeonManager {
 
@@ -370,8 +366,7 @@ public class DungeonManager {
 					continue;
 				room.setThiefChest(Utils.random(10));
 				World.spawnObject(new GameObject(DungeonConstants.THIEF_CHEST_LOCKED[party.getFloorType()], ObjectType.SCENERY_INTERACT, ((rotation + 3) & 0x3), region.getLocalX(chunkOffX, x), region.getLocalY(chunkOffY, y), 0));
-				if (Settings.getConfig().isDebug())
-					System.out.println("Added chest spot.");
+				Logger.debug(DungeonManager.class, "setResources", "Added chest spot.");
 				break;
 			}
 		if (party.getComplexity() >= 4 && Utils.random(3) == 0)
@@ -386,8 +381,7 @@ public class DungeonManager {
 				if (!World.floorFree(0, region.getLocalX(chunkOffX, x), region.getLocalY(chunkOffY, y)))
 					continue;
 				World.spawnObject(new GameObject(DungeonUtils.getFarmingResource(Utils.random(10), party.getFloorType()), ObjectType.SCENERY_INTERACT, rotation, region.getLocalX(chunkOffX, x), region.getLocalY(chunkOffY, y), 0));
-				if (Settings.getConfig().isDebug())
-					System.out.println("Added flower spot.");
+				Logger.debug(DungeonManager.class, "setResources", "Added flower spot.");
 				break;
 			}
 		if (party.getComplexity() >= 3 && Utils.random(3) == 0)
@@ -402,8 +396,7 @@ public class DungeonManager {
 				if (!World.floorFree(0, region.getLocalX(chunkOffX, x), region.getLocalY(chunkOffY, y)))
 					continue;
 				World.spawnObject(new GameObject(DungeonUtils.getMiningResource(Utils.random(DungeoneeringMining.DungeoneeringRocks.values().length), party.getFloorType()), ObjectType.SCENERY_INTERACT, rotation, region.getLocalX(chunkOffX, x), region.getLocalY(chunkOffY, y), 0));
-				if (Settings.getConfig().isDebug())
-					System.out.println("Added rock spot.");
+				Logger.debug(DungeonManager.class, "setResources", "Added rock spot.");
 				break;
 			}
 		if (party.getComplexity() >= 2 && Utils.random(3) == 0)
@@ -419,8 +412,7 @@ public class DungeonManager {
 					continue;
 				x -= Utils.ROTATION_DIR_X[rotation];
 				y -= Utils.ROTATION_DIR_Y[rotation];
-				if (Settings.getConfig().isDebug())
-					System.out.println("Added tree spot");
+				Logger.debug(DungeonManager.class, "setResources", "Added tree spot");
 				World.spawnObject(new GameObject(DungeonUtils.getWoodcuttingResource(Utils.random(10), party.getFloorType()), ObjectType.SCENERY_INTERACT, rotation, region.getLocalX(chunkOffX, x), region.getLocalY(chunkOffY, y), 0));
 				break;
 			}
@@ -437,8 +429,7 @@ public class DungeonManager {
 			if (!fishSpots.isEmpty()) {
 				int[] spot = fishSpots.get(Utils.random(fishSpots.size()));
 				spawnNPC(DungeonConstants.FISH_SPOT_NPC_ID, room.getRotation(), new WorldTile(region.getLocalX(chunkOffX, spot[0]), region.getLocalY(chunkOffY, spot[1]), 0), reference, DungeonConstants.FISH_SPOT_NPC);
-				if (Settings.getConfig().isDebug())
-					System.out.println("Added fish spot");
+				Logger.debug(DungeonManager.class, "setResources", "Added fish spot");
 			}
 		}
 	}
@@ -556,15 +547,15 @@ public class DungeonManager {
 
 	public void sendStartItems(Player player) {
 		if (party.getComplexity() == 1)
-			player.getDialogueManager().execute(new SimpleMessage(), "<col=0000FF>Complexity 1", "Combat only", "Armour and weapons allocated", "No shop stock");
+			player.simpleDialogue("<col=0000FF>Complexity 1", "Combat only", "Armour and weapons allocated", "No shop stock");
 		else if (party.getComplexity() == 2)
-			player.getDialogueManager().execute(new SimpleMessage(), "<col=0000FF>Complexity 2", "+ Fishing, Woodcutting, Firemaking, Cooking", "Armour and weapons allocated", "Minimal shop stock");
+			player.simpleDialogue("<col=0000FF>Complexity 2", "+ Fishing, Woodcutting, Firemaking, Cooking", "Armour and weapons allocated", "Minimal shop stock");
 		else if (party.getComplexity() == 3)
-			player.getDialogueManager().execute(new SimpleMessage(), "<col=0000FF>Complexity 3", "+ Mining, Smithing weapons, Fletching, Runecrafting", "Armour allocated", "Increased shop stock");
+			player.simpleDialogue("<col=0000FF>Complexity 3", "+ Mining, Smithing weapons, Fletching, Runecrafting", "Armour allocated", "Increased shop stock");
 		else if (party.getComplexity() == 4)
-			player.getDialogueManager().execute(new SimpleMessage(), "<col=0000FF>Complexity 4", "+ Smithing armour, Hunter, Farming textiles, Crafting", "Increased shop stock");
+			player.simpleDialogue("<col=0000FF>Complexity 4", "+ Smithing armour, Hunter, Farming textiles, Crafting", "Increased shop stock");
 		else if (party.getComplexity() == 5)
-			player.getDialogueManager().execute(new SimpleMessage(), "<col=0000FF>Complexity 5", "All skills included", "+ Farming seeds, Herblore, Thieving, Summoning", "Complete shop stock", "Challenge rooms + skill doors");
+			player.simpleDialogue("<col=0000FF>Complexity 5", "All skills included", "+ Farming seeds, Herblore, Thieving, Summoning", "Complete shop stock", "Challenge rooms + skill doors");
 		if (party.getComplexity() <= 3) {
 			int defenceTier = DungeonUtils.getTier(player.getSkills().getLevelForXp(Constants.DEFENSE));
 			if (defenceTier > 8)
@@ -606,7 +597,7 @@ public class DungeonManager {
 		else {
 			player.getControllerManager().startController(new DungeonController(DungeonManager.this));
 			player.setLargeSceneView(true);
-			player.getCombatDefinitions().setSpellBook(3);
+			player.getCombatDefinitions().setSpellbook(Spellbook.DUNGEONEERING);
 			player.getPackets().sendVarc(1725, 11);
 			setWorldMap(player, true);
 		}
@@ -1017,7 +1008,7 @@ public class DungeonManager {
 	}
 
 	public void setWorldMap(Player player, boolean dungIcon) {
-		player.getVars().setVarBit(11297, dungIcon ? 1 : 0);
+		player.getVars().setVarBit(6090, dungIcon ? 1 : 0);
 	}
 
 	public void endFarming() {
@@ -1329,11 +1320,11 @@ public class DungeonManager {
 		int presXp = getFloorXP(prestige, size, roomsOpened);
 		int avgXp = (int) ((baseXp+presXp) / 2);
 		
-		System.out.println("~~~Experience for floor " + floor + " size: " + size + " roomsOpened: " + roomsOpened + "~~~");
-		System.out.println("Base XP: " + baseXp);
-		System.out.println("Prestige " + prestige + " XP:" + presXp);
-		System.out.println("Average XP: " + avgXp);
-		System.out.println("Maximum possible XP for floor: " + ((int) (avgXp * 1.56)));
+		Logger.debug(DungeonManager.class, "printXP", "~~~Experience for floor " + floor + " size: " + size + " roomsOpened: " + roomsOpened + "~~~");
+		Logger.debug(DungeonManager.class, "printXP", "Base XP: " + baseXp);
+		Logger.debug(DungeonManager.class, "printXP", "Prestige " + prestige + " XP:" + presXp);
+		Logger.debug(DungeonManager.class, "printXP", "Average XP: " + avgXp);
+		Logger.debug(DungeonManager.class, "printXP", "Maximum possible XP for floor: " + ((int) (avgXp * 1.56)));
 	}
 
 	public void voteToMoveOn(Player player) {
@@ -1345,6 +1336,8 @@ public class DungeonManager {
 
 	public void ready(Player player) {
 		int index = party.getIndex(player);
+		if (rewardsTimer == null)
+			setRewardsTimer();
 		rewardsTimer.increaseReadyCount();
 		for (Player p2 : party.getTeam())
 			p2.getPackets().sendVarc(1397 + index, 1);
@@ -1429,7 +1422,7 @@ public class DungeonManager {
 				}
 				destroy();
 			} catch (Throwable e) {
-				Logger.handle(e);
+				Logger.handle(DestroyTimer.class, "run", e);
 			}
 		}
 
@@ -1463,7 +1456,7 @@ public class DungeonManager {
 				} else
 					nextFloor();
 			} catch (Throwable e) {
-				Logger.handle(e);
+				Logger.handle(RewardsTimer.class, "run", e);
 			}
 		}
 
@@ -1508,7 +1501,7 @@ public class DungeonManager {
 					stage = 1;
 				});
 			} catch (Throwable e) {
-				Logger.handle(e);
+				Logger.handle(DungeonManager.class, "load", e);
 			}
 		});
 	}
@@ -1606,7 +1599,7 @@ public class DungeonManager {
 		for (Player player : party.getTeam()) {
 			if (!isAtBossRoom(player.getTile()))
 				continue;
-			player.getPackets().sendMusicEffect(415);
+			player.jingle(415);
 			playMusic(player, reference);
 		}
 	}

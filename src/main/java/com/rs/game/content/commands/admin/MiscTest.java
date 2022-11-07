@@ -32,24 +32,29 @@ import com.rs.cache.loaders.ObjectType;
 import com.rs.cores.CoresManager;
 import com.rs.game.World;
 import com.rs.game.content.achievements.Achievement;
+import com.rs.game.content.bosses.qbd.QueenBlackDragonController;
+import com.rs.game.content.combat.CombatDefinitions.Spellbook;
 import com.rs.game.content.combat.PlayerCombat;
 import com.rs.game.content.commands.Commands;
-import com.rs.game.content.controllers.RunespanController;
-import com.rs.game.content.controllers.TutorialIslandController;
 import com.rs.game.content.cutscenes.ExampleCutscene;
 import com.rs.game.content.minigames.barrows.BarrowsController;
+import com.rs.game.content.pet.Pet;
 import com.rs.game.content.quests.Quest;
 import com.rs.game.content.randomevents.RandomEvents;
+import com.rs.game.content.skills.runecrafting.runespan.RunespanController;
 import com.rs.game.content.skills.summoning.Familiar;
+import com.rs.game.content.tutorialisland.TutorialIslandController;
 import com.rs.game.content.world.doors.Doors;
 import com.rs.game.model.entity.Hit;
 import com.rs.game.model.entity.Hit.HitLook;
+import com.rs.game.model.entity.ModelRotator;
+import com.rs.game.model.entity.Rotation;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.npc.combat.NPCCombatDefinitions;
-import com.rs.game.model.entity.npc.pet.Pet;
 import com.rs.game.model.entity.pathing.Direction;
 import com.rs.game.model.entity.pathing.FixedTileStrategy;
 import com.rs.game.model.entity.pathing.RouteFinder;
+import com.rs.game.model.entity.player.Equipment;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.entity.player.Skills;
 import com.rs.game.model.entity.player.managers.InterfaceManager;
@@ -64,18 +69,25 @@ import com.rs.lib.game.Item;
 import com.rs.lib.game.Rights;
 import com.rs.lib.game.SpotAnim;
 import com.rs.lib.game.WorldTile;
+import com.rs.lib.net.packets.decoders.ReflectionCheckResponse.ResponseCode;
 import com.rs.lib.net.packets.encoders.HintTrail;
-import com.rs.lib.util.ReflectionCheck;
+import com.rs.lib.util.Logger;
+import com.rs.lib.util.RSColor;
 import com.rs.lib.util.Utils;
+import com.rs.lib.util.reflect.ReflectionCheck;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.annotations.ServerStartupEvent;
 import com.rs.tools.MapSearcher;
 import com.rs.utils.DropSets;
 import com.rs.utils.ObjAnimList;
-import com.rs.utils.music.*;
+import com.rs.utils.music.Genre;
+import com.rs.utils.music.Music;
+import com.rs.utils.music.Song;
+import com.rs.utils.music.Voices;
+import com.rs.utils.reflect.ReflectionAnalysis;
+import com.rs.utils.reflect.ReflectionTest;
 import com.rs.utils.shop.ShopsHandler;
 import com.rs.utils.spawns.ItemSpawns;
-import com.rs.utils.spawns.NPCSpawn;
 import com.rs.utils.spawns.NPCSpawns;
 
 @PluginEventHandler
@@ -93,14 +105,49 @@ public class MiscTest {
 			14962, 14401, 14673, 14639, 14645, 14722, 14733, 14748, 14780, 14787, 14941, 14841, 14845, 14886, 14929, 14982, 3302, 3300, 3288, 3290, 15239, 15034, 15063, 15097, 7573, 15103, 15105, 15217, 15187, 15176, 15181, 6292, 6998, 7493, 15261, 7502, 7437, 7436, 7434, 15906, 15317, 15305, 15308, 15275, 15276, 2916, 15304, 16077, 107, 379, 307, 10825, 1478, 4207, 10860, 10824, 10116, 7456, 9573, 12465, 5848, 15353, 10964, 1174, 1291, 12437, 9674, 16875, 1202, 1730, 1786, 2120, 2566, 2231, 15740, 2605, 3413, 3536, 3497, 3052, 3929, 7055, 8644, 7157, 6787, 5684, 8498, 6066, 6575, 6366, 5784,
 			6786, 4405, 9856, 4729, 9818, 9211, 9700, 9699, 9694, 9503, 9953, 11553, 16501, 12361, 11843, 10731, 10734, 11957, 11235, 16325, 10978, 12666, 12546, 12760, 12901, 12934, 15644, 13686, 13510, 13597, 13956, 13700, 14528, 14306, 16921, 14878, 14955, 15313, 15376, 15330, 15402, 15382, 15429, 15433, 15536, 15560, 15573, 15566, 15576, 15900, 15584, 15592, 15602, 15733, 15702, 15637, 15639, 15658, 15645, 15717, 15716, 16212, 15746, 15754, 15940, 16404, 15994, 15898, 15757, 16062, 15802, 15808, 15937, 16072, 8527, 15943, 8545, 16245, 16410, 16439, 16429, 16370, 16532, 16548, 16533, 16632,
 			16686, 16647, 16617, 16623, 16620, 16629, 16603, 16671, 16940, 16929, 16870, 16826, 16835, 16855, 16825, 16770, 16767, 16760, 16850, 16864, 16881, 16917, 16894, 16935, 16938, 16973, 16964, 16958, 16978, 16987, 17064, 17010, 17132, 17118, 17159, 17184, 17169, 17155, 17149, 17158, 17168 };
-
+	
 	@ServerStartupEvent
 	public static void loadCommands() {
 
 		//		Commands.add(Rights.ADMIN, "command [args]", "Desc", (p, args) -> {
 		//
 		//		});
-
+		
+		Commands.add(Rights.DEVELOPER, "clanify", "Toggles the ability to clanify objects and npcs by examining them.", (p, args) -> {
+			p.getNSV().setB("clanifyStuff", !p.getNSV().getB("clanifyStuff"));
+			p.sendMessage("CLANIFY: " + p.getNSV().getB("clanifyStuff"));
+		});
+		
+		Commands.add(Rights.DEVELOPER, "allstopfaceme", "Stops all body model rotators.", (p, args) -> {
+			for (Player player : World.getPlayers()) {
+				if (player == null || !player.hasStarted() || player.hasFinished())
+					continue;
+				player.setBodyModelRotator(null);
+			}
+			for (NPC npc : World.getNPCs()) {
+				if (npc == null || npc.hasFinished())
+					continue;
+				npc.setBodyModelRotator(null);
+			}
+		});
+		
+		Commands.add(Rights.DEVELOPER, "allfaceme", "Sets body model rotators for all entities in the server.", (p, args) -> {
+			for (Player player : World.getPlayers()) {
+				if (player == null || !player.hasStarted() || player.hasFinished())
+					continue;
+				player.setBodyModelRotator(new ModelRotator().addRotator(new Rotation(p).enableAll()));
+			}
+			for (NPC npc : World.getNPCs()) {
+				if (npc == null || npc.hasFinished())
+					continue;
+				npc.setBodyModelRotator(new ModelRotator().addRotator(new Rotation(p).enableAll()));
+			}
+		});
+		
+		Commands.add(Rights.DEVELOPER, "spawnmax", "Spawns another max into the world on top of the player.", (p, args) -> {
+			World.spawnNPC(3373, new WorldTile(p.getTile()), -1, true, true, true);
+		});
+		
 		Commands.add(Rights.DEVELOPER, "playcs", "Plays a cutscene using new cutscene system", (p, args) -> {
 			p.getCutsceneManager().play(new ExampleCutscene());
 		});
@@ -119,6 +166,71 @@ public class MiscTest {
 		
 		Commands.add(Rights.DEVELOPER, "tutisland", "Start tutorial island", (p, args) -> {
 			p.getControllerManager().startController(new TutorialIslandController());
+		});
+		
+		Commands.add(Rights.DEVELOPER, "qbd", "Start qbd", (p, args) -> {
+			p.getControllerManager().startController(new QueenBlackDragonController());
+		});
+		
+		/**
+		 * 31 orange glow
+		 * 40 fire cape
+		 * 54 old hitsplats
+		 * 61 sick fire glow
+		 * 62 smokey pulsating
+		 * 89 colored glow
+		 * 361 bright white with bright colored glow
+		 * 451 running watery color
+		 * 637 ghostlyish mostly transparent
+		 * 647 another bright glow with less bloom
+		 * 648 breathing texture almost
+		 * 649 recolorable ghostly
+		 * 654, 656, 658 storm with thunder
+		 * 655 subtle dripping recolor
+		 * 657 fast pulsating ecto recolor
+		 * 676, 677 some colorful wheel
+		 * 679 recolorable ghillie suit
+		 * 691 another bright bloom glow
+		 * 707 transparent with black stars pulsating
+		 * 718 explosion bloom particles
+		 * 722 sick glow particle swirl recolorable
+		 * 811 eye blinding bloom
+		 * 824 bright looking lava
+		 * 825 recolorable bloom lava
+		 * 826 magical psychadelic moving
+		 * 831 recolorable upward flowing liquid
+		 * 847 sick bright yellow magical
+		 * 856 recolorable fast flowing liquid
+		 * 870 very bloomy recolorable
+		 * 875 bright but low bloom recolorable
+		 * 876-878 bright cool bloom
+		 * 880 alternate fire cape lava
+		 * 906 recolorable dragonhide lookin
+		 * 916 eye rape bloom
+		 * 
+		 */
+		Commands.add(Rights.DEVELOPER, "drtor [texId]", "Set equipment texture override", (p, args) -> {
+			if (p.getEquipment().get(Equipment.CHEST) != null)
+				p.getEquipment().get(Equipment.CHEST).addMetaData("drTOr", Integer.valueOf(args[0]));
+			if (p.getEquipment().get(Equipment.LEGS) != null)
+				p.getEquipment().get(Equipment.LEGS).addMetaData("drTOr", Integer.valueOf(args[0]));
+			if (p.getEquipment().get(Equipment.SHIELD) != null)
+				p.getEquipment().get(Equipment.SHIELD).addMetaData("drTOr", Integer.valueOf(args[0]));
+			if (p.getEquipment().get(Equipment.HEAD) != null)
+				p.getEquipment().get(Equipment.HEAD).addMetaData("drTOr", Integer.valueOf(args[0]));
+			p.getAppearance().generateAppearanceData();
+		});
+		
+		Commands.add(Rights.DEVELOPER, "drcor [r, g, b]", "Set equipment color override", (p, args) -> {
+			if (p.getEquipment().get(Equipment.CHEST) != null)
+				p.getEquipment().get(Equipment.CHEST).addMetaData("drCOr", RSColor.RGB_to_HSL(Integer.valueOf(args[0]), Integer.valueOf(args[1]), Integer.valueOf(args[2])));
+			if (p.getEquipment().get(Equipment.LEGS) != null)
+				p.getEquipment().get(Equipment.LEGS).addMetaData("drCOr", RSColor.RGB_to_HSL(Integer.valueOf(args[0]), Integer.valueOf(args[1]), Integer.valueOf(args[2])));
+			if (p.getEquipment().get(Equipment.SHIELD) != null)
+				p.getEquipment().get(Equipment.SHIELD).addMetaData("drCOr", RSColor.RGB_to_HSL(Integer.valueOf(args[0]), Integer.valueOf(args[1]), Integer.valueOf(args[2])));
+			if (p.getEquipment().get(Equipment.HEAD) != null)
+				p.getEquipment().get(Equipment.HEAD).addMetaData("drCOr", RSColor.RGB_to_HSL(Integer.valueOf(args[0]), Integer.valueOf(args[1]), Integer.valueOf(args[2])));
+			p.getAppearance().generateAppearanceData();
 		});
 		
 		Commands.add(Rights.DEVELOPER, "tileman", "Set to tileman mode", (p, args) -> {
@@ -221,12 +333,12 @@ public class MiscTest {
 										objects.add(obj);
 						}
 			for (GameObject o : objects) {
-				System.out.println(o);
-				System.out.println("vb: " + o.getDefinitions().varpBit);
+				Logger.debug(MiscTest.class, "areaobj", o);
+				Logger.debug(MiscTest.class, "areaobj", "vb: " + o.getDefinitions().varpBit);
 			}
 		});
 
-		Commands.add(Rights.DEVELOPER, "testnpc", "spawn npc walking dir", (player, args) -> {
+		Commands.add(Rights.DEVELOPER, "npcwalkdir", "Spawn npc walking dir.", (player, args) -> {
 			Direction dir = Arrays.stream(Direction.values()).filter(n -> n.name().equalsIgnoreCase(args[0])).findFirst().get();
 			if (dir == null)
 				return;
@@ -326,8 +438,8 @@ public class MiscTest {
 			p.getAppearance().generateAppearanceData();
 		});
 
-		Commands.add(Settings.getConfig().isDebug() ? Rights.PLAYER : Rights.DEVELOPER, "sound [id effectType]", "Plays a sound effect.", (p, args) -> {
-			p.getPackets().sendSound(Integer.valueOf(args[0]), 0, args.length > 1 ? Integer.valueOf(args[1]) : 1);
+		Commands.add(Settings.getConfig().isDebug() ? Rights.PLAYER : Rights.DEVELOPER, "sound [id]", "Plays a sound effect.", (p, args) -> {
+			p.soundEffect(Integer.valueOf(args[0]));
 		});
 
 		Commands.add(Settings.getConfig().isDebug() ? Rights.PLAYER : Rights.DEVELOPER, "music [id (volume)]", "Plays a music track.", (p, args) -> {
@@ -341,12 +453,12 @@ public class MiscTest {
 					Song song = Music.getSong(i);
 					count++;
 					if(song == null)
-						System.out.println("Error @" + i);
+						Logger.error(MiscTest.class, "unusedmusic", "Error @" + i);
 					else
-						System.out.println(i + " " + song.getName() + ": " + song.getHint());
+						Logger.debug(MiscTest.class, "unusedmusic", i + " " + song.getName() + ": " + song.getHint());
 				}
-			System.out.println("Total unused: " + count);
-			System.out.println("Unused is " + Math.ceil(count/1099.0*100) + "%");
+			Logger.debug(MiscTest.class, "unusedmusic", "Total unused: " + count);
+			Logger.debug(MiscTest.class, "unusedmusic", "Unused is " + Math.ceil(count/1099.0*100) + "%");
 		});
 
 		Commands.add(Rights.DEVELOPER, "nextm", "Plays a music track.", (p, args) -> {
@@ -369,19 +481,19 @@ public class MiscTest {
 		Commands.add(Rights.DEVELOPER, "frogland", "Plays frogland to everyone on the server.", (p, args) -> {
 			World.allPlayers(target -> {
 				target.getPackets().sendRunScript(1764, 12451857, 12451853, 20, 0); //0 music volume, 1 sound effect volume, 2 ambient sound volume
-				target.getPackets().sendMusic(409, 100, 255);
+				target.musicTrack(409);
 			});
 		});
 
 		Commands.add(Rights.DEVELOPER, "musicall [id]", "Plays music to everyone on the server.", (p, args) -> {
 			World.allPlayers(target -> {
 				target.getPackets().sendRunScript(1764, 12451857, 12451853, 20, 0); //0 music volume, 1 sound effect volume, 2 ambient sound volume
-				target.getPackets().sendMusic(Integer.valueOf(args[0]), 100, 255);
+				target.musicTrack(Integer.valueOf(args[0]));
 			});
 		});
 
-		Commands.add(Rights.DEVELOPER, "musiceffect [id]", "plays music effects", (p, args) -> {
-			p.getPackets().sendMusicEffect(Integer.valueOf(args[0]));
+		Commands.add(Rights.DEVELOPER, "jingle [id]", "plays jingles", (p, args) -> {
+			p.jingle(Integer.valueOf(args[0]));
 		});
 
 		Commands.add(Rights.DEVELOPER, "tileflags", "Get the tile flags for the tile you're standing on.", (p, args) -> {
@@ -432,6 +544,11 @@ public class MiscTest {
 			p.getNSV().setB("infPrayer", !p.getNSV().getB("infPrayer"));
 			p.sendMessage("INFINITE PRAYER: " + p.getNSV().getB("infPrayer"));
 		});
+		
+		Commands.add(Rights.ADMIN, "infrun", "Toggles infinite run for the player.", (p, args) -> {
+			p.getNSV().setB("infRun", !p.getNSV().getB("infRun"));
+			p.sendMessage("INFINITE RUN: " + p.getNSV().getB("infRun"));
+		});
 
 		Commands.add(Rights.ADMIN, "maxbank", "Sets all the item counts in the player's bank to 10m.", (p, args) -> {
 			for (Item i : p.getBank().getContainerCopy())
@@ -443,18 +560,18 @@ public class MiscTest {
 			switch(args[0].toLowerCase()) {
 			case "modern":
 			case "normal":
-				p.getCombatDefinitions().setSpellBook(0);
+				p.getCombatDefinitions().setSpellbook(Spellbook.MODERN);
 				break;
 			case "ancient":
 			case "ancients":
-				p.getCombatDefinitions().setSpellBook(1);
+				p.getCombatDefinitions().setSpellbook(Spellbook.ANCIENT);
 				break;
 			case "lunar":
 			case "lunars":
-				p.getCombatDefinitions().setSpellBook(2);
+				p.getCombatDefinitions().setSpellbook(Spellbook.LUNAR);
 				break;
 			case "dung":
-				p.getCombatDefinitions().setSpellBook(3);
+				p.getCombatDefinitions().setSpellbook(Spellbook.DUNGEONEERING);
 				break;
 			default:
 				p.sendMessage("Invalid spellbook. Spellbooks are modern, lunar, ancient, and dung");
@@ -624,20 +741,22 @@ public class MiscTest {
 				return;
 			}
 			p.setNextWorldTile(objs.get(Integer.valueOf(args[1])));
-
 		});
 
-		Commands.add(Rights.DEVELOPER, "searchnpc,sn [npcId]", "Searches the entire gameworld for an NPC matching the ID and teleports you to it.", (p, args) -> {
+		Commands.add(Rights.DEVELOPER, "searchnpc,sn [npcId index]", "Searches the entire gameworld for an NPC matching the ID and teleports you to it.", (p, args) -> {
+			int i = 0;
+			List<NPC> npcs = new ArrayList<>();
 			for (NPC npc : World.getNPCs())
 				if (npc.getId() == Integer.valueOf(args[0])) {
-					p.setNextWorldTile(new WorldTile(npc.getTile()));
-					return;
+					npcs.add(npc);
 				}
-			for (NPCSpawn spawns : NPCSpawns.getAllSpawns())
-				if (spawns.getNPCId() == Integer.valueOf(args[0])) {
-					p.setNextWorldTile(new WorldTile(spawns.getTile()));
-					return;
-				}
+			for(NPC npc : npcs)
+				p.getPackets().sendDevConsoleMessage(i++ + ": " + npc.toString());
+			if (args.length == 1) {
+				p.setNextWorldTile(new WorldTile(npcs.get(0).getTile()));
+				return;
+			}
+			p.setNextWorldTile(npcs.get(Integer.valueOf(args[1])).getTile());
 		});
 
 		Commands.add(Rights.ADMIN, "hide", "Hides the player from other players.", (p, args) -> {
@@ -674,11 +793,7 @@ public class MiscTest {
 			p.getSkills().init();
 		});
 
-		Commands.add(Rights.PLAYER, "voice, v [id]", "Plays voices.", (p, args) -> {
-			p.playSound(Integer.valueOf(args[0]), 2);
-		});
-
-
+		Commands.add(Rights.PLAYER, "voice, v [id]", "Plays voices.", (p, args) -> p.voiceEffect(Integer.valueOf(args[0])));
 
 		Commands.add(Rights.PLAYER, "playthroughvoices [start finish tick_delay]", "Gets player rights", (p, args) -> {
 			//		Voice[] voices = new Voice[3];
@@ -688,7 +803,7 @@ public class MiscTest {
 			//		try {
 			//			JsonFileManager.saveJsonFile(voices, new File("developer-information/voice.json"));
 			//		} catch(Exception e) {
-			//			System.out.println(e.getStackTrace());
+			//			Logger.debug(e.getStackTrace());
 			//		}
 
 			int tickDelay = Integer.valueOf(args[2]);
@@ -710,7 +825,7 @@ public class MiscTest {
 
 					if(!Voices.voicesMarked.contains(voiceID)) {
 						p.sendMessage("Playing voice " + voiceID);
-						p.getPackets().sendVoice(voiceID++);
+						p.voiceEffect(voiceID++);
 					}
 
 					if(voiceID > Integer.valueOf(args[1]))
@@ -828,8 +943,7 @@ public class MiscTest {
 		});
 
 		Commands.add(Rights.ADMIN, "camshake [slot, v1, v2, v3, v4]", "Transforms the player into an NPC.", (p, args) -> {
-			p.getPackets().sendCameraShake(Integer.valueOf(args[0]), Integer.valueOf(args[1]), Integer.valueOf(args[2]), Integer.valueOf(args[3]),
-					Integer.valueOf(args[4]));
+			p.getPackets().sendCameraShake(Integer.valueOf(args[0]), Integer.valueOf(args[1]), Integer.valueOf(args[2]), Integer.valueOf(args[3]), Integer.valueOf(args[4]));
 		});
 
 		Commands.add(Settings.getConfig().isDebug() ? Rights.PLAYER : Rights.ADMIN, "inter [interfaceId]", "Opens an interface with specific ID.", (p, args) -> {
@@ -887,7 +1001,7 @@ public class MiscTest {
 				return;
 			p.getPackets().sendDevConsoleMessage(Integer.valueOf(args[0]) + ": " + defs.getCompatibleAnimations().toString());
 			p.sendMessage(Integer.valueOf(args[0]) + ": " + defs.getCompatibleAnimations().toString());
-			System.out.println(defs.getCompatibleAnimations().toString());
+			Logger.debug(MiscTest.class, "companim", defs.getCompatibleAnimations().toString());
 		});
 
 		Commands.add(Rights.DEVELOPER, "varcstr [id value]", "Sets a varc string value.", (p, args) -> {
@@ -1021,7 +1135,23 @@ public class MiscTest {
 			if (target == null)
 				p.sendMessage("Couldn't find player.");
 			else
-				target.addReflectionCheck(new ReflectionCheck("com.Loader", "private", "void", "doFrame", true));
+				target.queueReflectionAnalysis(new ReflectionAnalysis()
+						.addTest(new ReflectionTest("Client", "validates client class", new ReflectionCheck("com.Loader", "MAJOR_BUILD"), check -> {
+							return check.getResponse().getCode() == ResponseCode.SUCCESS && check.getResponse().getStringData().equals("public static final");
+						}))
+						.addTest(new ReflectionTest("Loader", "validates launcher class", new ReflectionCheck("com.darkan.Loader", "DOWNLOAD_URL"), check -> {
+							return check.getResponse().getCode() == ResponseCode.SUCCESS && check.getResponse().getStringData().equals("public static");
+						}))
+						.addTest(new ReflectionTest("Player rights", "validates player rights client sided", new ReflectionCheck("com.jagex.client", "PLAYER_RIGHTS", true), check -> {
+							return check.getResponse().getCode() == ResponseCode.SUCCESS && check.getResponse().getData() == target.getRights().getCrown();
+						}))
+						.addTest(new ReflectionTest("Lobby port method", "validates getPort", new ReflectionCheck("com.Loader", "I", "getPort", new Object[] { Integer.valueOf(1115) }), check -> {
+							return check.getResponse().getCode() == ResponseCode.NUMBER && check.getResponse().getData() == 43594;
+						}))
+						.addTest(new ReflectionTest("Local checksum method", "validates getLocalChecksum", new ReflectionCheck("com.darkan.Download", "java.lang.String", "getLocalChecksum", new Object[] { }), check -> {
+							return check.getResponse().getCode() == ResponseCode.STRING && check.getResponse().getStringData().equals("e4d95327297ffca1698dff85eda6622d");
+						}))
+						.build());
 		});
 
 		Commands.add(Rights.DEVELOPER, "getip [player name]", "Verifies the user's client.", (p, args) -> {

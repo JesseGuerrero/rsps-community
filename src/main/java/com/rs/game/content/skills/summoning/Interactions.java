@@ -1,6 +1,5 @@
 package com.rs.game.content.skills.summoning;
 
-import com.rs.game.content.controllers.UndergroundDungeonController;
 import com.rs.game.content.dialogue.Dialogue;
 import com.rs.game.content.dialogue.HeadE;
 import com.rs.game.content.dialogue.Options;
@@ -8,6 +7,7 @@ import com.rs.game.content.quests.Quest;
 import com.rs.game.content.skills.firemaking.Firemaking;
 import com.rs.game.content.skills.firemaking.Firemaking.Fire;
 import com.rs.game.content.skills.magic.Magic;
+import com.rs.game.content.world.areas.dungeons.UndergroundDungeonController;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.entity.player.Skills;
 import com.rs.lib.game.Animation;
@@ -1660,7 +1660,7 @@ public class Interactions {
 			case GRANITE_LOBSTER -> {
 				if(!canTalk)
 					yield new Dialogue().addNPC(familiar.getId(), HeadE.CAT_CALM_TALK2, "CLomp! Clap Clamp!");
-				if(player.getQuestManager().isComplete(Quest.FREMENNIK_TRIALS))
+				if(player.isQuestComplete(Quest.FREMENNIK_TRIALS))
 					yield random(
 							new Dialogue()
 									.addNPC(familiar.getId(), HeadE.CAT_CALM_TALK2, "Ho, my Fremennik brother, shall we go raiding?")

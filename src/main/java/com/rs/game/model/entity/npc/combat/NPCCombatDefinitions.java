@@ -27,6 +27,7 @@ import com.rs.lib.file.JsonFileManager;
 import com.rs.lib.util.Logger;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.annotations.ServerStartupEvent;
+import com.rs.plugin.annotations.ServerStartupEvent.Priority;
 
 @PluginEventHandler
 public class NPCCombatDefinitions {
@@ -56,17 +57,19 @@ public class NPCCombatDefinitions {
 	}
 
 	public enum AggressiveType {
-		PASSIVE,
-		AGGRESSIVE
+		PASSIVE, AGGRESSIVE
 	}
 
 	private transient boolean realStats = true;
 	private int[] ids;
 	private String[] names;
 	private int attackAnim;
+	private int attackSound = -1;
 	private int defenceAnim;
+	private int defendSound = -1;
 	private int deathAnim;
 	private int deathDelay;
+	private int deathSound = -1;
 	private int respawnDelay;
 	private int hitpoints;
 	private int maxHit;
@@ -78,7 +81,7 @@ public class NPCCombatDefinitions {
 	private int attackGfx;
 	private int attackProjectile;
 	private AggressiveType agressivenessType;
-	private int aggroDistance = -1; //4 for melee, 8 for range default
+	public int aggroDistance = -1; //4 for melee, 8 for range default
 	private int deAggroDistance = -1; //16 by default
 	private int maxDistFromSpawn = -1; //16 by default 64 for special/special2
 
@@ -122,7 +125,7 @@ public class NPCCombatDefinitions {
 		combatLevels = defs.combatLevels == null ? null : new HashMap<>(defs.combatLevels);
 	}
 
-	@ServerStartupEvent
+	@ServerStartupEvent(Priority.FILE_IO)
 	public static final void init() {
 		loadPackedCombatDefinitions();
 	}
@@ -154,7 +157,7 @@ public class NPCCombatDefinitions {
 			for (File f : dropFiles)
 				loadFile(f);
 		} catch (Throwable e) {
-			Logger.handle(e);
+			Logger.handle(NPCCombatDefinitions.class, "loadPackedCombatDefinitions", e);
 		}
 	}
 
@@ -248,25 +251,29 @@ public class NPCCombatDefinitions {
 	public String[] getNames() {
 		return names;
 	}
+	
+	public int getLevel(Skill skill) {
+		return getLevels().get(skill) == null ? 1 : getLevels().get(skill);
+	}
 
 	public int getAttackLevel() {
-		return getLevels().get(Skill.ATTACK);
+		return getLevel(Skill.ATTACK);
 	}
 
 	public int getStrengthLevel() {
-		return getLevels().get(Skill.STRENGTH);
+		return getLevel(Skill.STRENGTH);
 	}
 
 	public int getDefenseLevel() {
-		return getLevels().get(Skill.DEFENSE);
+		return getLevel(Skill.DEFENSE);
 	}
 
 	public int getMagicLevel() {
-		return getLevels().get(Skill.MAGE);
+		return getLevel(Skill.MAGE);
 	}
 
 	public int getRangeLevel() {
-		return getLevels().get(Skill.RANGE);
+		return getLevel(Skill.RANGE);
 	}
 
 	public static Map<Skill, Integer> generateLevels(int combat, int hp) {
@@ -286,12 +293,12 @@ public class NPCCombatDefinitions {
 	}
 
 	public int getCombatLevel() {
-		int attack = getLevels().get(Skill.ATTACK);
-		int defence = getLevels().get(Skill.DEFENSE);
-		int strength = getLevels().get(Skill.STRENGTH);
+		int attack = getLevel(Skill.ATTACK);
+		int defence = getLevel(Skill.DEFENSE);
+		int strength = getLevel(Skill.STRENGTH);
 		int hp = hitpoints/10;
-		int ranged = getLevels().get(Skill.RANGE);
-		int magic = getLevels().get(Skill.MAGE);
+		int ranged = getLevel(Skill.RANGE);
+		int magic = getLevel(Skill.MAGE);
 		int combatLevel = 3;
 		combatLevel = (int) ((defence + hp) * 0.25) + 1;
 		double melee = (attack + strength) * 0.325;
@@ -369,5 +376,17 @@ public class NPCCombatDefinitions {
 		if (bonuses.get(bonus) == null)
 			return 0;
 		return (Integer) bonuses.get(bonus);
+	}
+
+	public int getAttackSound() {
+		return attackSound;
+	}
+
+	public int getDefendSound() {
+		return defendSound;
+	}
+
+	public int getDeathSound() {
+		return deathSound;
 	}
 }

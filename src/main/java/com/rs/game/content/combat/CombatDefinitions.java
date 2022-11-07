@@ -16,18 +16,38 @@
 //
 package com.rs.game.content.combat;
 
+import java.util.Map;
+
 import com.rs.cache.loaders.Bonus;
+import com.rs.game.content.quests.Quest;
+import com.rs.game.model.entity.player.Equipment;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.entity.player.managers.InterfaceManager.Sub;
-import com.rs.lib.Constants;
 import com.rs.lib.game.Item;
-import com.rs.lib.util.Utils;
 
 public final class CombatDefinitions {
+	
+	public enum Spellbook {
+		MODERN(192),
+		ANCIENT(193),
+		LUNAR(430),
+		DUNGEONEERING(950);
+		
+		private int interfaceId;
+		
+		private Spellbook(int interfaceId) {
+			this.interfaceId = interfaceId;
+		}
+		
+		public int getInterfaceId() {
+			return interfaceId;
+		}
+	}
 
 	private transient Player player;
 	private transient boolean usingSpecialAttack;
 	private transient int[] bonuses;
+	private transient boolean dungSpellbook;
 
 	private byte attackStyle;
 	private byte specialAttackPercentage;
@@ -35,11 +55,10 @@ public final class CombatDefinitions {
 	private byte sortSpellBook;
 	private boolean showCombatSpells;
 	private boolean showSkillSpells;
-	private boolean showMiscallaneousSpells;
+	private boolean showMiscSpells;
 	private boolean showTeleportSpells;
 	private boolean defensiveCasting;
-	private transient boolean dungSpellBook;
-	private byte spellBook;
+	private Spellbook spellbook = Spellbook.MODERN;
 	private CombatSpell autoCast;
 
 	public CombatSpell getSpell() {
@@ -86,7 +105,7 @@ public final class CombatDefinitions {
 	public int getSpellAutoCastConfigValue() {
 		if (autoCast == null)
 			return 0;
-		if (dungSpellBook)
+		if (dungSpellbook)
 			switch (autoCast) {
 			case WIND_STRIKE:
 				return 103;
@@ -131,7 +150,7 @@ public final class CombatDefinitions {
 			default:
 				return 0;
 			}
-		if (spellBook == 0)
+		if (spellbook == Spellbook.MODERN)
 			switch (autoCast) {
 			case WIND_STRIKE:
 				return 3;
@@ -192,7 +211,7 @@ public final class CombatDefinitions {
 			default:
 				return 0;
 			}
-		else if (spellBook == 1)
+		else if (spellbook == Spellbook.ANCIENT)
 			switch (autoCast) {
 			case SMOKE_RUSH:
 				return 63;
@@ -246,35 +265,27 @@ public final class CombatDefinitions {
 		autoRetaliate = true;
 		showCombatSpells = true;
 		showSkillSpells = true;
-		showMiscallaneousSpells = true;
+		showMiscSpells = true;
 		showTeleportSpells = true;
 	}
 
-	public void setSpellBook(int id) {
-		if (id == 3)
-			dungSpellBook = true;
+	public void setSpellbook(Spellbook book) {
+		if (book == Spellbook.LUNAR && !player.isQuestComplete(Quest.LUNAR_DIPLOMACY, "to use the Lunar spellbook."))
+			return;
+		if (book == Spellbook.ANCIENT && !player.isQuestComplete(Quest.DESERT_TREASURE, "to use the Ancient spellbook."))
+			return;
+		if (book == Spellbook.DUNGEONEERING)
+			dungSpellbook = true;
 		else
-			spellBook = (byte) id;
+			spellbook = book;
 		refreshSpellbook();
 		player.getInterfaceManager().sendSubDefault(Sub.TAB_MAGIC);
 	}
 
-	public int getSpellbookId() {
-		if (dungSpellBook)
-			return 3;
-		return spellBook;
-	}
-
-	public int getSpellBook() {
-		if (dungSpellBook)
-			return 950; // dung book
-		if (spellBook == 0)
-			return 192; // normal
-		if (spellBook == 1)
-			return 193; // ancients
-		else
-			return 430; // lunar
-
+	public Spellbook getSpellbook() {
+		if (dungSpellbook)
+			return Spellbook.DUNGEONEERING;
+		return spellbook;
 	}
 
 	public void switchShowCombatSpells() {
@@ -288,7 +299,7 @@ public final class CombatDefinitions {
 	}
 
 	public void switchShowMiscSpells() {
-		showMiscallaneousSpells = !showMiscallaneousSpells;
+		showMiscSpells = !showMiscSpells;
 		refreshSpellbookSettings();
 	}
 
@@ -312,7 +323,7 @@ public final class CombatDefinitions {
 	}
 
 	public void refreshSpellbookSettings() {
-		player.getVars().setVarBit(357, getSpellbookId());
+		player.getVars().setVarBit(357, spellbook.ordinal());
 		player.getVars().setVarBit(5822, sortSpellBook);
 		player.getVars().setVarBit(5823, sortSpellBook);
 		player.getVars().setVarBit(5824, sortSpellBook);
@@ -326,9 +337,9 @@ public final class CombatDefinitions {
 		player.getVars().setVarBit(6460, showSkillSpells ? 0 : 1);
 		player.getVars().setVarBit(7349, showSkillSpells ? 0 : 1);
 
-		player.getVars().setVarBit(6461, showMiscallaneousSpells ? 0 : 1);
-		player.getVars().setVarBit(6464, showMiscallaneousSpells ? 0 : 1);
-		player.getVars().setVarBit(7350, showMiscallaneousSpells ? 0 : 1);
+		player.getVars().setVarBit(6461, showMiscSpells ? 0 : 1);
+		player.getVars().setVarBit(6464, showMiscSpells ? 0 : 1);
+		player.getVars().setVarBit(7350, showMiscSpells ? 0 : 1);
 
 		player.getVars().setVarBit(6462, showTeleportSpells ? 0 : 1);
 		player.getVars().setVarBit(6467, showTeleportSpells ? 0 : 1);
@@ -352,6 +363,8 @@ public final class CombatDefinitions {
 	public void setPlayer(Player player) {
 		this.player = player;
 		bonuses = new int[18];
+		if (spellbook == null)
+			spellbook = Spellbook.MODERN;
 	}
 
 	public int getBonus(Bonus bonus) {
@@ -367,27 +380,10 @@ public final class CombatDefinitions {
 		for (Item item : player.getEquipment().getItemsCopy()) {
 			if (item == null)
 				continue;
-			int[] bonuses = item.getDefinitions().getBonuses();
-			if (bonuses == null)
-				continue;
 			for (Bonus bonus : Bonus.values()) {
 				if (bonus == Bonus.RANGE_STR && getBonus(Bonus.RANGE_STR) != 0)
 					continue;
-				this.bonuses[bonus.ordinal()] += bonuses[bonus.ordinal()];
-			}
-			switch(item.getId()) {
-			case 11283:
-			case 11284:
-				this.bonuses[Bonus.STAB_DEF.ordinal()] += item.getMetaDataI("dfsCharges", 0);
-				this.bonuses[Bonus.SLASH_DEF.ordinal()] += item.getMetaDataI("dfsCharges", 0);
-				this.bonuses[Bonus.CRUSH_DEF.ordinal()] += item.getMetaDataI("dfsCharges", 0);
-				this.bonuses[Bonus.RANGE_DEF.ordinal()] += item.getMetaDataI("dfsCharges", 0);
-				break;
-			case 19152:
-			case 19157:
-			case 19162:
-				this.bonuses[Bonus.RANGE_STR.ordinal()] += Utils.clampI((int) (player.getSkills().getLevelForXp(Constants.RANGE) * 0.7), 0, 49);
-				break;
+				this.bonuses[bonus.ordinal()] += Equipment.getBonus(player, item, bonus);
 			}
 		}
 	}
@@ -442,11 +438,15 @@ public final class CombatDefinitions {
 	}
 
 	public void setAttackStyle(int style) {
-		AttackStyle[] styles = AttackStyle.getStyles(player.getEquipment().getWeaponId());
+		Map<Integer, AttackStyle> styles = AttackStyle.getStyles(player.getEquipment().getWeaponId());
 		if (style < 0)
 			style = 0;
-		if (style >= styles.length)
-			style = styles.length-1;
+		for (int i = style;i >= 0;i--) {
+			if (styles.get(i) != null) {
+				style = i;
+				break;
+			}
+		}
 		if (style != attackStyle) {
 			attackStyle = (byte) style;
 			if (autoCast != null)
@@ -512,11 +512,17 @@ public final class CombatDefinitions {
 	}
 
 	public AttackStyle getAttackStyle() {
-		AttackStyle[] styles = AttackStyle.getStyles(player.getEquipment().getWeaponId());
+		Map<Integer, AttackStyle> styles = AttackStyle.getStyles(player.getEquipment().getWeaponId());
 		int style = attackStyle;
-		if (style >= styles.length)
-			style = styles.length-1;
-		return styles[style];
+		for (int i = style;i >= 0;i--) {
+			if (styles.get(i) != null) {
+				style = i;
+				break;
+			}
+		}
+		if (style != attackStyle)
+			setAttackStyle(style);
+		return styles.get(style);
 	}
 
 	public int getAttackBonusForStyle() {
@@ -535,13 +541,13 @@ public final class CombatDefinitions {
 		this.autoRetaliate = autoRetaliate;
 	}
 
-	public boolean isDungeonneringSpellBook() {
-		return dungSpellBook;
+	public boolean isDungSpellbook() {
+		return dungSpellbook;
 	}
 
 	public void removeDungeonneringBook() {
-		if (dungSpellBook) {
-			dungSpellBook = false;
+		if (dungSpellbook) {
+			dungSpellbook = false;
 			player.getInterfaceManager().sendSubDefault(Sub.TAB_MAGIC);
 		}
 	}

@@ -18,14 +18,10 @@ package com.rs.db.collection;
 
 import static com.mongodb.client.model.Filters.eq;
 
-import java.util.ArrayList;
+import java.util.function.Consumer;
 
 import org.bson.Document;
-import org.bson.conversions.Bson;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.FindOneAndReplaceOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Sorts;
@@ -34,6 +30,7 @@ import com.rs.game.model.entity.player.Player;
 import com.rs.lib.db.DBItemManager;
 import com.rs.lib.file.JsonFileManager;
 import com.rs.lib.game.Rights;
+import com.rs.lib.util.Logger;
 
 public class HighscoresManager extends DBItemManager {
 
@@ -43,7 +40,7 @@ public class HighscoresManager extends DBItemManager {
 
 	@Override
 	public void initCollection() {
-		getDocs().createIndex(Indexes.text("username"));
+		getDocs().createIndex(Indexes.compoundIndex(Indexes.text("displayName"), Indexes.text("username")));
 		getDocs().createIndex(Indexes.descending("totalLevel", "totalXp"));
 	}
 
@@ -65,59 +62,17 @@ public class HighscoresManager extends DBItemManager {
 		try {
 			getDocs().findOneAndReplace(eq("username", player.getUsername()), Document.parse(JsonFileManager.toJson(new Highscore(player))), new FindOneAndReplaceOptions().upsert(true));
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.handle(HighscoresManager.class, "saveSync", e);
 		}
 	}
 
-	public ArrayList<Document> getTotalSync(int page, int ironman) {
-		ArrayList<Document> docs = new ArrayList<>();
-
-		Bson filters = null, iron = null;
-
-		if (ironman != -1) {
-			iron = eq("ironman", ironman == 1);
-			if (filters == null)
-				filters = iron;
-		}
-
-		FindIterable<Document> res = filters == null ? getDocs().find() : getDocs().find(filters);
-		MongoCursor<Document> cursor = res.sort(Sorts.descending("totalLevel", "totalXp")).skip(20 * page).limit(20).iterator();
-
-		while (cursor.hasNext())
-			docs.add(cursor.next());
-		cursor.close();
-
-		return docs;
-	}
-
-	public ArrayList<Document> getLevelSync(int skill, int page, int ironman) {
-		ArrayList<Document> docs = new ArrayList<>();
-
-		try {
-			Bson filters = null, iron = null;
-
-			if (ironman != -1) {
-				iron = eq("ironman", ironman == 1);
-				if (filters == null)
-					filters = iron;
-			}
-
-			FindIterable<Document> res = filters == null ? getDocs().find() : getDocs().find(filters);
-
-			MongoCursor<Document> cursor = res.sort(new BasicDBObject("xp." + skill + "", -1)).skip(20 * page).limit(20).iterator();
-			while (cursor.hasNext())
-				docs.add(cursor.next());
-			cursor.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return docs;
-	}
-
-	public void clearAllHighscores() {
+	public void getPlayerAtPosition(int rank, Consumer<Highscore> top) {
 		execute(() -> {
-			getDocs().drop();
+			try {
+				top.accept(JsonFileManager.fromJSONString(getDocs().find().sort(Sorts.descending("totalLevel", "totalXp")).skip(rank).limit(1).first().toJson(), Highscore.class));
+			} catch(Throwable e) {
+				top.accept(null);
+			}
 		});
 	}
 }

@@ -21,7 +21,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.rs.Settings;
-import com.rs.db.WorldDB;
 import com.rs.game.World;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.player.Player;
@@ -30,6 +29,7 @@ import com.rs.game.tasks.WorldTasks;
 import com.rs.lib.util.Logger;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.annotations.ServerStartupEvent;
+import com.rs.plugin.annotations.ServerStartupEvent.Priority;
 import com.rs.web.Telemetry;
 
 @PluginEventHandler
@@ -40,10 +40,10 @@ public final class WorldThread extends Thread {
 	protected WorldThread() {
 		setPriority(Thread.MAX_PRIORITY);
 		setName("World Thread");
-		setUncaughtExceptionHandler((th, ex) -> Logger.handle(ex));
+		setUncaughtExceptionHandler((th, ex) -> Logger.handle(WorldThread.class, "uncaughtExceptionHandler", ex));
 	}
 
-	@ServerStartupEvent
+	@ServerStartupEvent(Priority.SYSTEM)
 	public static void init() {
 		WORLD_CYCLE = System.currentTimeMillis() / 600L;
 		CoresManager.getWorldExecutor().scheduleAtFixedRate(new WorldThread(), 0, Settings.WORLD_CYCLE_MS, TimeUnit.MILLISECONDS);
@@ -61,42 +61,58 @@ public final class WorldThread extends Thread {
 			World.processRegions();
 			NAMES.clear();
 			for (Player player : World.getPlayers()) {
-				if (player != null && player.getTempAttribs().getB("realFinished"))
-					player.realFinish();
-				if (player == null || !player.hasStarted() || player.hasFinished())
-					continue;
-				if (NAMES.contains(player.getUsername()))
-					player.logout(false);
-				else
-					NAMES.add(player.getUsername());
-				player.processEntity();
+				try {
+					if (player != null && player.getTempAttribs().getB("realFinished"))
+						player.realFinish();
+					if (player == null || !player.hasStarted() || player.hasFinished())
+						continue;
+					if (NAMES.contains(player.getUsername()))
+						player.logout(false);
+					else
+						NAMES.add(player.getUsername());
+					player.processEntity();
+				} catch(Throwable e) {
+					Logger.handle(WorldThread.class, "run:playerProcessEntity", "Error processing player: " + (player == null ? "NULL PLAYER" : player.getUsername()), e);
+				}
 			}
 			for (NPC npc : World.getNPCs()) {
-				if (npc == null || npc.hasFinished())
-					continue;
-				npc.processEntity();
+				try {
+					if (npc == null || npc.hasFinished())
+						continue;
+					npc.processEntity();
+				} catch(Throwable e) {
+					Logger.handle(WorldThread.class, "run:npcProcessEntity", "Error processing NPC: " + (npc == null ? "NULL NPC" : npc.getId()), e);
+				}
 			}
 			for (Player player : World.getPlayers()) {
 				if (player == null || !player.hasStarted() || player.hasFinished())
 					continue;
-				player.processMovement();
+				try {
+					player.processMovement();
+				} catch(Throwable e) {
+					Logger.handle(WorldThread.class, "processPlayerMovement", e);
+				}
 			}
 			for (NPC npc : World.getNPCs()) {
 				if (npc == null || npc.hasFinished())
 					continue;
-				npc.processMovement();
+				try {
+					npc.processMovement();
+				} catch(Throwable e) {
+					Logger.handle(WorldThread.class, "processNPCMovement", e);
+				}
 			}
 			for (Player player : World.getPlayers()) {
-				if (player == null)
+				if (player == null || !player.hasStarted() || player.hasFinished())
 					continue;
 				try {
 					player.getPackets().sendLocalPlayersUpdate();
-					player.getPackets().sendLocalNPCsUpdate(player);
+					player.getPackets().sendLocalNPCsUpdate();
 					player.postSync();
 					player.processProjectiles();
 					player.getSession().flush();
 				} catch(Throwable e) {
-					WorldDB.getLogs().logError(e);
+					Logger.handle(WorldThread.class, "processPlayersPostSync", e);
 				}
 			}
 			World.removeProjectiles();
@@ -113,7 +129,7 @@ public final class WorldThread extends Thread {
 			World.processEntityLists();
 			Telemetry.queueTelemetryTick((System.currentTimeMillis() - startTime));
 		} catch (Throwable e) {
-			Logger.handle(e);
+			Logger.handle(WorldThread.class, "tick", e);
 		}
 	}
 }

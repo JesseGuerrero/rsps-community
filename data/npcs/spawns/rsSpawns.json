@@ -1,5 +1,50 @@
 [
   {
+    "comment": "Bill Teach added by trent",
+    "npcId": 3157,
+    "tile": {
+      "x": 3713,
+      "y": 3498,
+      "plane": 1
+    }
+  },
+  {
+    "comment": "Bill Teach added by trent",
+    "npcId": 3157,
+    "tile": {
+      "x": 3682,
+      "y": 2948,
+      "plane": 1
+    }
+  },
+  {
+    "comment": "Lady Servil added by jazneta",
+    "npcId": 258,
+    "tile": {
+      "x": 2569,
+      "y": 3199,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Justin Servil added by jazneta",
+    "npcId": 7541,
+    "tile": {
+      "x": 2567,
+      "y": 3199,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "Jeremy Servil added by jazneta",
+    "npcId": 7533,
+    "tile": {
+      "x": 2568,
+      "y": 3199,
+      "plane": 0
+    }
+  },
+  {
     "comment": "Grifolaroo added by trent",
     "npcId": 14700,
     "tile": {
@@ -22367,15 +22412,6 @@
   {
     "tile": {
       "plane": 0,
-      "x": 2616,
-      "y": 3168
-    },
-    "comment": "Jeremy Servil",
-    "npcId": 265
-  },
-  {
-    "tile": {
-      "plane": 0,
       "x": 2601,
       "y": 3168
     },
@@ -22403,8 +22439,8 @@
   {
     "tile": {
       "plane": 0,
-      "x": 2617,
-      "y": 3144
+      "x": 2616,
+      "y": 3143
     },
     "comment": "Lazy Khazard Guard",
     "npcId": 7550
@@ -75125,7 +75161,7 @@
   {
     "tile": {
       "plane": 0,
-      "x": 2971,
+      "x": 2964,
       "y": 3288
     },
     "comment": "Avalani",
@@ -82617,8 +82653,8 @@
   {
     "tile": {
       "plane": 0,
-      "x": 2976,
-      "y": 3283
+      "x": 2984,
+      "y": 3288
     },
     "comment": "Captain of the Guard",
     "npcId": 13633
@@ -115918,8 +115954,26 @@
   {
     "tile": {
       "plane": 0,
-      "x": 3230,
-      "y": 3461
+      "x": 3253,
+      "y": 3426
+    },
+    "comment": "Max",
+    "npcId": 3705
+  },
+  {
+    "tile": {
+      "plane": 0,
+      "x": 3213,
+      "y": 3424
+    },
+    "comment": "Max",
+    "npcId": 3705
+  },
+  {
+    "tile": {
+      "plane": 0,
+      "x": 3213,
+      "y": 3423
     },
     "comment": "Max",
     "npcId": 3705
@@ -131029,8 +131083,8 @@
   {
     "tile": {
       "plane": 0,
-      "x": 2960,
-      "y": 3280
+      "x": 2991,
+      "y": 3305
     },
     "comment": "Scribe",
     "npcId": 5915
@@ -131263,8 +131317,8 @@
   {
     "tile": {
       "plane": 0,
-      "x": 2977,
-      "y": 3282
+      "x": 2969,
+      "y": 3288
     },
     "comment": "Sergeant-at-Arms",
     "npcId": 5914

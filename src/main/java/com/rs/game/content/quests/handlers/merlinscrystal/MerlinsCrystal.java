@@ -3,13 +3,12 @@ package com.rs.game.content.quests.handlers.merlinscrystal;
 import java.util.ArrayList;
 
 import com.rs.game.World;
-import com.rs.game.content.controllers.MerlinsCrystalRitualScene;
 import com.rs.game.content.dialogue.Conversation;
 import com.rs.game.content.dialogue.HeadE;
 import com.rs.game.content.quests.Quest;
 import com.rs.game.content.quests.QuestHandler;
 import com.rs.game.content.quests.QuestOutline;
-import com.rs.game.model.entity.npc.others.OwnedNPC;
+import com.rs.game.model.entity.npc.OwnedNPC;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.object.GameObject;
 import com.rs.game.tasks.WorldTask;
@@ -19,13 +18,11 @@ import com.rs.lib.game.Item;
 import com.rs.lib.game.WorldTile;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ItemClickEvent;
-import com.rs.plugin.events.ItemOnItemEvent;
 import com.rs.plugin.events.LoginEvent;
 import com.rs.plugin.events.NPCClickEvent;
 import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.events.PlayerStepEvent;
 import com.rs.plugin.handlers.ItemClickHandler;
-import com.rs.plugin.handlers.ItemOnItemHandler;
 import com.rs.plugin.handlers.LoginHandler;
 import com.rs.plugin.handlers.NPCClickHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
@@ -126,7 +123,7 @@ public class MerlinsCrystal extends QuestOutline {
 		final int BUCKET_WAX = 30;
 
         private static void openShop(Player p) {
-            if(p.getQuestManager().isComplete(Quest.MERLINS_CRYSTAL))
+            if(p.isQuestComplete(Quest.MERLINS_CRYSTAL))
                 ShopsHandler.openShop(p, "candle_with_black_shop");
             else
                 ShopsHandler.openShop(p, "candle_shop");
@@ -136,7 +133,7 @@ public class MerlinsCrystal extends QuestOutline {
 		public void handle(NPCClickEvent e) {
 			if(e.getOption().equalsIgnoreCase("Talk-to")) {
                 if (e.getPlayer().getQuestManager().getStage(Quest.MERLINS_CRYSTAL) >= MerlinsCrystal.THE_BLACK_CANDLE
-                        && !e.getPlayer().getQuestManager().isComplete(Quest.MERLINS_CRYSTAL)) {
+                        && !e.getPlayer().isQuestComplete(Quest.MERLINS_CRYSTAL)) {
                     e.getPlayer().startConversation(new Conversation(e.getPlayer()) {
                         {
                             if (e.getPlayer().getInventory().containsItem(UNLIT_BLACK_CANDLE)) {
@@ -191,23 +188,11 @@ public class MerlinsCrystal extends QuestOutline {
 	final static int LIT_BLACK_CANDLE = 32;
 	final static int UNLIT_BLACK_CANDLE = 38;
 	final static int TINDERBOX = 590;
-	public static ItemOnItemHandler handleCandleLighting = new ItemOnItemHandler(new int[]{UNLIT_BLACK_CANDLE}, new int[]{TINDERBOX}) {
-		@Override
-		public void handle(ItemOnItemEvent e) {
-			e.getPlayer().getInventory().replaceItem(LIT_BLACK_CANDLE, 1, e.getUsedWith(TINDERBOX).getSlot());
-		}
-	};
 
-	public static ItemClickHandler handleLitCandle = new ItemClickHandler(LIT_BLACK_CANDLE) {
+	public static ItemClickHandler handleLitCandle = new ItemClickHandler(new Object[] { LIT_BLACK_CANDLE }, new String[] { "Extinguish" }) {
 		@Override
 		public void handle(ItemClickEvent e) {
-			if(e.getOption().equalsIgnoreCase("Extinguish"))
-				e.getPlayer().getInventory().replaceItem(UNLIT_BLACK_CANDLE, 1, e.getItem().getSlot());
-			if(e.getOption().equalsIgnoreCase("drop")) {
-				e.getPlayer().getInventory().deleteItem(e.getSlotId(), e.getItem());
-				World.addGroundItem(e.getItem(), new WorldTile(e.getPlayer().getTile()), e.getPlayer());
-				e.getPlayer().getPackets().sendSound(2739, 0, 1);
-			}
+			e.getPlayer().getInventory().replaceItem(UNLIT_BLACK_CANDLE, 1, e.getItem().getSlot());
 		}
 	};
 

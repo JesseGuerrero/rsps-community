@@ -16,10 +16,16 @@
 //
 package com.rs.game.content.dialogue.statements;
 
+import java.util.Arrays;
+
 import com.rs.cache.loaders.ItemDefinitions;
 import com.rs.game.content.dialogue.impl.skilling.MakeXItem;
 import com.rs.game.model.entity.player.Player;
+import com.rs.plugin.annotations.PluginEventHandler;
+import com.rs.plugin.events.ButtonClickEvent;
+import com.rs.plugin.handlers.ButtonClickHandler;
 
+@PluginEventHandler
 public class MakeXStatement implements Statement {
 
 	public enum MakeXType {
@@ -32,10 +38,10 @@ public class MakeXStatement implements Statement {
 		BAKE,
 		CUT,
 		DEPOSIT,
-		MAKE2,
+		MAKE_INTERVAL,
 		TELEPORT,
 		SELECT,
-		MAKE_SET2,
+		MAKE_SET_INTERVAL,
 		TAKE,
 		RETURN,
 		HEAT,
@@ -43,7 +49,7 @@ public class MakeXStatement implements Statement {
 	}
 
 	private MakeXType type;
-	private int maxQuantity = -1;
+	private int maxQuantity = -50;
 	private String question;
 	private int[] items;
 	private String[] options;
@@ -57,11 +63,27 @@ public class MakeXStatement implements Statement {
 	}
 
 	public MakeXStatement(MakeXItem[] items, int maxQuantity) {
-		this(MakeXType.MAKE, maxQuantity, "How many would you like to make?", null, null);
-		int[] itemIds = new int[items.length];
-		for (int i = 0;i < items.length;i++)
-			itemIds[i] = items[i].getItemId();
-		this.items = itemIds;
+		this(MakeXType.MAKE, maxQuantity, "How many would you like to make?", Arrays.stream(items).mapToInt(item -> item.getItemId()).toArray(), null);
+	}
+	
+	public MakeXStatement(MakeXType type, String question, int[] items, int maxQuantity) {
+		this(type, maxQuantity, question, items, null);
+	}
+
+	public MakeXStatement(MakeXType type, int[] items, int maxQuantity) {
+		this(type, maxQuantity, "How many would you like to make?", items, null);
+	}
+
+	public MakeXStatement(MakeXType type, int[] items, String[] options) {
+		this(type, -50, "Select an item.", items, options);
+	}
+
+	public MakeXStatement(MakeXType type, int[] items) {
+		this(type, -50, "Select an item.", items, null);
+	}
+	
+	public MakeXStatement(String question, int[] items, int maxQuantity) {
+		this(MakeXType.MAKE, maxQuantity, question, items, null);
 	}
 
 	public MakeXStatement(int[] items, int maxQuantity) {
@@ -69,16 +91,16 @@ public class MakeXStatement implements Statement {
 	}
 
 	public MakeXStatement(int[] items, String[] options) {
-		this(MakeXType.SELECT, -1, "Select an item.", items, options);
+		this(MakeXType.SELECT, -50, "Select an item.", items, options);
 	}
 
 	public MakeXStatement(int[] items) {
-		this(MakeXType.SELECT, -1, "Select an item.", items, null);
+		this(MakeXType.SELECT, -50, "Select an item.", items, null);
 	}
 
 	@Override
 	public void send(Player player) {
-		player.getPackets().setIFRightClickOps(916, 8, -1, 0, 0); // unlocks all option
+		player.getPackets().setIFRightClickOps(916, 8, -1, 0, 0);
 		player.getPackets().setIFText(916, 6, question);
 		player.getPackets().sendVarc(754, type.ordinal());
 		for (int i = 0; i < 10; i++) {
@@ -94,6 +116,24 @@ public class MakeXStatement implements Statement {
 		player.getInterfaceManager().sendChatBoxInterface(905);
 		player.getInterfaceManager().sendSubSpecific(true, 905, 4, 916);
 	}
+	
+	public static ButtonClickHandler handleSetQuantityButtons = new ButtonClickHandler(916) {
+		@Override
+		public void handle(ButtonClickEvent e) {
+			if (e.getComponentId() == 10)
+				setQuantity(e.getPlayer(), 1, true);
+			else if (e.getComponentId() == 11)
+				setQuantity(e.getPlayer(), 5, true);
+			else if (e.getComponentId() == 12)
+				setQuantity(e.getPlayer(), 10, true);
+			else if (e.getComponentId() == 8)
+				setQuantity(e.getPlayer(), getMaxQuantity(e.getPlayer()), true);
+			else if (e.getComponentId() == 24)
+				setQuantity(e.getPlayer(), getQuantity(e.getPlayer()) + 1, true);
+			else if (e.getComponentId() == 25)
+				setQuantity(e.getPlayer(), getQuantity(e.getPlayer()) - 1, true);
+		}
+	};
 
 	@Override
 	public int getOptionId(int componentId) {
@@ -129,7 +169,14 @@ public class MakeXStatement implements Statement {
 	}
 
 	public static int getQuantity(Player player) {
+		if (player.getVars().getVarBit(8094) <= 0)
+			return 60;
 		return player.getVars().getVarBit(8095);
+	}
+
+	@Override
+	public void close(Player player) {
+		
 	}
 
 }

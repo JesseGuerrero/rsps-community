@@ -3,9 +3,12 @@
     "Clay familiar (class 2)"
   ],
   "attackAnim": 10591,
+  "attackSound": -1,
   "defenceAnim": 10592,
+  "defendSound": -1,
   "deathAnim": 10597,
   "deathDelay": 6,
+  "deathSound": -1,
   "respawnDelay": 59,
   "hitpoints": 1000,
   "maxHit": 80,
@@ -31,7 +34,7 @@
   "attackGfx": -1,
   "attackProjectile": -1,
   "agressivenessType": "PASSIVE",
-  "aggroDistance": 16,
+  "aggroDistance": 4,
   "deAggroDistance": -1,
   "maxDistFromSpawn": -1
 }

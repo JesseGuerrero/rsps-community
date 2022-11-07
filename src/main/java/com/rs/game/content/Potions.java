@@ -22,8 +22,8 @@ import java.util.function.Consumer;
 
 import com.rs.cache.loaders.ItemDefinitions;
 import com.rs.game.World;
-import com.rs.game.content.controllers.WildernessController;
 import com.rs.game.content.skills.summoning.Familiar;
+import com.rs.game.content.world.areas.wilderness.WildernessController;
 import com.rs.game.model.entity.Hit;
 import com.rs.game.model.entity.Hit.HitLook;
 import com.rs.game.model.entity.player.Player;
@@ -832,7 +832,7 @@ public class Potions {
 				player.addPotionDelay(2);
 				effect.accept(player);
 				player.setNextAnimation(new Animation(829));
-				player.getPackets().sendSound(4580, 0, 1);
+				player.soundEffect(4580);
 				player.sendMessage("You drink some of your " + ItemDefinitions.getDefs(itemId).name.toLowerCase().replace(" (1)", "").replace(" (2)", "").replace(" (3)", "").replace(" (4)", "").replace(" (5)", "").replace(" (6)", "") + ".", true);
 			}
 		}
@@ -927,9 +927,45 @@ public class Potions {
 			e.getPlayer().sendMessage("You pour from one container into the other" + (pot.emptyId == -1 && doses1 == 0 ? " and the flask shatters to pieces." : "."));
 		}
 	};
+	
+	public static void checkOverloads(Player player) {
+		boolean changed = false;
+		int level = player.getSkills().getLevelForXp(Constants.ATTACK);
+		int maxLevel = (int) (level + 5 + (level * 0.15));
+		if (maxLevel < player.getSkills().getLevel(Constants.ATTACK)) {
+			player.getSkills().set(Constants.ATTACK, maxLevel);
+			changed = true;
+		}
+		level = player.getSkills().getLevelForXp(Constants.STRENGTH);
+		maxLevel = (int) (level + 5 + (level * 0.15));
+		if (maxLevel < player.getSkills().getLevel(Constants.STRENGTH)) {
+			player.getSkills().set(Constants.STRENGTH, maxLevel);
+			changed = true;
+		}
+		level = player.getSkills().getLevelForXp(Constants.DEFENSE);
+		maxLevel = (int) (level + 5 + (level * 0.15));
+		if (maxLevel < player.getSkills().getLevel(Constants.DEFENSE)) {
+			player.getSkills().set(Constants.DEFENSE, maxLevel);
+			changed = true;
+		}
+		level = player.getSkills().getLevelForXp(Constants.RANGE);
+		maxLevel = (int) (level + 5 + (level * 0.1));
+		if (maxLevel < player.getSkills().getLevel(Constants.RANGE)) {
+			player.getSkills().set(Constants.RANGE, maxLevel);
+			changed = true;
+		}
+		level = player.getSkills().getLevelForXp(Constants.MAGIC);
+		maxLevel = level + 5;
+		if (maxLevel < player.getSkills().getLevel(Constants.MAGIC)) {
+			player.getSkills().set(Constants.MAGIC, maxLevel);
+			changed = true;
+		}
+		if (changed)
+			player.sendMessage("Your extreme potion bonus has been reduced.");
+	}
 
 	public static void applyOverLoadEffect(Player player) {
-		if (player.getControllerManager().getController() instanceof WildernessController) {
+		if (player.hasEffect(Effect.OVERLOAD_PVP_REDUCTION)) {
 			int actualLevel = player.getSkills().getLevel(Constants.ATTACK);
 			int realLevel = player.getSkills().getLevelForXp(Constants.ATTACK);
 			int level = actualLevel > realLevel ? realLevel : actualLevel;

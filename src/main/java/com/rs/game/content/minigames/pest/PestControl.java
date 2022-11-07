@@ -23,14 +23,12 @@ import java.util.List;
 
 import com.rs.cache.loaders.NPCDefinitions;
 import com.rs.game.World;
-import com.rs.game.content.controllers.PestControlGameController;
-import com.rs.game.content.dialogues_matrix.SimpleMessage;
+import com.rs.game.content.minigames.pest.npcs.PestMonsters;
+import com.rs.game.content.minigames.pest.npcs.PestPortal;
+import com.rs.game.content.minigames.pest.npcs.Shifter;
+import com.rs.game.content.minigames.pest.npcs.Spinner;
+import com.rs.game.content.minigames.pest.npcs.Splatter;
 import com.rs.game.model.entity.npc.NPC;
-import com.rs.game.model.entity.npc.pest.PestMonsters;
-import com.rs.game.model.entity.npc.pest.PestPortal;
-import com.rs.game.model.entity.npc.pest.Shifter;
-import com.rs.game.model.entity.npc.pest.Spinner;
-import com.rs.game.model.entity.npc.pest.Splatter;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.region.RegionBuilder.DynamicRegionReference;
 import com.rs.game.tasks.WorldTask;
@@ -74,7 +72,7 @@ public class PestControl {
 					sendPortalInterfaces();
 				seconds--;
 			} catch (Exception e) {
-				Logger.handle(e);
+				Logger.handle(PestGameTimer.class, "run", e);
 			}
 		}
 	}
@@ -110,7 +108,7 @@ public class PestControl {
 	}
 
 	public boolean createPestNPC(int index) {
-		if (pestCounts[index] >= (index == 4 ? 4 : (portals[index] != null && portals[index].isLocked()) ? 5 : 15))
+		if (region == null || pestCounts[index] >= (index == 4 ? 4 : (portals[index] != null && portals[index].isLocked()) ? 5 : 15))
 			return false;
 		pestCounts[index]++;
 		WorldTile baseTile = getWorldTile(PORTAL_LOCATIONS[0][index], PORTAL_LOCATIONS[1][index]);
@@ -158,13 +156,13 @@ public class PestControl {
 
 	private void sendFinalReward(Player player, int knightZeal) {
 		if (knight.isDead())
-			player.getDialogueManager().execute(new SimpleMessage(), "You failed to protect the void knight and have not been awarded any points.");
+			player.simpleDialogue("You failed to protect the void knight and have not been awarded any points.");
 		else if (knightZeal < 750)
-			player.getDialogueManager().execute(new SimpleMessage(), "The knights notice your lack of zeal in that battle and have not presented you with any points.");
+			player.simpleDialogue("The knights notice your lack of zeal in that battle and have not presented you with any points.");
 		else {
 			int coinsAmount = player.getSkills().getCombatLevel() * 100;
 			int pointsAmount = data.getReward();
-			player.getDialogueManager().execute(new SimpleMessage(), "Congratulations! You have successfully kept the lander safe and have been awarded: " + coinsAmount + " gold coins and " + pointsAmount + " commendation points.");
+			player.simpleDialogue("Congratulations! You have successfully kept the lander safe and have been awarded: " + coinsAmount + " gold coins and " + pointsAmount + " commendation points.");
 			player.getInventory().addItem(new Item(995, coinsAmount));
 			player.setPestPoints(player.getPestPoints() + pointsAmount);
 		}

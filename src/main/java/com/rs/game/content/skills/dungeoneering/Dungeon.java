@@ -23,6 +23,7 @@ import java.awt.Graphics2D;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
+import java.lang.SuppressWarnings;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
@@ -34,9 +35,8 @@ import com.rs.game.content.skills.dungeoneering.DungeonConstants.KeyDoors;
 import com.rs.game.content.skills.dungeoneering.DungeonConstants.SkillDoors;
 import com.rs.game.content.skills.dungeoneering.rooms.BossRoom;
 import com.rs.lib.Constants;
+import com.rs.lib.util.Logger;
 import com.rs.lib.util.Utils;
-
-
 
 @SuppressWarnings("unused")
 public final class Dungeon {
@@ -75,7 +75,7 @@ public final class Dungeon {
 
 		long lastDung = System.currentTimeMillis();
 		test = new Dungeon(null, 1, 6, DungeonConstants.LARGE_DUNGEON);
-		System.out.println("Generated dungeon in " + (System.currentTimeMillis() - lastDung) + "ms...");
+		Logger.debug(Dungeon.class, "main", "Generated dungeon in " + (System.currentTimeMillis() - lastDung) + "ms...");
 		frame.repaint();
 	}
 

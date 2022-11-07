@@ -3,9 +3,12 @@
     "Barker toad"
   ],
   "attackAnim": 7260,
+  "attackSound": -1,
   "defenceAnim": 7257,
+  "defendSound": -1,
   "deathAnim": 7256,
   "deathDelay": 6,
+  "deathSound": -1,
   "respawnDelay": 59,
   "hitpoints": 3400,
   "maxHit": 86,
@@ -21,7 +24,7 @@
   "attackGfx": -1,
   "attackProjectile": -1,
   "agressivenessType": "PASSIVE",
-  "aggroDistance": 16,
+  "aggroDistance": 4,
   "deAggroDistance": -1,
   "maxDistFromSpawn": -1
 }

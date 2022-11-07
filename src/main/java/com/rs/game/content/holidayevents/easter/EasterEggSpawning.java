@@ -21,8 +21,6 @@ import java.util.List;
 import com.rs.cores.CoresManager;
 import com.rs.game.World;
 import com.rs.game.region.Region;
-import com.rs.game.tasks.WorldTask;
-import com.rs.game.tasks.WorldTasks;
 import com.rs.lib.game.GroundItem;
 import com.rs.lib.game.Item;
 import com.rs.lib.game.WorldTile;
@@ -40,19 +38,14 @@ public class EasterEggSpawning {
 
 	//@ServerStartupEvent
 	public static void initSpawning() {
-		WorldTasks.schedule(new WorldTask() {
-			@Override
-			public void run() {
-				for (int id : regionsToSpawn)
-					World.getRegion(id, true);
-			}
-		}, 10);
+		for (int id : regionsToSpawn)
+			World.getRegion(id, true);
 		CoresManager.schedule(() -> {
 			try {
 				spawnEggs();
 				World.sendWorldMessage("<col=FF0000><shad=000000>Easter Eggs have spawned in various cities around the world!", false);
 			} catch (Throwable e) {
-				Logger.handle(e);
+				Logger.handle(EasterEggSpawning.class, "initSpawning", e);
 			}
 		}, Ticks.fromSeconds(30), Ticks.fromMinutes(30));
 	}

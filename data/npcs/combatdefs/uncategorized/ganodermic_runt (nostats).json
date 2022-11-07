@@ -1,0 +1,23 @@
+{
+  "names": [
+    "Ganodermic runt"
+  ],
+  "attackAnim": 14577,
+  "attackSound": -1,
+  "defenceAnim": 14578,
+  "defendSound": -1,
+  "deathAnim": 14580,
+  "deathDelay": 6,
+  "deathSound": -1,
+  "respawnDelay": 59,
+  "hitpoints": 1250,
+  "maxHit": 139,
+  "attackStyle": "MAGE",
+  "attackRange": -1,
+  "attackGfx": 2036,
+  "attackProjectile": 2035,
+  "agressivenessType": "PASSIVE",
+  "aggroDistance": 8,
+  "deAggroDistance": -1,
+  "maxDistFromSpawn": -1
+}

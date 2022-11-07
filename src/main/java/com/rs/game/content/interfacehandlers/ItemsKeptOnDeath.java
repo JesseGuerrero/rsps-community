@@ -17,8 +17,8 @@
 package com.rs.game.content.interfacehandlers;
 
 import com.rs.cache.loaders.EnumDefinitions;
-import com.rs.game.content.controllers.DeathOfficeController;
-import com.rs.game.model.entity.npc.others.GraveStone;
+import com.rs.game.content.death.DeathOfficeController;
+import com.rs.game.content.death.GraveStone;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.Item;
 import com.rs.lib.util.Utils;
@@ -81,7 +81,7 @@ public class ItemsKeptOnDeath {
 		if (wilderness)
 			text.append("Your hub will be set to:").append("<br>").append("Edgeville.");
 		else
-			text.append("Current hub: " + EnumDefinitions.getEnum(3792).getStringValue(DeathOfficeController.getCurrentHub(player.getTile())));
+			text.append("Current hub: " + EnumDefinitions.getEnum(3792).getStringValue(DeathOfficeController.getCurrentHub(player, player.getTile()).ordinal()));
 		player.getPackets().sendVarcString(352, text.toString());
 	}
 

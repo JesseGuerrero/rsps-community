@@ -25,6 +25,7 @@ import com.rs.lib.util.Logger;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.annotations.ServerStartupEvent;
+import com.rs.plugin.annotations.ServerStartupEvent.Priority;
 
 @PluginEventHandler
 public class CombatScriptsHandler {
@@ -32,7 +33,7 @@ public class CombatScriptsHandler {
 	private static final HashMap<Object, CombatScript> MAPPED_SCRIPTS = new HashMap<>();
 	private static final CombatScript DEFAULT_SCRIPT = new Default();
 
-	@ServerStartupEvent
+	@ServerStartupEvent(Priority.FILE_IO)
 	public static final void loadScripts() {
 		List<Class<?>> classes;
 		try {
@@ -55,7 +56,7 @@ public class CombatScriptsHandler {
 			e.printStackTrace();
 		}
 
-		Logger.log("CombatScriptsHandler", "Loaded combat scripts for " + MAPPED_SCRIPTS.size() + " NPCs...");
+		Logger.info(CombatScriptsHandler.class, "loadScripts", "Loaded combat scripts for " + MAPPED_SCRIPTS.size() + " NPCs...");
 	}
 
 	public static int attack(final NPC npc, final Entity target) {

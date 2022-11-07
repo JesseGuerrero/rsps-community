@@ -29,6 +29,7 @@ import com.rs.game.content.dialogue.statements.OptionStatement;
 import com.rs.game.content.dialogue.statements.PlayerStatement;
 import com.rs.game.content.dialogue.statements.SimpleStatement;
 import com.rs.game.content.dialogue.statements.Statement;
+import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.Item;
 import com.rs.lib.util.Utils;
@@ -39,6 +40,7 @@ public class Dialogue {
 	private ArrayList<Dialogue> next = new ArrayList<>();
 	private Runnable event;
 	private Statement statement;
+	private int voiceEffectId = -1;
 	private boolean started = true;
 
 	public Dialogue(Statement statement, Runnable extraFunctionality) {
@@ -78,6 +80,10 @@ public class Dialogue {
 		event = consumer;
 		return this;
 	}
+	
+	public Runnable getFunc() {
+		return event;
+	}
 
 	public Dialogue addGotoStage(String stageName, Conversation conversation) {
 		return addNext(new StageSelectDialogue(stageName, conversation));
@@ -115,6 +121,14 @@ public class Dialogue {
 
 	public Dialogue addNPC(int npcId, HeadE expression, String text, Runnable extraFunctionality) {
 		return addNext(new Dialogue(new NPCStatement(npcId, expression, text), extraFunctionality));
+	}
+	
+	public Dialogue addNPC(NPC npc, HeadE expression, String text) {
+		return addNext(new NPCStatement(npc.getCustomName(), npc.getId(), expression, text));
+	}
+
+	public Dialogue addNPC(NPC npc, HeadE expression, String text, Runnable extraFunctionality) {
+		return addNext(new Dialogue(new NPCStatement(npc.getCustomName(), npc.getId(), expression, text), extraFunctionality));
 	}
 
 	public Dialogue addItem(int itemId, String text) {
@@ -162,12 +176,22 @@ public class Dialogue {
 		};
 		return addOptions(title, options);
 	}
+	
+	public Dialogue addOptions(String stageName, Conversation conv, String title, Consumer<Options> create) {
+		Options options = new Options(stageName, conv) {
+			@Override
+			public void create() {
+				create.accept(this);
+			}
+		};
+		return addOptions(title, options);
+	}
 
 	public Dialogue addOptions(String title, Options options) {
 		if (options.getOptions().size() <= 1) {
 			for (String opName : options.getOptions().keySet()) {
 				Option op = options.getOptions().get(opName);
-				if (op.show())
+				if (op.show() && op.getDialogue() != null)
 					addNext(op.getDialogue());
 			}
 			if (options.getConv() != null)
@@ -182,7 +206,7 @@ public class Dialogue {
 			Dialogue op = new Dialogue(new OptionStatement(title, ops.stream().toArray(String[] ::new)));
 			for (String opName : options.getOptions().keySet()) {
 				Option o = options.getOptions().get(opName);
-				if (o.show())
+				if (o.show() && o.getDialogue() != null)
 					op.addNext(o.getDialogue());
 			}
 			addNext(op);
@@ -199,7 +223,7 @@ public class Dialogue {
 			Dialogue currPage = baseOption;
 			for (int i = 0;i < ops.length;i++) {
 				Option op = options.getOptions().get(ops[i]);
-				if (op.show()) {
+				if (op.show() && op.getDialogue() != null) {
 					currPage.addNext(op.getDialogue());
 					if (i >= 3 && ((i+1) % 4) == 0) {
 						String[] nextOps = new String[Utils.clampI(ops.length-i, 0, 5)];
@@ -292,6 +316,8 @@ public class Dialogue {
 			event.run();
 		if (statement != null)
 			statement.send(player);
+		if (voiceEffectId != -1)
+			player.voiceEffect(voiceEffectId);
 	}
 
 	public Dialogue getPrev() {
@@ -329,6 +355,20 @@ public class Dialogue {
 		Dialogue copy = new Dialogue(this);
 		copy.prev = null;
 		conversation.addStage(stageName, copy);
+		return this;
+	}
+
+	public void close(Player player) {
+		if (statement != null)
+			statement.close(player);
+	}
+
+	public int getVoiceEffect() {
+		return voiceEffectId;
+	}
+
+	public Dialogue voiceEffect(int voiceId) {
+		this.voiceEffectId = voiceId;
 		return this;
 	}
 }

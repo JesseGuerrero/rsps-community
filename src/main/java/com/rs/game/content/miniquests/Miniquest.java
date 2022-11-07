@@ -18,6 +18,7 @@ package com.rs.game.content.miniquests;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.SuppressWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -28,7 +29,8 @@ import com.rs.game.model.entity.player.Skills;
 import com.rs.lib.util.Utils;
 
 public enum Miniquest {
-	ENTER_THE_ABYSS("Enter the Abyss", null, null, null),
+	ENTER_THE_ABYSS("Enter the Abyss", new Quest[] { Quest.RUNE_MYSTERIES }, null, null),
+	KNIGHTS_WAVE_TRAINING_GROUNDS("Knights Waves Training Grounds", new Quest[] { Quest.KINGS_RANSOM }, null, null),
 	;
 
 	static {
@@ -71,14 +73,14 @@ public enum Miniquest {
 		return handler;
 	}
 
-	public boolean meetsRequirements(Player player) {
-		return meetsRequirements(player, null);
+	public boolean meetsReqs(Player player) {
+		return meetsReqs(player, null);
 	}
 
-	public boolean meetsRequirements(Player player, String actionStr) {
+	public boolean meetsReqs(Player player, String actionStr) {
 		boolean meetsRequirements = true;
 		for (Quest preReq : preReqs) {
-			if (!player.getQuestManager().isComplete(preReq) && !preReq.meetsRequirements(player)) {
+			if (!player.isQuestComplete(preReq, actionStr)) {
 				player.sendMessage("You need to complete " + preReq.getDefs().name + " first.");
 				meetsRequirements = false;
 			}
@@ -93,7 +95,7 @@ public enum Miniquest {
 			}
 		}
 		if (!meetsRequirements && actionStr != null)
-			player.sendMessage("You must meet the requirements for the miniquest: " + name + " " + actionStr);
+			player.sendMessage("You must meet the requirements for the miniquest: " + getName() + " " + actionStr);
 		return meetsRequirements;
 	}
 
@@ -108,11 +110,15 @@ public enum Miniquest {
 			jingleNum = 318;
 		else
 			jingleNum+=152;
-		player.getPackets().sendMusicEffect(jingleNum);
+		player.jingle(jingleNum);
 
 		player.getInterfaceManager().sendInterface(1244);
 		player.getPackets().setIFItem(1244, 24, itemId, 1);
-		player.getPackets().setIFText(1244, 25, "You have completed "+name+"!");
+		player.getPackets().setIFText(1244, 25, "You have completed "+getName()+"!");
 		player.getPackets().setIFText(1244, 26, line);
+	}
+
+	public String getName() {
+		return name;
 	}
 }

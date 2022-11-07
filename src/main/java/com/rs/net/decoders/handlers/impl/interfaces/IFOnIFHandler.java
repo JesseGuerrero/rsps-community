@@ -19,18 +19,35 @@ package com.rs.net.decoders.handlers.impl.interfaces;
 import com.rs.game.content.skills.magic.Alchemy;
 import com.rs.game.content.skills.magic.Enchanting;
 import com.rs.game.content.skills.magic.Lunars;
+import com.rs.game.model.entity.player.Equipment;
 import com.rs.game.model.entity.player.Inventory;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.Item;
 import com.rs.lib.game.Rights;
 import com.rs.lib.net.packets.PacketHandler;
 import com.rs.lib.net.packets.decoders.interfaces.IFOnIF;
+import com.rs.lib.util.Logger;
 import com.rs.net.decoders.handlers.InventoryOptionsHandler;
 
 public class IFOnIFHandler implements PacketHandler<Player, IFOnIF> {
 
 	@Override
 	public void handle(Player player, IFOnIF packet) {
+		if (packet.getFromInter() == Inventory.INVENTORY_INTERFACE && packet.getFromInter() == packet.getToInter() && !player.getInterfaceManager().containsInventoryInter()) {
+			if (packet.getToSlot() >= 28 || packet.getFromSlot() >= 28)
+				return;
+			Item usedWith = player.getInventory().getItem(packet.getToSlot());
+			Item itemUsed = player.getInventory().getItem(packet.getFromSlot());
+			if (itemUsed == null || usedWith == null || itemUsed.getId() != packet.getFromItemId() || usedWith.getId() != packet.getToItemId())
+				return;
+			if (packet.getFromSlot() == packet.getToSlot())
+				return;
+			player.stopAll();
+			if (!InventoryOptionsHandler.handleItemOnItem(player, itemUsed, usedWith, packet.getFromSlot(), packet.getToSlot()))
+				player.sendMessage("Nothing interesting happens.");
+			return;
+		}
+		
 		if (packet.getFromInter() == 192 && packet.getToInter() == 679) {
 			Item item = player.getInventory().getItem(packet.getToSlot());
 			if (item == null)
@@ -95,19 +112,17 @@ public class IFOnIFHandler implements PacketHandler<Player, IFOnIF> {
 			}
 			return;
 		}
-		if (packet.getFromInter() == Inventory.INVENTORY_INTERFACE && packet.getFromInter() == packet.getToInter() && !player.getInterfaceManager().containsInventoryInter()) {
-			if (packet.getToSlot() >= 28 || packet.getFromSlot() >= 28)
+		
+		if ((packet.getFromInter() == 670 || packet.getFromInter() == 667) && (packet.getToInter() == 670 || packet.getToInter() == 667)) {
+			Item item1 = packet.getFromInter() == 670 ? player.getInventory().getItem(packet.getFromSlot()) : player.getEquipment().get(packet.getFromSlot());
+			Item item2 = packet.getToInter() == 670 ? player.getInventory().getItem(packet.getToSlot()) : player.getEquipment().get(packet.getToSlot());
+			if (item1 == null || item2 == null || item1 == item2)
 				return;
-			Item usedWith = player.getInventory().getItem(packet.getToSlot());
-			Item itemUsed = player.getInventory().getItem(packet.getFromSlot());
-			if (itemUsed == null || usedWith == null || itemUsed.getId() != packet.getFromItemId() || usedWith.getId() != packet.getToItemId())
-				return;
-			if (packet.getFromSlot() == packet.getToSlot())
-				return;
-			player.stopAll();
-			if (!InventoryOptionsHandler.handleItemOnItem(player, itemUsed, usedWith, packet.getFromSlot(), packet.getToSlot()))
-				player.sendMessage("Nothing interesting happens.");
+			Equipment.compareItems(player, item1, item2);
+			return;
 		}
+		
+		Logger.debug(IFOnIFHandler.class, "handle", "IF on IF: (" + packet.getFromInter() + ", " + packet.getFromComp() + ", " + packet.getFromSlot() + ") -> (" + packet.getToInter() + ", " + packet.getToComp() + ", " + packet.getToSlot() + ")");
 	}
 
 }

@@ -20,13 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.lang.SuppressWarnings;
 
 import com.rs.Settings;
 import com.rs.cache.loaders.Bonus;
 import com.rs.cache.loaders.ItemDefinitions;
 import com.rs.game.World;
 import com.rs.game.content.Effect;
-import com.rs.game.content.controllers.DungeonController;
+import com.rs.game.content.skills.dungeoneering.DungeonController;
 import com.rs.game.content.skills.dungeoneering.KinshipPerk;
 import com.rs.game.content.skills.summoning.Familiar;
 import com.rs.game.content.skills.summoning.Pouch;
@@ -175,7 +176,7 @@ public class PlayerCombat extends PlayerAction {
 			player.setNextAnimation(new Animation(15448));
 			PolyporeStaff.drainCharge(player);
 			WorldProjectile p = World.sendProjectile(player, target, 2035, 60, 32, 50, 2, 0, 0);
-			Hit hit = getMagicHit(player, getRandomMagicMaxHit(player, (5 * player.getSkills().getLevel(Constants.MAGIC)) - 180));
+			Hit hit = getMagicHit(player, getRandomMagicMaxHit(player, (5 * player.getSkills().getLevel(Constants.MAGIC)) - 180, false));
 			delayMagicHit(p.getTaskDelay(), hit, () -> {
 				if (hit.getDamage() > 0)
 					target.setNextSpotAnim(new SpotAnim(2036, 0, 96));
@@ -364,11 +365,17 @@ public class PlayerCombat extends PlayerAction {
 				@Override
 				public void run() {
 					if (hit > 0) {
-						if (spell.getHitSpotAnim() != null)
+						if (spell.getHitSpotAnim() != null) {
 							target.setNextSpotAnim(spell.getHitSpotAnim());
+							if (spell.landSound != -1)
+								playSound(spell.landSound, player, target);
+						}
 					} else {
 						target.setNextSpotAnim(new SpotAnim(85, 0, 96));
-						playSound(227, player, target);
+						if (spell.splashSound != -1)
+							playSound(spell.landSound, player, target);
+						else
+							playSound(227, player, target);
 					}
 				}
 			}, delay);
@@ -395,8 +402,8 @@ public class PlayerCombat extends PlayerAction {
 		Hit hit = getMagicHit(player, getRandomMagicMaxHit(player, spell.getBaseDamage(player)));
 		if (spell == CombatSpell.STORM_OF_ARMADYL && hit.getDamage() > 0) {
 			int minHit = (player.getSkills().getLevelForXp(Constants.MAGIC) - 77) * 5;
-			hit.setDamage(hit.getDamage() + minHit);
-			max_hit = CombatSpell.STORM_OF_ARMADYL.getBaseDamage(player) + minHit;
+			if (hit.getDamage() < minHit)
+				hit.setDamage(hit.getDamage() + minHit);
 		}
 		hit.setData("combatSpell", spell);
 		boolean sparkle = target.getSize() >= 2 || target.hasEffect(Effect.FREEZE) || target.hasEffect(Effect.FREEZE_BLOCK);
@@ -411,15 +418,22 @@ public class PlayerCombat extends PlayerAction {
 							target.setNextSpotAnim(new SpotAnim(1677, 0, 96));
 						else
 							target.setNextSpotAnim(spell.getHitSpotAnim());
+						if (spell.landSound != -1)
+							playSound(spell.landSound, player, target);
 						break;
 					default:
 						if (spell.getHitSpotAnim() != null)
 							target.setNextSpotAnim(spell.getHitSpotAnim());
+						if (spell.landSound != -1)
+							playSound(spell.landSound, player, target);
 						break;
 				}
 			else {
 				target.setNextSpotAnim(new SpotAnim(85, 0, 96));
-				playSound(227, player, target);
+				if (spell.splashSound != -1)
+					playSound(spell.landSound, player, target);
+				else
+					playSound(227, player, target);
 			}
 		}, () -> {
 			spell.onHit(player, target, hit);
@@ -534,7 +548,7 @@ public class PlayerCombat extends PlayerAction {
 					dropAmmo(player, Equipment.AMMO, 2);
 				}
 				case HAND_CANNON -> {
-					player.setNextAnimation(new Animation(12174));
+					player.setNextAnimation(new Animation(12175));
 					player.setNextSpotAnim(new SpotAnim(2138));
 					WorldProjectile p = World.sendProjectile(player, target, 2143, 0, 50, 1.5);
 					delayHit(p.getTaskDelay(), weaponId, attackStyle, getRangeHit(player, getRandomMaxHit(player, weaponId, attackStyle, true)));
@@ -1273,9 +1287,9 @@ public class PlayerCombat extends PlayerAction {
 	public static void playSound(int soundId, Player player, Entity target) {
 		if (soundId == -1)
 			return;
-		player.getPackets().sendSound(soundId, 0, 1);
+		player.soundEffect(soundId);
 		if (target instanceof Player p2)
-			p2.getPackets().sendSound(soundId, 0, 1);
+			p2.soundEffect(soundId);
 	}
 
 	public static int getSpecialAmmount(int weaponId) {
@@ -1385,9 +1399,17 @@ public class PlayerCombat extends PlayerAction {
 				return 0;
 		}
 	}
-
+	
 	public int getRandomMagicMaxHit(Player player, int baseDamage) {
-		int current = calculateMagicHit(player, baseDamage);
+		return getRandomMagicMaxHit(player, baseDamage, true);
+	}
+
+	public int calculateMagicHit(Player player, int maxHit) {
+		return calculateMagicHit(player, maxHit, true);
+	}
+	
+	public int getRandomMagicMaxHit(Player player, int baseDamage, boolean applyMageLevelBoost) {
+		int current = calculateMagicHit(player, baseDamage, applyMageLevelBoost);
 		if (current <= 0) // Splash.
 			return 0;
 
@@ -1399,7 +1421,7 @@ public class PlayerCombat extends PlayerAction {
 		return hit;
 	}
 
-	private int calculateMagicHit(Player player, int maxHit) {
+	private int calculateMagicHit(Player player, int maxHit, boolean applyMageLevelBoost) {
 		double lvl = Math.floor(player.getSkills().getLevel(Constants.MAGIC) * player.getPrayer().getMageMultiplier());
 		lvl += 8;
 		if (fullVoidEquipped(player, 11663, 11674))
@@ -1452,9 +1474,11 @@ public class PlayerCombat extends PlayerAction {
 			return 0;
 
 		max_hit = maxHit;
-		double boost = 1 + ((player.getSkills().getLevel(Constants.MAGIC) - player.getSkills().getLevelForXp(Constants.MAGIC)) * 0.03);
-		if (boost > 1)
-			max_hit *= boost;
+		if (applyMageLevelBoost) {
+			double boostedMageLevelBonus = 1 + ((player.getSkills().getLevel(Constants.MAGIC) - player.getSkills().getLevelForXp(Constants.MAGIC)) * 0.03);
+			if (boostedMageLevelBonus > 1)
+				max_hit *= boostedMageLevelBonus;
+		}
 		double magicPerc = player.getCombatDefinitions().getBonus(Bonus.MAGIC_STR);
 		if (spellcasterGloveSpell != null)
 			if (maxHit > 60) {
@@ -1468,8 +1492,8 @@ public class PlayerCombat extends PlayerAction {
 				}
 				player.sendMessage("Your magic surged with extra power.");
 			}
-		boost = magicPerc / 100 + 1;
-		max_hit *= boost;
+		double mageBonusBoost = magicPerc / 100 + 1;
+		max_hit *= mageBonusBoost;
 
 		if (player.hasSlayerTask())
 			if (target instanceof NPC n && player.getSlayer().isOnTaskAgainst(n))
@@ -1639,15 +1663,15 @@ public class PlayerCombat extends PlayerAction {
 		//int multiplier = PluginManager.handle()
 
 		switch (weaponId) {
-			case 11694:
-			case 23679:
-			case 11696:
-			case 23680:
-			case 11698:
-			case 23681:
-			case 11700:
-			case 23682:
-				baseDamage *= 1.1;
+//			case 11694:
+//			case 23679:
+//			case 11696:
+//			case 23680:
+//			case 11698:
+//			case 23681:
+//			case 11700:
+//			case 23682:
+//				baseDamage *= 1.1;
 			case 6523:
 			case 6525:
 			case 6527:
@@ -1821,6 +1845,8 @@ public class PlayerCombat extends PlayerAction {
 			if (afterDelay != null)
 				afterDelay.run();
 			target.setNextAnimationNoPriority(new Animation(PlayerCombat.getDefenceEmote(target)));
+			if (target instanceof NPC n)
+				n.soundEffect(n.getCombatDefinitions().getDefendSound());
 			if (target instanceof Player p2) {
 				p2.closeInterfaces();
 				if (!p2.isLocked() && p2.getCombatDefinitions().isAutoRetaliate() && !p2.getActionManager().hasSkillWorking() && p2.getInteractionManager().getInteraction() == null && !p2.hasWalkSteps())
@@ -1943,16 +1969,17 @@ public class PlayerCombat extends PlayerAction {
 		int damage = Utils.clampI(hit.getDamage(), 0, target.getHitpoints());
 		switch (hit.getLook()) {
 			case MAGIC_DAMAGE:
-				combatXp = (damage / 5);
+				combatXp = (damage / 5.0);
 				if (combatXp > 0) {
 					if (player.getCombatDefinitions().isDefensiveCasting() || (PolyporeStaff.isWielding(player) && player.getCombatDefinitions().getAttackStyle().getAttackType() == AttackType.POLYPORE_LONGRANGE)) {
-						int defenceXp = (int) (hit.getDamage() / 7.5);
-						if (defenceXp > 0) {
+						double defenceXp = (damage / 7.5);
+						if (defenceXp > 0.0) {
 							combatXp -= defenceXp;
-							player.getSkills().addXp(Constants.DEFENSE, defenceXp / 7.5);
+							player.getSkills().addXp(Constants.DEFENSE, defenceXp);
 						}
 					}
-					player.getSkills().addXp(Constants.MAGIC, combatXp);
+					if (combatXp > 0.0)
+						player.getSkills().addXp(Constants.MAGIC, combatXp);
 					//				double hpXp = (hit.getDamage() / 7.5);
 					//				if (hpXp > 0)
 					//					player.getSkills().addXp(Constants.HITPOINTS, hpXp);
@@ -1997,14 +2024,14 @@ public class PlayerCombat extends PlayerAction {
 
 	public static int getWeaponAttackEmote(int weaponId, AttackStyle attackStyle) {
 		if (weaponId != -1) {
-			if (weaponId == -2)
-				// punch/block:14393 kick:14307 spec:14417
+			if (weaponId == -2) {
 				switch (attackStyle.getIndex()) {
 					case 1:
 						return 14307;
 					default:
 						return 14393;
 				}
+			}
 			String weaponName = ItemDefinitions.getDefs(weaponId).getName().toLowerCase();
 			if (weaponName != null && !weaponName.equals("null")) {
 				if (weaponName.contains("boxing gloves"))
@@ -2246,6 +2273,8 @@ public class PlayerCombat extends PlayerAction {
 	public boolean checkAll(Player player) {
 		if (target.isDead())
 			return false;
+		if (!player.canAttackMulti(target) || !target.canAttackMulti(player))
+			return false;
 		if (target instanceof Player p2) {
 			if (!player.isCanPvp() || !p2.isCanPvp())
 				return false;
@@ -2258,10 +2287,6 @@ public class PlayerCombat extends PlayerAction {
 					return false;
 			} else if (isAttackExeption(player, n))
 				return false;
-		}
-		if ((!(target instanceof NPC n && n.isForceMultiAttacked()) && !target.isAtMultiArea() || !player.isAtMultiArea()) && ((player.getAttackedBy() != target && player.inCombat()) || (target.getAttackedBy() != player) && target.inCombat())) {
-			//TODO possibly print here
-			return false;
 		}
 		if (player.getTempAttribs().getL("SOL_SPEC") >= System.currentTimeMillis() && !(player.getEquipment().getWeaponId() == 15486 || player.getEquipment().getWeaponId() == 22207 || player.getEquipment().getWeaponId() == 22209 || player.getEquipment().getWeaponId() == 22211 || player.getEquipment().getWeaponId() == 22213))
 			player.getTempAttribs().setL("SOL_SPEC", 0);

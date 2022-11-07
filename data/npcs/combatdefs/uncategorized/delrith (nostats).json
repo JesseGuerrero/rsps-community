@@ -3,9 +3,12 @@
     "Delrith"
   ],
   "attackAnim": 64,
+  "attackSound": -1,
   "defenceAnim": 65,
+  "defendSound": -1,
   "deathAnim": 67,
   "deathDelay": 8,
+  "deathSound": -1,
   "respawnDelay": 59,
   "hitpoints": 70,
   "maxHit": 30,
@@ -21,7 +24,7 @@
   "attackGfx": -1,
   "attackProjectile": -1,
   "agressivenessType": "PASSIVE",
-  "aggroDistance": 16,
+  "aggroDistance": 4,
   "deAggroDistance": -1,
   "maxDistFromSpawn": -1
 }

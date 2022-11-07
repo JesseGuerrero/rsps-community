@@ -23,12 +23,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.rs.Settings;
 import com.rs.cache.Cache;
 import com.rs.cache.IndexType;
 import com.rs.cache.loaders.ObjectDefinitions;
 import com.rs.cache.loaders.ObjectType;
-import com.rs.cores.CoresManager;
 import com.rs.game.World;
 import com.rs.game.content.ItemConstants;
 import com.rs.game.model.WorldProjectile;
@@ -76,7 +74,7 @@ public class Region {
 	private List<GroundItem> groundItemList;
 	protected List<WorldProjectile> projectiles;
 	protected GameObject[][][][] objects;
-	private volatile int loadMapStage;
+	private int loadMapStage;
 	private boolean loadedNPCSpawns;
 	private boolean loadedObjectSpawns;
 	private boolean loadedItemSpawns;
@@ -294,8 +292,7 @@ public class Region {
 			if (clip && mapObject != null)
 				unclip(mapObject, localX, localY);
 		} else if (spawned == null) {
-			if (Settings.getConfig().isDebug())
-				Logger.log(this, "Requested object to spawn is already spawned.(Shouldnt happen)");
+			Logger.info(Region.class, "spawnObject", "Requested object to spawn is already spawned. (Shouldnt happen) " + mapObject);
 			return;
 		}
 
@@ -330,8 +327,7 @@ public class Region {
 			unclip(object, localX, localY);
 			addRemovedObject(mapObject);
 		} else {
-			if (Settings.getConfig().isDebug())
-				Logger.log(this, "Requested object to remove wasnt found.(Shouldnt happen)");
+			Logger.info(Region.class, "removeObject", "Requested object to spawn is already spawned. (Shouldnt happen) " + mapObject);
 			return;
 		}
 		for (Player player : World.getPlayersInRegionRange(getRegionId())) {
@@ -368,8 +364,8 @@ public class Region {
 	public void checkLoadMap() {
 		if (getLoadMapStage() == 0) {
 			setLoadMapStage(1);
-			CoresManager.execute(() -> {
-				try {
+//			CoresManager.execute(() -> {
+//				try {
 					loadRegionMap();
 					setLoadMapStage(2);
 					if (!isLoadedObjectSpawns()) {
@@ -384,10 +380,10 @@ public class Region {
 						loadItemSpawns();
 						setLoadedItemSpawns(true);
 					}
-				} catch (Throwable e) {
-					Logger.handle(e);
-				}
-			});
+//				} catch (Throwable e) {
+//					Logger.handle(this, e);
+//				}
+//			});
 		}
 	}
 
@@ -478,17 +474,17 @@ public class Region {
 					int localX = (location >> 6 & 0x3f);
 					int localY = (location & 0x3f);
 					int plane = location >> 12;
-			int objectData = landStream.readUnsignedByte();
-			int type = objectData >> 2;
-				int rotation = objectData & 0x3;
-				if (localX < 0 || localX >= 64 || localY < 0 || localY >= 64)
-					continue;
-				int objectPlane = plane;
-				if (tileFlags != null && (tileFlags[1][localX][localY] & 0x2) != 0)
-					objectPlane--;
-				if (objectPlane < 0 || objectPlane >= 4 || plane < 0 || plane >= 4)
-					continue;
-				spawnObject(new GameObject(objectId, ObjectType.forId(type), rotation, localX + regionX, localY + regionY, objectPlane), objectPlane, localX, localY);
+					int objectData = landStream.readUnsignedByte();
+					int type = objectData >> 2;
+					int rotation = objectData & 0x3;
+					if (localX < 0 || localX >= 64 || localY < 0 || localY >= 64)
+						continue;
+					int objectPlane = plane;
+					if (tileFlags != null && (tileFlags[1][localX][localY] & 0x2) != 0)
+						objectPlane--;
+					if (objectPlane < 0 || objectPlane >= 4 || plane < 0 || plane >= 4)
+						continue;
+					spawnObject(new GameObject(objectId, ObjectType.forId(type), rotation, localX + regionX, localY + regionY, objectPlane), objectPlane, localX, localY);
 				}
 			}
 		}
@@ -519,8 +515,8 @@ public class Region {
 		//				}
 		//			}
 		//		}
-		if (Settings.getConfig().isDebug() && landContainerData == null && landArchiveId != -1 && MapXTEAs.getMapKeys(regionId) != null)
-			Logger.log(this, "Missing xteas for region " + regionId + ".");
+		if (landContainerData == null && landArchiveId != -1 && MapXTEAs.getMapKeys(regionId) != null)
+			Logger.warn(Region.class, "loadRegionMap", "Missing xteas for region " + regionId + ".");
 	}
 
 	public Set<Integer> getPlayerIndexes() {

@@ -4,9 +4,12 @@
     8576
   ],
   "attackAnim": 11093,
+  "attackSound": -1,
   "defenceAnim": 11107,
+  "defendSound": -1,
   "deathAnim": 11108,
   "deathDelay": 6,
+  "deathSound": -1,
   "respawnDelay": 59,
   "hitpoints": 1530,
   "maxHit": 160,
@@ -22,7 +25,7 @@
   "attackGfx": -1,
   "attackProjectile": -1,
   "agressivenessType": "AGGRESSIVE",
-  "aggroDistance": 16,
+  "aggroDistance": 8,
   "deAggroDistance": -1,
   "maxDistFromSpawn": -1
 }

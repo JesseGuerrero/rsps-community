@@ -3,9 +3,12 @@
     "Ram"
   ],
   "attackAnim": 5338,
+  "attackSound": -1,
   "defenceAnim": 5337,
+  "defendSound": -1,
   "deathAnim": 5336,
   "deathDelay": 6,
+  "deathSound": -1,
   "respawnDelay": 59,
   "hitpoints": 40,
   "maxHit": 15,
@@ -21,7 +24,7 @@
   "attackGfx": -1,
   "attackProjectile": -1,
   "agressivenessType": "PASSIVE",
-  "aggroDistance": 16,
+  "aggroDistance": 4,
   "deAggroDistance": -1,
   "maxDistFromSpawn": -1
 }

@@ -270,18 +270,26 @@ public enum Quest {
 		return handler;
 	}
 
-	public boolean meetsRequirements(Player player) {
-		return meetsRequirements(player, null);
+	public boolean meetsReqs(Player player) {
+		return meetsReqs(player, null);
 	}
 
-	public boolean meetsRequirements(Player player, String actionStr) {
+	public boolean meetsReqs(Player player, String actionStr) {
 		boolean meetsRequirements = true;
-		for (int skillId : getDefs().getExtraInfo().getPreReqSkillReqs().keySet())
+		for (Quest quest : getDefs().getExtraInfo().getPreReqs()) {
+			if (!player.isQuestComplete(quest)) {
+				if (actionStr != null && quest.isImplemented())
+					player.sendMessage("You must have completed " + quest.getDefs().name + ".");
+				meetsRequirements = false;
+			}
+		}
+		for (int skillId : getDefs().getExtraInfo().getPreReqSkillReqs().keySet()) {
 			if (player.getSkills().getLevelForXp(skillId) < getDefs().getExtraInfo().getPreReqSkillReqs().get(skillId)) {
 				if (actionStr != null)
 					player.sendMessage("You need a " + Skills.SKILL_NAME[skillId] + " level of " + getDefs().getExtraInfo().getPreReqSkillReqs().get(skillId)+".");
 				meetsRequirements = false;
 			}
+		}
 		if (!meetsRequirements && actionStr != null)
 			player.sendMessage("You must meet the requirements for " + getDefs().name + " " + actionStr);
 		return meetsRequirements;
@@ -303,7 +311,7 @@ public enum Quest {
 			jingleNum = 318;
 		else
 			jingleNum+=152;
-		player.getPackets().sendMusicEffect(jingleNum);
+		player.jingle(jingleNum);
 
 		player.getInterfaceManager().sendInterface(1244);
 		player.getPackets().setIFItem(1244, 24, itemId, 1);

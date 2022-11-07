@@ -3,9 +3,12 @@
     "Fire Warrior of Lesarkus"
   ],
   "attackAnim": 2791,
+  "attackSound": -1,
   "defenceAnim": 424,
+  "defendSound": -1,
   "deathAnim": 836,
   "deathDelay": 6,
+  "deathSound": -1,
   "respawnDelay": 59,
   "hitpoints": 590,
   "maxHit": 80,
@@ -21,7 +24,7 @@
   "attackGfx": 2728,
   "attackProjectile": 2735,
   "agressivenessType": "PASSIVE",
-  "aggroDistance": 16,
+  "aggroDistance": 8,
   "deAggroDistance": -1,
   "maxDistFromSpawn": -1
 }

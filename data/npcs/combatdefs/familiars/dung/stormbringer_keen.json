@@ -3,9 +3,12 @@
     "Keen stormbringer"
   ],
   "attackAnim": 13620,
+  "attackSound": -1,
   "defenceAnim": 13674,
+  "defendSound": -1,
   "deathAnim": 13675,
   "deathDelay": 6,
+  "deathSound": -1,
   "respawnDelay": 59,
   "hitpoints": 656,
   "maxHit": 120,
@@ -21,7 +24,7 @@
   "attackGfx": 2591,
   "attackProjectile": 2592,
   "agressivenessType": "PASSIVE",
-  "aggroDistance": 16,
+  "aggroDistance": 8,
   "deAggroDistance": -1,
   "maxDistFromSpawn": -1
 }

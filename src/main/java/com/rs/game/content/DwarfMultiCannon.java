@@ -23,15 +23,15 @@ import java.util.Set;
 import com.rs.cache.loaders.ObjectType;
 import com.rs.game.World;
 import com.rs.game.content.combat.PlayerCombat;
-import com.rs.game.content.controllers.Controller;
-import com.rs.game.content.controllers.WildernessController;
 import com.rs.game.content.quests.Quest;
+import com.rs.game.content.world.areas.wilderness.WildernessController;
 import com.rs.game.model.WorldProjectile;
 import com.rs.game.model.entity.Entity;
 import com.rs.game.model.entity.Hit;
 import com.rs.game.model.entity.Hit.HitLook;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.pathing.Direction;
+import com.rs.game.model.entity.player.Controller;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.object.GameObject;
 import com.rs.game.model.object.OwnedObject;
@@ -119,7 +119,7 @@ public class DwarfMultiCannon extends OwnedObject {
 	}
 
 	public static void setUp(Player player, int type) {
-		if (!player.getQuestManager().isComplete(Quest.DWARF_CANNON)) {
+		if (!player.isQuestComplete(Quest.DWARF_CANNON)) {
 			player.sendMessage("You have no idea how to operate this machine.");
 			return;
 		}

@@ -3,9 +3,12 @@
     "Praying mantis"
   ],
   "attackAnim": 8069,
+  "attackSound": -1,
   "defenceAnim": 8066,
+  "defendSound": -1,
   "deathAnim": 8065,
   "deathDelay": 3,
+  "deathSound": -1,
   "respawnDelay": 59,
   "hitpoints": 4280,
   "maxHit": 120,
@@ -21,7 +24,7 @@
   "attackGfx": -1,
   "attackProjectile": -1,
   "agressivenessType": "PASSIVE",
-  "aggroDistance": 16,
+  "aggroDistance": 4,
   "deAggroDistance": -1,
   "maxDistFromSpawn": -1
 }

@@ -116,6 +116,7 @@ public final class Settings {
 	public static ArrayList<String> COMMIT_HISTORY = new ArrayList<>();
 
 	public static void loadConfig() {
+		Logger.info(Settings.class, "loadConfig", "Loading config...");
 		try {
 			File configFile = new File("./worldConfig.json");
 			if (configFile.exists())
@@ -132,7 +133,8 @@ public final class Settings {
 		}
 		try {
 			String line;
-			Process proc = Runtime.getRuntime().exec("git log -n 1");
+			ProcessBuilder builder = new ProcessBuilder("git", "log", "-n", "1");
+			Process proc = builder.start();
 			BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 			boolean markMsg = false;
 			while ((line = in.readLine()) != null) {
@@ -149,11 +151,12 @@ public final class Settings {
 			}
 			proc.waitFor();
 			in.close();
+			Logger.info(Settings.class, "loadConfig", "Commit history loaded: " + COMMIT_HISTORY);
 		} catch (JsonIOException | IOException | InterruptedException e) {
-			Logger.handle(e);
+			Logger.handle(Settings.class, "loadConfig", e);
 		}
 		Globals.DEBUG = getConfig().debug;
-		Logger.log("Settings", "Loaded lobby IP: " + getConfig().lobbyIp);
+		Logger.info(Settings.class, "loadConfig", "Loaded lobby IP: " + getConfig().lobbyIp);
 	}
 
 	public String getServerName() {

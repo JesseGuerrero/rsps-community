@@ -140,7 +140,7 @@ public class TribalTotem extends QuestOutline {
 		public void handle(ObjectClickEvent e) {
 			Player p = e.getPlayer();
 			GameObject obj = e.getObject();
-			if (p.getX() < obj.getX() || p.getQuestManager().isComplete(Quest.TRIBAL_TOTEM) || (p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).getO(LOCK_PASS_ATTR) != null
+			if (p.getX() < obj.getX() || p.isQuestComplete(Quest.TRIBAL_TOTEM) || (p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).getO(LOCK_PASS_ATTR) != null
 					&& ((String) p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).getO(LOCK_PASS_ATTR)).equalsIgnoreCase("KURT"))) {
 				handleDoor(p, obj);
 				return;
@@ -150,18 +150,12 @@ public class TribalTotem extends QuestOutline {
 		}
 	};
 
-    public static ItemClickHandler handleClickOnGuideBook = new ItemClickHandler(1856) { //Guide book for middle name
-        @Override
-        public void handle(ItemClickEvent e) {
-            if(e.getOption().equalsIgnoreCase("read"))
-                e.getPlayer().openBook(new RealEstateGuideBook());
-            if(e.getOption().equalsIgnoreCase("drop")) {
-                e.getPlayer().getInventory().deleteItem(e.getSlotId(), e.getItem());
-                World.addGroundItem(e.getItem(), new WorldTile(e.getPlayer().getTile()), e.getPlayer());
-                e.getPlayer().getPackets().sendSound(2739, 0, 1);
-            }
-        }
-    };
+	public static ItemClickHandler handleClickOnGuideBook = new ItemClickHandler(new Object[] { 1856 }, new String[] { "Read" }) { //Guide book for middle name
+		@Override
+		public void handle(ItemClickEvent e) {
+			e.getPlayer().openBook(new RealEstateGuideBook());
+		}
+	};
 
 	public static ObjectClickHandler handleTrapStairs = new ObjectClickHandler(new Object[] { 2711 }) {
 		@Override
@@ -169,7 +163,7 @@ public class TribalTotem extends QuestOutline {
 			Player p = e.getPlayer();
 			GameObject obj = e.getObject();
 			if(e.getOption().equalsIgnoreCase("climb-up"))
-				if(p.getQuestManager().isComplete(Quest.TRIBAL_TOTEM)
+				if(p.isQuestComplete(Quest.TRIBAL_TOTEM)
 						|| p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).getB(DISARMED_STAIRS_ATTR))
 					p.useStairs(-1, new WorldTile(p.getX()-3, obj.getY(), p.getPlane() + 1), 0, 1);
 				else {
@@ -277,7 +271,7 @@ public class TribalTotem extends QuestOutline {
 				GameObject openedChest = new GameObject(obj.getId() + 1, obj.getType(), obj.getRotation(), obj.getX(), obj.getY(), obj.getPlane());
 				p.faceObject(openedChest);
 				World.spawnObjectTemporary(openedChest, Ticks.fromMinutes(1));
-				if(!p.getInventory().containsItem(TOTEM, 1) && !p.getQuestManager().isComplete(Quest.TRIBAL_TOTEM)) {
+				if(!p.getInventory().containsItem(TOTEM, 1) && !p.isQuestComplete(Quest.TRIBAL_TOTEM)) {
 					p.startConversation(new Dialogue().addPlayer(HeadE.SECRETIVE, "This looks like the Totem. Now back to Brimhaven, I gotta" +
 							" get this to Kangai Mau..."));
 					p.getInventory().addItem(new Item(TOTEM, 1));

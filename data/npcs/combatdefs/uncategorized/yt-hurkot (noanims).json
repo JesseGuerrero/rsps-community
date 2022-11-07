@@ -3,9 +3,12 @@
     "Yt-HurKot"
   ],
   "attackAnim": 16087,
+  "attackSound": -1,
   "defenceAnim": 16086,
+  "defendSound": -1,
   "deathAnim": -1,
   "deathDelay": 12,
+  "deathSound": -1,
   "respawnDelay": 59,
   "hitpoints": 600,
   "maxHit": 140,
@@ -21,8 +24,8 @@
   "attackRange": -1,
   "attackGfx": -1,
   "attackProjectile": -1,
-  "agressivenessType": "AGGRESSIVE",
-  "aggroDistance": 16,
+  "agressivenessType": "PASSIVE",
+  "aggroDistance": 4,
   "deAggroDistance": -1,
   "maxDistFromSpawn": -1
 }

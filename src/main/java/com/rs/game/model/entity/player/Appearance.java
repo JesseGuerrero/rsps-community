@@ -26,11 +26,11 @@ import com.rs.game.World;
 import com.rs.game.model.entity.BodyGlow;
 import com.rs.lib.game.Item;
 import com.rs.lib.io.OutputStream;
+import com.rs.lib.util.Logger;
 import com.rs.lib.util.Utils;
 
 public class Appearance {
 
-	private transient int bas;
 	private int title;
 	private int[] lookI;
 	private int[] colour;
@@ -53,7 +53,6 @@ public class Appearance {
 
 	public Appearance() {
 		male = true;
-		bas = -1;
 		title = -1;
 		resetAppearance();
 	}
@@ -66,7 +65,6 @@ public class Appearance {
 	public void setPlayer(Player player) {
 		this.player = player;
 		transformedNpcId = -1;
-		bas = -1;
 		if (lookI == null)
 			resetAppearance();
 	}
@@ -104,6 +102,8 @@ public class Appearance {
 
 	public void generateAppearanceData() {
 		OutputStream stream = new OutputStream();
+		boolean pvpArea = World.isPvpArea(player);
+		boolean showSkillTotal = player.getTempAttribs().getB("showSkillTotal") && !pvpArea;
 		if (glowRed && player.getNextBodyGlow() == null)
 			player.setNextBodyGlow(new BodyGlow(90, 0, 0, 0, 255));
 		int flag = 0;
@@ -111,7 +111,7 @@ public class Appearance {
 			flag |= 0x1;
 		if (transformedNpcId >= 0 && NPCDefinitions.getDefs(transformedNpcId).aBool4872)
 			flag |= 0x2;
-		if (player.getTempAttribs().getB("showSkillTotal") && !World.isPvpArea(player))
+		if (showSkillTotal)
 			flag |= 0x4;
 		if (title != 0 || player.getTitle() != null)
 			flag |= isTitleAfter(title) || player.isTitleAfter() ? 0x80 : 0x40; // after/before
@@ -198,13 +198,12 @@ public class Appearance {
 
 		stream.writeShort(getRenderEmote());
 		stream.writeString(player.getDisplayName());
-		boolean pvpArea = World.isPvpArea(player);
 		stream.writeByte(pvpArea ? player.getSkills().getCombatLevel() : player.getSkills().getCombatLevelWithSummoning());
-		if (player.getTempAttribs().getB("showSkillTotal") && !pvpArea)
+		if (showSkillTotal)
 			stream.writeShort(player.getSkills().getTotalLevel());
 		else {
 			stream.writeByte(pvpArea ? player.getSkills().getCombatLevelWithSummoning() : 0);
-			stream.writeByte(-1);
+			stream.writeByte(player.getPvpCombatLevelThreshhold());
 		}
 		stream.writeByte(transformedNpcId >= 0 ? 1 : 0);
 		if (transformedNpcId >= 0) {
@@ -224,8 +223,8 @@ public class Appearance {
 		md5AppearanceDataHash = md5Hash;
 	}
 
-	private ArrayList<MeshModifier> getMeshModifiers() {
-		ArrayList<MeshModifier> modifiers = new ArrayList<>();
+	private ArrayList<ItemMeshModifier> getMeshModifiers() {
+		ArrayList<ItemMeshModifier> modifiers = new ArrayList<>();
 		int slotFlag = -1;
 		for (int slotId = 0; slotId < Equipment.SIZE; slotId++) {
 			if (Equipment.DISABLED_SLOTS[slotId] != 0)
@@ -233,34 +232,54 @@ public class Appearance {
 			slotFlag++;
 			if (player.getEquipment().getId(slotId) == -1)
 				continue;
-			ItemDefinitions defs = ItemDefinitions.getDefs(player.getEquipment().getId(slotId));
+			Item item = player.getEquipment().get(slotId);
+			if (item == null)
+				continue;
+			ItemDefinitions defs = item.getDefinitions();
 			if (defs == null)
 				continue;
 
 			switch(defs.getId()) {
+			case 1833:
+			case 1835:
+			case 1171:
+			case 2637:
+				ItemMeshModifier mod = new ItemMeshModifier(defs, slotFlag);
+				boolean add = false;
+				if (item.getMetaDataI("drTOr", -1) > 0) {
+					mod.addTextures(item.getMetaDataI("drTOr", -1), item.getMetaDataI("drTOr", -1), item.getMetaDataI("drTOr", -1));
+					add = true;
+				}
+				if (item.getMetaDataI("drCOr", -1) > 0) {
+					mod.addColors(item.getMetaDataI("drCOr", -1));
+					add = true;
+				}
+				if (add)
+					modifiers.add(mod);
+				break;
 			case 20767:
 			case 20768:
-				modifiers.add(new MeshModifier(defs, slotFlag)
+				modifiers.add(new ItemMeshModifier(defs, slotFlag)
 						.addColors(player.getMaxedCapeCustomized()));
 				break;
 			case 20769:
 			case 20770:
 			case 20771:
 			case 20772:
-				modifiers.add(new MeshModifier(defs, slotFlag)
+				modifiers.add(new ItemMeshModifier(defs, slotFlag)
 						.addColors(player.getCompletionistCapeCustomized()));
 				break;
 			case 20708:
 			case 20709:
 				if (player.getClan() != null)
-					modifiers.add(new MeshModifier(defs, slotFlag)
-							.addColors(player.getClan().getMottifColors())
-							.addTextures(player.getClan().getMottifTextures()));
+					modifiers.add(new ItemMeshModifier(defs, slotFlag)
+							.addColors(player.getClan().getMotifColors())
+							.addTextures(player.getClan().getMotifTextures()));
 				break;
 			}
 
 			if (slotId == Equipment.AURA && player.getAuraManager().isActive())
-				modifiers.add(new MeshModifier(defs, slotFlag)
+				modifiers.add(new ItemMeshModifier(defs, slotFlag)
 						.addBodyModels(player.getAuraManager().getAuraModelId(), player.getAuraManager().getAuraModelId2()));
 
 		}
@@ -271,7 +290,7 @@ public class Appearance {
 		int start = stream.getOffset();
 		stream.writeShort(0);
 		int slotHash = 0;
-		for (MeshModifier modifier : getMeshModifiers()) {
+		for (ItemMeshModifier modifier : getMeshModifiers()) {
 			int slot = modifier.encode(stream);
 			if (slot != -1)
 				slotHash |= 1 << slot;
@@ -289,7 +308,7 @@ public class Appearance {
 	}
 
 	public void setBAS(int id) {
-		bas = id;
+		player.setBas(id);
 		generateAppearanceData();
 	}
 
@@ -317,8 +336,8 @@ public class Appearance {
 	}
 
 	public int getRenderEmote() {
-		if (bas >= 0)
-			return bas;
+		if (player.getBas() >= 0)
+			return player.getBas();
 		if (transformedNpcId >= 0)
 			return NPCDefinitions.getDefs(transformedNpcId).basId;
 		return player.getEquipment().getWeaponBAS();
@@ -568,8 +587,8 @@ public class Appearance {
 
 	public void printDebug() {
 		for (int i = 0;i < lookI.length;i++)
-			System.out.println("lookI["+i+"] = " + lookI[i] + ";");
+			Logger.debug(Appearance.class, "printDebug", "lookI["+i+"] = " + lookI[i] + ";");
 		for (int i = 0;i < colour.length;i++)
-			System.out.println("colour["+i+"] = " + colour[i] + ";");
+			Logger.debug(Appearance.class, "printDebug", "colour["+i+"] = " + colour[i] + ";");
 	}
 }

@@ -39,7 +39,9 @@ import com.rs.game.content.skills.dungeoneering.npcs.Stomp;
 import com.rs.game.content.skills.magic.Magic;
 import com.rs.game.content.skills.prayer.Prayer;
 import com.rs.game.content.skills.summoning.Familiar;
+import com.rs.game.content.world.npcs.max.Max;
 import com.rs.game.model.entity.Hit.HitLook;
+import com.rs.game.model.entity.actions.Action;
 import com.rs.game.model.entity.interactions.InteractionManager;
 import com.rs.game.model.entity.interactions.PlayerCombatInteraction;
 import com.rs.game.model.entity.npc.NPC;
@@ -114,6 +116,7 @@ public abstract class Entity {
 	private transient ActionManager actionManager;
 	private transient InteractionManager interactionManager;
 	private transient ClipType clipType = ClipType.NORMAL;
+	private transient long lockDelay; // used for doors and stuff like that
 
 	private transient BodyGlow nextBodyGlow;
 	private transient ConcurrentLinkedQueue<Hit> receivedHits;
@@ -121,11 +124,13 @@ public abstract class Entity {
 	private transient boolean finished;
 	private transient long tickCounter = 0;
 	// entity masks
+	private transient int bas = -1;
 	private transient Animation nextAnimation;
 	private transient SpotAnim nextSpotAnim1;
 	private transient SpotAnim nextSpotAnim2;
 	private transient SpotAnim nextSpotAnim3;
 	private transient SpotAnim nextSpotAnim4;
+	private transient ModelRotator bodyModelRotator;
 	private transient ArrayList<Hit> nextHits;
 	private transient ArrayList<HitBar> nextHitBars;
 	private transient ForceMovement nextForceMovement;
@@ -269,6 +274,7 @@ public abstract class Entity {
 		nextWalkDirection = nextRunDirection = null;
 		lastFaceEntity = -1;
 		nextFaceEntity = -2;
+		bas = -1;
 		if (!(this instanceof NPC))
 			faceAngle = 2;
 		poison.setEntity(this);
@@ -342,6 +348,8 @@ public abstract class Entity {
 	}
 
 	public void processReceivedHits() {
+		if (lockDelay > World.getServerTicks())
+			return;
 		if (this instanceof Player p)
 			if (p.getEmotesManager().isAnimating())
 				return;
@@ -423,6 +431,7 @@ public abstract class Entity {
 					hit.getSource().applyHit(new Hit(player, (int) (hit.getDamage() * 0.1), HitLook.REFLECTED_DAMAGE));
 			if (player.getPrayer().hasPrayersOn())
 				if ((hitpoints < player.getMaxHitpoints() * 0.1) && player.getPrayer().active(Prayer.REDEMPTION)) {
+					player.soundEffect(2681);
 					setNextSpotAnim(new SpotAnim(436));
 					setHitpoints((int) (hitpoints + player.getSkills().getLevelForXp(Constants.PRAYER) * 2.5));
 					player.getPrayer().setPoints(0);
@@ -608,6 +617,12 @@ public abstract class Entity {
 			World.updateEntityRegion(this);
 			if (needMapUpdate())
 				loadMapRegions();
+			if (player != null) {
+				if (World.getRegion(getRegionId(), true) instanceof DynamicRegion)
+					player.setLastNonDynamicTile(new WorldTile(lastWorldTile));
+				else
+					player.clearLastNonDynamicTile();
+			}
 			resetWalkSteps();
 			return;
 		}
@@ -731,6 +746,7 @@ public abstract class Entity {
 				return true;
 			}
 			switch(npc.getName()) {
+			case "Tool leprechaun":
 			case "Xuan":
 			case "Fremennik shipmaster":
 			case "Fishing spot":
@@ -739,6 +755,7 @@ public abstract class Entity {
 			case "Rocktail shoal":
 			case "Musician":
 			case "Ghostly piper":
+			case "Clan vexillum":
 				return true;
 			}
 		}
@@ -842,7 +859,7 @@ public abstract class Entity {
 	}
 
 	public boolean needMasksUpdate() {
-		return nextBodyGlow != null || nextFaceEntity != -2 || nextAnimation != null || nextSpotAnim1 != null || nextSpotAnim2 != null || nextSpotAnim3 != null || nextSpotAnim4 != null || (nextWalkDirection == null && nextFaceWorldTile != null) || !nextHits.isEmpty() || !nextHitBars.isEmpty() || nextForceMovement != null || nextForceTalk != null;
+		return nextBodyGlow != null || nextFaceEntity != -2 || nextAnimation != null || nextSpotAnim1 != null || nextSpotAnim2 != null || nextSpotAnim3 != null || nextSpotAnim4 != null || (nextWalkDirection == null && nextFaceWorldTile != null) || !nextHits.isEmpty() || !nextHitBars.isEmpty() || nextForceMovement != null || nextForceTalk != null || bodyModelRotator != null;
 	}
 
 	public boolean isDead() {
@@ -858,6 +875,8 @@ public abstract class Entity {
 		nextSpotAnim4 = null;
 		if (nextWalkDirection == null)
 			nextFaceWorldTile = null;
+		if (bodyModelRotator == ModelRotator.RESET)
+			bodyModelRotator = null;
 		nextForceMovement = null;
 		nextForceTalk = null;
 		nextFaceEntity = -2;
@@ -904,7 +923,7 @@ public abstract class Entity {
 		for (int regionX = fromRegionX; regionX <= toRegionX; regionX++)
 			for (int regionY = fromRegionY; regionY <= toRegionY; regionY++) {
 				int regionId = MapUtils.encode(Structure.REGION, regionX, regionY);
-				Region region = World.getRegion(regionId, this instanceof Player);
+				Region region = World.getRegion(regionId, this instanceof Player || this instanceof Max);
 				if (region instanceof DynamicRegion)
 					isAtDynamicRegion = true;
 				mapRegionIds.add(regionId);
@@ -1110,6 +1129,14 @@ public abstract class Entity {
 
 	public int getLastFaceEntity() {
 		return lastFaceEntity;
+	}
+	
+	public void unfreeze() {
+		removeEffect(Effect.FREEZE);
+	}
+	
+	public void freeze() {
+		freeze(Integer.MAX_VALUE, false);
 	}
 
 	public void freeze(int ticks) {
@@ -1333,19 +1360,6 @@ public abstract class Entity {
 
 	public int getSceneBaseChunkId() {
 		return sceneBaseChunkId;
-	}
-
-	public void playSound(int soundId, int type) {
-		for (int regionId : getMapRegionsIds()) {
-			Set<Integer> playerIndexes = World.getRegion(regionId).getPlayerIndexes();
-			if (playerIndexes != null)
-				for (int playerIndex : playerIndexes) {
-					Player player = World.getPlayers().get(playerIndex);
-					if (player == null || !player.isRunning() || !withinDistance(player.getTile()))
-						continue;
-					player.getPackets().sendSound(soundId, 0, type);
-				}
-		}
 	}
 
 	public long getFindTargetDelay() {
@@ -1717,5 +1731,81 @@ public abstract class Entity {
 			case Skills.RANGE -> npc.lowerRange(amt, maxDrain);
 			}
 		}
+	}
+	
+	public void repeatAction(int ticks, Function<Integer, Boolean> action) {
+		getActionManager().setAction(new Action() {
+			int count = 0;
+			@Override
+			public boolean start(Entity entity) {
+				return true;
+			}
+
+			@Override
+			public boolean process(Entity entity) {
+				return true;
+			}
+
+			@Override
+			public int processWithDelay(Entity entity) {
+				if (action.apply(++count))
+					return ticks;
+				return -1;
+			}
+
+			@Override
+			public void stop(Entity entity) {
+				
+			}
+		});
+	}
+
+	public ModelRotator getBodyModelRotator() {
+		return bodyModelRotator;
+	}
+
+	public void setBodyModelRotator(ModelRotator bodyModelRotator) {
+		if (bodyModelRotator == null) {
+			this.bodyModelRotator = ModelRotator.RESET;
+			return;
+		}
+		this.bodyModelRotator = bodyModelRotator;
+	}
+
+	public int getBas() {
+		return bas;
+	}
+
+	public void setBas(int basAnim) {
+		if (basAnim == -1) {
+			setBasNoReset(-2);
+			return;
+		}
+		setBasNoReset(basAnim);
+	}
+	
+	public void setBasNoReset(int bas) {
+		this.bas = bas;
+	}
+	
+	public boolean isLocked() {
+		return lockDelay >= World.getServerTicks();
+	}
+
+	/**
+	 * You are invincible & cannot use your character until unlocked.
+	 * All hits are processed after unlocking.
+	 * If you use resetRecievedHits you lose those hits.
+	 */
+	public void lock() {
+		lockDelay = Long.MAX_VALUE;
+	}
+
+	public void lock(int ticks) {
+		lockDelay = World.getServerTicks() + ticks;
+	}
+
+	public void unlock() {
+		lockDelay = 0;
 	}
 }

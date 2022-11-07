@@ -17,9 +17,7 @@ import com.rs.plugin.handlers.NPCClickHandler;
 @PluginEventHandler
 public class Musician {
 
-	static Object[] musiciansList = { 29, 30, 3463, 3509, 3611, 5442, 5439, 8698,8699, 8700, 8701, 8702, 8703, 8704, 8705, 8706, 8707, 8708, 8709, 8712, 8713, 8715, 8716, 8717, 8718, 8719, 8720, 8721, 8722, 8723, 14628, 14629, 14640 };
-
-	//	public static NPCClickHandler handleMusicians = new NPCClickHandler("29", "30", "3463", "3509", "3611", "5442", "8698","8699", "8700", "8701", "8702", "8703", "8704", "8705", "8706", "8707", "8708", "8712", "8713", "8715", "8716", "8717", "8718", "8719", "8720", "8721", "8722", "8723", "14628", "14629", "14640") {
+	private static Object[] MUSICIANS = { 29, 30, 3463, 3509, 3611, 5442, 5439, 8698,8699, 8700, 8701, 8702, 8703, 8704, 8705, 8706, 8707, 8708, 8709, 8712, 8713, 8715, 8716, 8717, 8718, 8719, 8720, 8721, 8722, 8723, 14628, 14629, 14640 };
 
 	static class MusicianD extends Conversation {
 		public MusicianD(Player player, int npcId) {
@@ -47,9 +45,7 @@ public class Musician {
 									.addNPC(npcId, HeadE.CALM_TALK, "Well, you may rest anywhere, simply choose the Rest option on the run buttons. When you are nice and relaxed, you will recharge your run energy more quickly and your life points twice as fast as you would do so normally.")
 									.addNPC(npcId, HeadE.CALM_TALK, "Of course, you can’t do anything else while you’re resting, other than talk.")
 									.addPlayer(HeadE.CALM_TALK, "Why not?")
-									.addNPC(npcId, HeadE.CALM_TALK, "Well, you wouldn’t be resting, now would you? Also, you should know that resting by a musician, has a similar effect but the benefits are greater.")
-									.addPlayer(HeadE.CALM_TALK, "")
-									.addNPC(npcId, HeadE.CALM_TALK, ""));
+									.addNPC(npcId, HeadE.CALM_TALK, "Well, you wouldn’t be resting, now would you? Also, you should know that resting by a musician, has a similar effect but the benefits are greater."));
 
 							option("What's special about resting by a musician?", new Dialogue()
 									.addNPC(npcId, HeadE.CALM_TALK, "The effects of resting are enhanced by music. Your run energy will recharge many times the normal rate, and your life points three times as fast. Simply sit down and rest as you would normally, nice and close to the musician. ")
@@ -78,7 +74,7 @@ public class Musician {
 		}
 	}
 
-	public static NPCClickHandler handleMusicians = new NPCClickHandler(musiciansList) {
+	public static NPCClickHandler handleMusicians = new NPCClickHandler(MUSICIANS) {
 		@Override
 		public void handle(NPCClickEvent e) {
 			Player p = e.getPlayer();
@@ -106,11 +102,14 @@ public class Musician {
 
 	public static boolean isNearby(Player p) {
 		List<NPC> nearbyNPCs = World.getNPCsInRegion(p.getRegionId());
-		for (NPC nearbyNPC : nearbyNPCs)
-			for (Object musicianId : musiciansList)
+		for (NPC nearbyNPC : nearbyNPCs) {
+			if (nearbyNPC == null)
+				continue;
+			for (Object musicianId : MUSICIANS)
 				if (nearbyNPC.getId() == (int)musicianId)
 					if (p.withinDistance(nearbyNPC.getMiddleWorldTile(), 2))
 						return true;
+		}
 		return false;
 	}
 }

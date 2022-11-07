@@ -3,9 +3,12 @@
     "Giant worm"
   ],
   "attackAnim": 16782,
+  "attackSound": -1,
   "defenceAnim": 16779,
+  "defendSound": -1,
   "deathAnim": 16778,
   "deathDelay": 6,
+  "deathSound": -1,
   "respawnDelay": 59,
   "hitpoints": 500,
   "maxHit": 210,
@@ -14,7 +17,7 @@
   "attackGfx": 3162,
   "attackProjectile": 3164,
   "agressivenessType": "PASSIVE",
-  "aggroDistance": 16,
+  "aggroDistance": 8,
   "deAggroDistance": -1,
   "maxDistFromSpawn": -1
 }

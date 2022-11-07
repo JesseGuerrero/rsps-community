@@ -2,10 +2,13 @@
   "names": [
     "Dagon'hai Monk"
   ],
-  "attackAnim": -1,
-  "defenceAnim": -1,
-  "deathAnim": -1,
+  "attackAnim": 422,
+  "attackSound": -1,
+  "defenceAnim": 383,
+  "defendSound": -1,
+  "deathAnim": 836,
   "deathDelay": 6,
+  "deathSound": -1,
   "respawnDelay": 59,
   "hitpoints": 880,
   "maxHit": 110,
@@ -14,7 +17,7 @@
   "attackGfx": -1,
   "attackProjectile": -1,
   "agressivenessType": "AGGRESSIVE",
-  "aggroDistance": 16,
+  "aggroDistance": 4,
   "deAggroDistance": -1,
   "maxDistFromSpawn": -1
 }

@@ -3,9 +3,12 @@
     "Ancient mage"
   ],
   "attackAnim": 1979,
+  "attackSound": -1,
   "defenceAnim": 6183,
+  "defendSound": -1,
   "deathAnim": 6182,
   "deathDelay": 4,
+  "deathSound": -1,
   "respawnDelay": 59,
   "hitpoints": 1200,
   "maxHit": 207,
@@ -21,7 +24,7 @@
   "attackGfx": -1,
   "attackProjectile": 380,
   "agressivenessType": "AGGRESSIVE",
-  "aggroDistance": 16,
+  "aggroDistance": 8,
   "deAggroDistance": -1,
   "maxDistFromSpawn": -1
 }

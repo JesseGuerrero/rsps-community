@@ -16,15 +16,12 @@
 //
 package com.rs.game.content.skills.runecrafting;
 
-import com.rs.Settings;
 import com.rs.cache.loaders.ItemDefinitions;
-import com.rs.game.content.dialogues_matrix.SimpleMessage;
 import com.rs.game.content.skills.magic.Rune;
 import com.rs.game.model.entity.player.Equipment;
 import com.rs.lib.Constants;
 import com.rs.lib.game.Animation;
 import com.rs.lib.game.SpotAnim;
-import com.rs.lib.util.Logger;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ItemOnObjectEvent;
 import com.rs.plugin.handlers.ItemOnObjectHandler;
@@ -102,26 +99,18 @@ public class RunecraftingCombinations {
 				for (int i = 0; i < cr.altars.length; i++)
 					if (e.getObject().getId() == cr.altars[i] && (e.getItem().getId() == cr.getTalismans()[i] || e.getItem().getId() == cr.getRunes()[i]))
 						if (e.getPlayer().getSkills().getLevel(Constants.RUNECRAFTING) >= cr.getLevel() && e.getPlayer().getInventory().getItems().getNumberOf(cr.getTalismans()[i]) > 0) {
-							if (Settings.getConfig().isDebug()) {
-								Logger.log("altar", cr.getAltars()[i]);
-								Logger.log("talisman", cr.getTalismans()[i]);
-								Logger.log("rune", cr.getRunes()[i]);
-								Logger.log("combinationRune", cr.getCombinationRune());
-								Logger.log("level", cr.getLevel());
-								Logger.log("xp", cr.getXP()[i]);
-							}
 							int maxCraftable = 0;
 							int pureEss = e.getPlayer().getInventory().getItems().getNumberOf(Runecrafting.PURE_ESS);
 							int inputRune = e.getPlayer().getInventory().getItems().getNumberOf(cr.getRunes()[i]);
 							double xp = cr.getXP()[i];
 
 							if (pureEss == 0) {
-								e.getPlayer().getDialogueManager().execute(new SimpleMessage(), "You don't have enough pure essence.");
+								e.getPlayer().simpleDialogue("You don't have enough pure essence.");
 								return;
 							}
 
 							if (inputRune == 0) {
-								e.getPlayer().getDialogueManager().execute(new SimpleMessage(), "You don't have enough " + ItemDefinitions.getDefs(cr.getRunes()[i]).getName() + "s.");
+								e.getPlayer().simpleDialogue("You don't have enough " + ItemDefinitions.getDefs(cr.getRunes()[i]).getName() + "s.");
 								return;
 							}
 

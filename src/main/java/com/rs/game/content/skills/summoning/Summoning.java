@@ -18,13 +18,12 @@ package com.rs.game.content.skills.summoning;
 
 import java.util.Arrays;
 
-import com.rs.Settings;
 import com.rs.cache.loaders.EnumDefinitions;
 import com.rs.cache.loaders.ItemDefinitions;
 import com.rs.cache.loaders.NPCDefinitions;
 import com.rs.cache.loaders.interfaces.IFEvents;
 import com.rs.game.content.ItemConstants;
-import com.rs.game.content.controllers.DungeonController;
+import com.rs.game.content.skills.dungeoneering.DungeonController;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.Constants;
 import com.rs.lib.game.Item;
@@ -32,9 +31,15 @@ import com.rs.lib.game.WorldTile;
 import com.rs.lib.net.ClientPacket;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ButtonClickEvent;
+import com.rs.plugin.events.IFOnNPCEvent;
+import com.rs.plugin.events.IFOnPlayerEvent;
 import com.rs.plugin.events.ItemClickEvent;
+import com.rs.plugin.events.ItemOnItemEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
+import com.rs.plugin.handlers.InterfaceOnNPCHandler;
+import com.rs.plugin.handlers.InterfaceOnPlayerHandler;
 import com.rs.plugin.handlers.ItemClickHandler;
+import com.rs.plugin.handlers.ItemOnItemHandler;
 
 @PluginEventHandler
 public class Summoning {
@@ -55,6 +60,24 @@ public class Summoning {
 	public static boolean isFollower(int npcId) {
 		return EnumDefinitions.getEnum(1279).getValues().containsKey((long) npcId);
 	}
+	
+	public static ItemOnItemHandler handleCarveTurnip = new ItemOnItemHandler(946, 12134) {
+		@Override
+		public void handle(ItemOnItemEvent e) {
+			e.getPlayer().repeatAction(2, count -> {
+				if (!e.getPlayer().getInventory().containsItem(946, 1)) {
+					e.getPlayer().sendMessage("You need a knife to cut the turnip.");
+					return false;
+				}
+				if (!e.getPlayer().getInventory().containsItem(12134))
+					return false;
+				e.getPlayer().getInventory().deleteItem(12134, 1);
+				e.getPlayer().getInventory().addItem(12153, 1);
+				e.getPlayer().anim(6702);
+				return true;
+			});
+		}
+	};
 
 	public static ItemClickHandler handleSummonOps = new ItemClickHandler(Arrays.stream(Pouch.values()).map(p -> p.getId()).toArray(), new String[] { "Summon" }) {
 		@Override
@@ -66,6 +89,32 @@ public class Summoning {
 				else
 					e.getPlayer().sendMessage("You need a summoning level of " + pouches.getLevel() + " to summon this familiar.");
 			}
+		}
+	};
+	
+	public static InterfaceOnPlayerHandler scrollOnPlayer = new InterfaceOnPlayerHandler(false, new int[] { 662, 747 }) {
+		@Override
+		public void handle(IFOnPlayerEvent e) {
+			if (e.getPlayer().getFamiliar() == null)
+				return;
+			e.getPlayer().stopAll(false, true, false);
+			if ((e.getInterfaceId() == 747 && e.getComponentId() == 15) || (e.getInterfaceId() == 662 && e.getComponentId() == 65) || e.getInterfaceId() == 747 && e.getComponentId() == 24)
+				e.getPlayer().getFamiliar().commandAttack(e.getTarget());
+			if ((e.getInterfaceId() == 662 && e.getComponentId() == 74) || (e.getInterfaceId() == 747 && e.getComponentId() == 18))
+				e.getPlayer().getFamiliar().executeSpecial(e.getTarget());
+		}
+	};
+	
+	public static InterfaceOnNPCHandler scrollOnNPC = new InterfaceOnNPCHandler(false, new int[] { 662, 747 }) {
+		@Override
+		public void handle(IFOnNPCEvent e) {
+			if (e.getPlayer().getFamiliar() == null)
+				return;
+			e.getPlayer().stopAll(false, true, false);
+			if ((e.getInterfaceId() == 747 && e.getComponentId() == 15) || (e.getInterfaceId() == 662 && e.getComponentId() == 65) || e.getInterfaceId() == 747 && e.getComponentId() == 24)
+				e.getPlayer().getFamiliar().commandAttack(e.getTarget());
+			if ((e.getInterfaceId() == 662 && e.getComponentId() == 74) || (e.getInterfaceId() == 747 && e.getComponentId() == 18))
+				e.getPlayer().getFamiliar().executeSpecial(e.getTarget());
 		}
 	};
 	
@@ -138,7 +187,10 @@ public class Summoning {
 			if (e.getComponentId() == 16) {
 				Pouch pouch = Pouch.forId(e.getSlotId2());
 				if (pouch == null) {
-					e.getPlayer().sendMessage("You need " + getMaterialListString(Pouch.forId(getPouchID(e.getSlotId()))) + " to create this pouch.");
+					if(e.getPlayer().getControllerManager().isIn(DungeonController.class))
+						e.getPlayer().sendMessage("You need " + getMaterialListString(Pouch.forId(getPouchID(e.getSlotId()))) + " to create this pouch.");
+					if(!e.getPlayer().getControllerManager().isIn(DungeonController.class))
+						;//e.getPlayer().sendMessage("You need " + getMaterialListString(Pouch.forId(getPouchID(e.getSlotId()))) + " to create this pouch.");
 					return;
 				}
 				if (e.getPacket() == ClientPacket.IF_OP1)

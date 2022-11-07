@@ -3,9 +3,12 @@
     "Wise skinweaver"
   ],
   "attackAnim": 13678,
+  "attackSound": -1,
   "defenceAnim": 13674,
+  "defendSound": -1,
   "deathAnim": 13675,
   "deathDelay": 6,
+  "deathSound": -1,
   "respawnDelay": 59,
   "hitpoints": 875,
   "maxHit": 168,
@@ -21,7 +24,7 @@
   "attackGfx": -1,
   "attackProjectile": -1,
   "agressivenessType": "PASSIVE",
-  "aggroDistance": 16,
+  "aggroDistance": 4,
   "deAggroDistance": -1,
   "maxDistFromSpawn": -1
 }

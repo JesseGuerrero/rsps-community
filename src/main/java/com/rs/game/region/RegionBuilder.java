@@ -18,6 +18,7 @@ package com.rs.game.region;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.lang.SuppressWarnings;
 
 import com.rs.cores.CoresManager;
 import com.rs.game.World;
@@ -290,7 +291,7 @@ public final class RegionBuilder {
 				if (callback != null)
 					callback.run();
 			} catch (Throwable e) {
-				Logger.handle(e);
+				Logger.handle(RegionBuilder.class, "findEmptyChunkBound", e);
 			}
 		});
 	}
@@ -341,7 +342,7 @@ public final class RegionBuilder {
 				if (callback != null)
 					callback.run();
 			} catch (Throwable e) {
-				Logger.handle(e);
+				Logger.handle(RegionBuilder.class, "destroyMap", e);
 			}
 		}, 8);
 	}
@@ -372,7 +373,7 @@ public final class RegionBuilder {
 				if (callback != null)
 					callback.run();
 			} catch (Throwable e) {
-				Logger.handle(e);
+				Logger.handle(RegionBuilder.class, "copyChunk", e);
 			}
 		});
 	}
@@ -395,7 +396,7 @@ public final class RegionBuilder {
 				if (callback != null)
 					callback.run();
 			} catch (Throwable e) {
-				Logger.handle(e);
+				Logger.handle(RegionBuilder.class, "copy2x2ChunkSquare", e);
 			}
 		});
 	}
@@ -433,7 +434,7 @@ public final class RegionBuilder {
 				if (callback != null)
 					callback.run();
 			} catch (Throwable e) {
-				Logger.handle(e);
+				Logger.handle(RegionBuilder.class, "clearChunk", e);
 			}
 		});
 	}
@@ -468,7 +469,7 @@ public final class RegionBuilder {
 				if (callback != null)
 					callback.run();
 			} catch (Throwable e) {
-				Logger.handle(e);
+				Logger.handle(RegionBuilder.class, "clearMap", e);
 			}
 		});
 	}
@@ -484,7 +485,7 @@ public final class RegionBuilder {
 				if (callback != null)
 					callback.run();
 			} catch (Throwable e) {
-				Logger.handle(e);
+				Logger.handle(RegionBuilder.class, "copyMap", e);
 			}
 		});
 	}
@@ -515,7 +516,7 @@ public final class RegionBuilder {
 				if (callback != null)
 					callback.run();
 			} catch (Throwable e) {
-				Logger.handle(e);
+				Logger.handle(RegionBuilder.class, "copyMap", e);
 			}
 		});
 	}

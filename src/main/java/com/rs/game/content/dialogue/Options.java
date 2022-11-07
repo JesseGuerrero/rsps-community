@@ -51,7 +51,7 @@ public abstract class Options {
 	}
 
 	public void option(String name) {
-		option(name, () -> {});
+		options.put(name, new Option(null));
 	}
 	
 	public void add(String name, Dialogue dialogue) {
@@ -66,8 +66,14 @@ public abstract class Options {
 		options.put(name, new Option(constraint, dialogue.getHead()));
 	}
 
-	public void add(String name) {
-		option(name, () -> {});
+	public Dialogue add(String name) {
+		Dialogue dial = new Dialogue();
+		options.put(name, new Option(dial));
+		return dial;
+	}
+	
+	public void empty(String name) {
+		options.put(name, new Option(null));
 	}
 
 	public Map<String, Option> getOptions() {

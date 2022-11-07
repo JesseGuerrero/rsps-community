@@ -24,9 +24,6 @@ import java.util.Set;
 import com.rs.cache.loaders.EnumDefinitions;
 import com.rs.cache.loaders.ItemDefinitions;
 import com.rs.game.World;
-import com.rs.game.content.controllers.DamonheimController;
-import com.rs.game.content.controllers.DungeonController;
-import com.rs.game.content.dialogues_matrix.SimpleMessage;
 import com.rs.game.content.skills.dungeoneering.dialogues.DungeonDifficulty;
 import com.rs.game.content.skills.dungeoneering.dialogues.DungeonLeaveParty;
 import com.rs.game.content.skills.dungeoneering.dialogues.DungeonPartyStart;
@@ -131,7 +128,7 @@ public class DungManager {
 			if (dung == null)
 				return;
 			if (e.getPlayer().getSkills().getLevelForXp(Constants.DUNGEONEERING) < dung.level) {
-				e.getPlayer().getDialogueManager().execute(new SimpleMessage(), "You need a dungeoneering level of " + dung.level + " to enter this resource dungeon.");
+				e.getPlayer().simpleDialogue("You need a dungeoneering level of " + dung.level + " to enter this resource dungeon.");
 				return;
 			}
 			if (dung == ResourceDungeon.POLYPORE_DUNGEON)
@@ -878,7 +875,7 @@ public class DungManager {
 
 	public void openResetProgress() {
 		player.stopAll();
-		player.getDialogueManager().execute(new PrestigeReset());
+		player.startConversation(new PrestigeReset(player));
 	}
 
 	public void switchGuideMode() {
@@ -1116,7 +1113,7 @@ public class DungManager {
 		player.stopAll();
 		expireInvitation();
 		if (party == null) {
-			player.getDialogueManager().execute(new DungeonPartyStart());
+			player.startConversation(new DungeonPartyStart(player));
 			return;
 		}
 		if (party.getDungeon() != null) // cant happen
@@ -1135,14 +1132,14 @@ public class DungManager {
 		}
 		if (party.getDificulty() == 0) {
 			if (party.getTeam().size() != 1) {
-				player.getDialogueManager().execute(new DungeonDifficulty(), party.getTeam().size());
+				player.startConversation(new DungeonDifficulty(player, party.getTeam().size()));
 				return;
 			}
 			party.setDificulty(1);
 		}
 		if (selectSize) {
 			if (party.getComplexity() == 6) {
-				player.getDialogueManager().execute(new DungeonSize());
+				player.startConversation(new DungeonSize(player));
 				return;
 			}
 			party.setSize(DungeonConstants.SMALL_DUNGEON);
@@ -1282,7 +1279,7 @@ public class DungManager {
 		if (party == null)
 			return;
 		if (party.getDungeon() != null)
-			player.getDialogueManager().execute(new DungeonLeaveParty());
+			player.startConversation(new DungeonLeaveParty(player));
 		else
 			leaveParty();
 	}

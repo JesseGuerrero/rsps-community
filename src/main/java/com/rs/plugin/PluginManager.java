@@ -19,6 +19,7 @@ package com.rs.plugin;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.SuppressWarnings;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -29,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.rs.db.WorldDB;
 import com.rs.game.content.skills.smithing.ArtisansWorkshop;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.util.Logger;
@@ -56,12 +56,12 @@ public class PluginManager {
 	public static void loadPlugins() {
 		try {
 			long start = System.currentTimeMillis();
-			Logger.log("PluginManager", "Loading plugins...");
+			Logger.info(PluginManager.class, "loadPlugins", "Loading plugins...");
 			List<Class<?>> eventTypes = Utils.getClasses("com.rs.plugin.events");
 			List<Class<?>> classes = Utils.getClassesWithAnnotation("com.rs", PluginEventHandler.class);
 			Set<Method> visitedMethods = new HashSet<>();
 			Set<Field> visitedFields = new HashSet<>();
-			Logger.log("PluginManager", "Loading " + eventTypes.size() + " event types and " + classes.size() + " plugin enabled classes.");
+			Logger.info(PluginManager.class, "loadPlugins", "Loading " + eventTypes.size() + " event types and " + classes.size() + " plugin enabled classes.");
 			int handlers = 0;
 			for (Class<?> clazz : classes) {
 				for (Method method : clazz.getMethods()) {
@@ -99,7 +99,7 @@ public class PluginManager {
 					handlers += processField(field, eventTypes);
 				}
 			}
-			Logger.log("PluginManager", "Loaded " + handlers + " plugin event handlers in " + (System.currentTimeMillis()-start) + "ms.");
+			Logger.info(PluginManager.class, "loadPlugins", "Loaded " + handlers + " plugin event handlers in " + (System.currentTimeMillis()-start) + "ms.");
 		} catch (ClassNotFoundException | IOException | IllegalArgumentException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
@@ -158,6 +158,7 @@ public class PluginManager {
 	}
 
 	public static void executeStartupHooks() {
+		STARTUP_HOOKS.sort((m1, m2) -> m1.getAnnotationsByType(ServerStartupEvent.class)[0].value().ordinal() - m2.getAnnotationsByType(ServerStartupEvent.class)[0].value().ordinal());
 		for (Method m : STARTUP_HOOKS) {
 			long start = System.currentTimeMillis();
 			try {
@@ -168,7 +169,7 @@ public class PluginManager {
 			}
 			long time = System.currentTimeMillis() - start;
 			if (time > 100L)
-				Logger.log(m.getDeclaringClass().getSimpleName(), "Executed " + m.getName() + " in " + time + "ms...");
+				Logger.info(m.getDeclaringClass(), m.getName(), m.getDeclaringClass().getSimpleName() + ": Executed " + m.getName() + " in " + time + "ms...");
 		}
 	}
 
@@ -204,7 +205,7 @@ public class PluginManager {
 		try {
 			return (boolean) method.invoke(null, event);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			WorldDB.getLogs().logError(e);
+			Logger.handle(method.getDeclaringClass(), method.getName(), e);
 		}
 		return false;
 	}

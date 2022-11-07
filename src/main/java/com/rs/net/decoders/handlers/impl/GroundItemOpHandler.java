@@ -19,13 +19,13 @@ package com.rs.net.decoders.handlers.impl;
 import com.rs.cache.loaders.ItemDefinitions;
 import com.rs.game.World;
 import com.rs.game.content.Effect;
+import com.rs.game.content.minigames.treasuretrails.TreasureTrailsManager;
 import com.rs.game.content.skills.firemaking.Firemaking;
 import com.rs.game.content.skills.firemaking.Firemaking.Fire;
 import com.rs.game.content.skills.hunter.BoxAction;
 import com.rs.game.content.skills.hunter.BoxTrapType;
 import com.rs.game.model.entity.pathing.RouteEvent;
 import com.rs.game.model.entity.player.Player;
-import com.rs.game.model.entity.player.managers.TreasureTrailsManager;
 import com.rs.lib.game.Animation;
 import com.rs.lib.game.GroundItem;
 import com.rs.lib.game.WorldTile;
@@ -35,7 +35,7 @@ import com.rs.lib.net.packets.decoders.GroundItemOp;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.PluginManager;
 import com.rs.plugin.events.PickupItemEvent;
-import com.rs.utils.ItemExamines;
+import com.rs.utils.ItemConfig;
 
 public class GroundItemOpHandler implements PacketHandler<Player, GroundItemOp> {
 
@@ -57,7 +57,7 @@ public class GroundItemOpHandler implements PacketHandler<Player, GroundItemOp> 
 			ItemDefinitions def = ItemDefinitions.getDefs(item.getId());
 			if (item.getMetaData("combatCharges") != null)
 				player.sendMessage("<col=FF0000>It looks like it will last another " + Utils.ticksToTime(item.getMetaDataI("combatCharges")));
-			player.getPackets().sendGroundItemMessage(player, item, ItemExamines.getExamine(item) + " General store: " + Utils.formatTypicalInteger(def.getSellPrice()) + " High Alchemy: " + Utils.formatTypicalInteger(def.getHighAlchPrice()));
+			player.getPackets().sendGroundItemMessage(item, ItemConfig.get(item.getId()).getExamine(item) + " General store: " + Utils.formatTypicalInteger(def.getSellPrice()) + " High Alchemy: " + Utils.formatTypicalInteger(def.getHighAlchPrice()));
 			return;
 		}
 		player.stopAll();

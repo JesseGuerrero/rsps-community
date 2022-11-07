@@ -3,9 +3,12 @@
     "Fungal mage"
   ],
   "attackAnim": 15507,
+  "attackSound": -1,
   "defenceAnim": 15508,
+  "defendSound": -1,
   "deathAnim": 15511,
   "deathDelay": 4,
+  "deathSound": -1,
   "respawnDelay": 59,
   "hitpoints": 1200,
   "maxHit": 114,
@@ -14,7 +17,7 @@
   "attackGfx": 2036,
   "attackProjectile": 2035,
   "agressivenessType": "PASSIVE",
-  "aggroDistance": 16,
+  "aggroDistance": 8,
   "deAggroDistance": -1,
   "maxDistFromSpawn": -1
 }

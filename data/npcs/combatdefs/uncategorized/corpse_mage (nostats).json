@@ -3,9 +3,12 @@
     "Corpse mage"
   ],
   "attackAnim": 12841,
+  "attackSound": -1,
   "defenceAnim": 12868,
+  "defendSound": -1,
   "deathAnim": 12869,
   "deathDelay": 6,
+  "deathSound": -1,
   "respawnDelay": 59,
   "hitpoints": 99,
   "maxHit": 1,
@@ -14,7 +17,7 @@
   "attackGfx": -1,
   "attackProjectile": -1,
   "agressivenessType": "AGGRESSIVE",
-  "aggroDistance": 16,
+  "aggroDistance": 8,
   "deAggroDistance": -1,
   "maxDistFromSpawn": -1
 }

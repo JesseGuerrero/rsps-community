@@ -30,6 +30,7 @@ import com.rs.game.content.world.doors.Doors;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.object.GameObject;
+import com.rs.game.tasks.WorldTasks;
 import com.rs.lib.game.Animation;
 import com.rs.lib.game.WorldTile;
 import com.rs.lib.util.GenericAttribMap;
@@ -37,11 +38,13 @@ import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ItemClickEvent;
 import com.rs.plugin.events.ItemOnItemEvent;
+import com.rs.plugin.events.ItemOnPlayerEvent;
 import com.rs.plugin.events.NPCClickEvent;
 import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.events.PickupItemEvent;
 import com.rs.plugin.handlers.ItemClickHandler;
 import com.rs.plugin.handlers.ItemOnItemHandler;
+import com.rs.plugin.handlers.ItemOnPlayerHandler;
 import com.rs.plugin.handlers.NPCClickHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
 import com.rs.plugin.handlers.PickupItemHandler;
@@ -429,28 +432,21 @@ public class ShieldOfArrav extends QuestOutline {
                 p.getPackets().sendGameMessage("You find nothing of interest to you.");
             }
         }
-    };
+	};
 
-    public static ItemClickHandler handleClickOnArravBook = new ItemClickHandler(BOOK) {
-        @Override
-        public void handle(ItemClickEvent e) {
-            if (e.getOption().equalsIgnoreCase("read"))
-                BookShieldOfArrav.openBook(e.getPlayer());
-            if (e.getOption().equalsIgnoreCase("drop")) {
-                e.getPlayer().getInventory().deleteItem(e.getSlotId(), e.getItem());
-                World.addGroundItem(e.getItem(), new WorldTile(e.getPlayer().getTile()), e.getPlayer());
-                e.getPlayer().getPackets().sendSound(2739, 0, 1);
-            }
-        }
-    };
+	public static ItemClickHandler handleClickOnArravBook = new ItemClickHandler(new Object[] { BOOK }, new String[] { "Read" }) {
+		@Override
+		public void handle(ItemClickEvent e) {
+			BookShieldOfArrav.openBook(e.getPlayer());
+		}
+	};
 
-    public static ItemClickHandler handleClickOnIntelReport = new ItemClickHandler(761) {
-        @Override
-        public void handle(ItemClickEvent e) {
-            if (e.getOption().equalsIgnoreCase("read"))
-                e.getPlayer().sendMessage("It seems to have intel on the Phoenix gang");
-        }
-    };
+	public static ItemClickHandler handleClickOnIntelReport = new ItemClickHandler(new Object[] { 761 }, new String[] { "Read" }) {
+		@Override
+		public void handle(ItemClickEvent e) {
+			e.getPlayer().sendMessage("It seems to have intel on the Phoenix gang");
+		}
+	};
 
     public static ObjectClickHandler handlePhoenixGangDoor = new ObjectClickHandler(new Object[]{2397}) {
         @Override
@@ -632,6 +628,29 @@ public class ShieldOfArrav extends QuestOutline {
             });
         }
     };
+    
+    public static ItemOnPlayerHandler giveCerts = new ItemOnPlayerHandler(WEAPONS_KEY, CERTIFICATE_LEFT, CERTIFICATE_RIGHT) {
+		@Override
+		public void handle(ItemOnPlayerEvent e) {
+			if (e.getItem().getAmount() >= 1) {
+				if (e.getTarget().getInventory().getFreeSlots() >= 1) {
+					e.getPlayer().lock();
+					e.getPlayer().getInventory().deleteItem(e.getItem().getId(), 1);
+					WorldTasks.delay(0, () -> {
+						e.getPlayer().setNextAnimation(new Animation(881));
+						e.getTarget().getInventory().addItem(e.getItem().getId(), 1);
+						if (e.getTarget().isIronMan())
+							e.getPlayer().sendMessage("They stand alone, but not this once!");
+						e.getPlayer().unlock();
+					});
+				} else {
+					e.getTarget().sendMessage("You need to make space in your inventory");
+					e.getPlayer().sendMessage(e.getTarget().getUsername() + " does not have enough space.");
+				}
+			} else
+				e.getPlayer().sendMessage("You need at least 1 of this item to give!");
+		}
+    };
 
     /**
      * When the player logs in, the Shield Of Arrav display case is updated based on quest completion.
@@ -641,7 +660,7 @@ public class ShieldOfArrav extends QuestOutline {
 //    public static LoginHandler onLogin = new LoginHandler() {
 //        @Override
 //        public void handle(LoginEvent e) {
-//            if (e.getPlayer().getQuestManager().isComplete(Quest.SHIELD_OF_ARRAV))
+//            if (e.getPlayer().isQuestComplete(Quest.SHIELD_OF_ARRAV))
 //				e.getPlayer().getVars().setVarBit(5394, 1);
 //            else
 //                e.getPlayer().getVars().setVarBit(5394, 0);

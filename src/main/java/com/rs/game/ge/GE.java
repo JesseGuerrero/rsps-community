@@ -32,6 +32,7 @@ import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.Item;
 import com.rs.lib.net.ClientPacket;
 import com.rs.lib.net.ServerPacket;
+import com.rs.lib.util.Logger;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ButtonClickEvent;
@@ -39,7 +40,7 @@ import com.rs.plugin.events.NPCClickEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
 import com.rs.plugin.handlers.NPCClickHandler;
 import com.rs.plugin.handlers.NPCInteractionDistanceHandler;
-import com.rs.utils.ItemExamines;
+import com.rs.utils.ItemConfig;
 
 @PluginEventHandler
 public class GE {
@@ -122,9 +123,9 @@ public class GE {
 		case 186 -> confirmOffer(e.getPlayer());
 
 		//Search item
-		case 190 -> e.getPlayer().getPackets().openGESearch(e.getPlayer());
+		case 190 -> e.getPlayer().getPackets().openGESearch();
 
-		default -> System.out.println("Unhandled GE button: " + e.getComponentId() + ", " + e.getSlotId());
+		default -> Logger.debug(GE.class, "mainInterface", "Unhandled GE button: " + e.getComponentId() + ", " + e.getSlotId());
 		}
 		}
 	};
@@ -165,7 +166,7 @@ public class GE {
 			case 32 -> collectItems(e.getPlayer(), 3, e.getSlotId() / 2, e.getPacket() == ClientPacket.IF_OP1);
 			case 37 -> collectItems(e.getPlayer(), 4, e.getSlotId() / 2, e.getPacket() == ClientPacket.IF_OP1);
 			case 42 -> collectItems(e.getPlayer(), 5, e.getSlotId() / 2, e.getPacket() == ClientPacket.IF_OP1);
-			default -> System.out.println("Unhandled collection box button: " + e.getComponentId() + ", " + e.getSlotId());
+			default -> Logger.debug(GE.class, "collBox", "Unhandled collection box button: " + e.getComponentId() + ", " + e.getSlotId());
 			}
 		}
 	};
@@ -233,7 +234,7 @@ public class GE {
 			return;
 		}
 		player.getVars().setVar(VAR_CURR_BOX, box);
-		player.getPackets().setIFText(OFFER_SELECTION, 143, ItemExamines.getExamine(new Item(offer.getItemId())));
+		player.getPackets().setIFText(OFFER_SELECTION, 143, ItemConfig.get(offer.getItemId()).getExamine(new Item(offer.getItemId())));
 		player.getPackets().setIFEvents(new IFEvents(OFFER_SELECTION, 206, -1, 0).enableRightClickOptions(0,1));
 		player.getPackets().setIFEvents(new IFEvents(OFFER_SELECTION, 208, -1, 0).enableRightClickOptions(0,1));
 	}
@@ -254,7 +255,7 @@ public class GE {
 	public static void openBuy(Player player, int box) {
 		player.getVars().setVar(VAR_CURR_BOX, box);
 		player.getVars().setVar(VAR_IS_SELLING, 0);
-		player.getPackets().openGESearch(player);
+		player.getPackets().openGESearch();
 	}
 
 	public static void openSell(Player player, int box) {
@@ -277,9 +278,9 @@ public class GE {
 		player.getVars().setVar(VAR_ITEM_AMOUNT, amount);
 		player.getVars().setVar(VAR_FOR_PRICE_TEXT, ItemDefinitions.getDefs(itemId).getHighAlchPrice());
 		player.getVars().setVar(VAR_MEDIAN_PRICE, ItemDefinitions.getDefs(itemId).getHighAlchPrice());
-		player.getPackets().setIFText(OFFER_SELECTION, 143, ItemExamines.getExamine(new Item(itemId)));
+		player.getPackets().setIFText(OFFER_SELECTION, 143, ItemConfig.get(itemId).getExamine(new Item(itemId)));
 		WorldDB.getGE().getBestOffer(itemId, player.getVars().getVar(VAR_IS_SELLING) == 1, offer -> {
-			player.getPackets().setIFText(OFFER_SELECTION, 143, ItemExamines.getExamine(new Item(itemId)) + "<br>" + "Best offer: " + (offer == null ? "None" : Utils.formatNumber(offer.getPrice())));
+			player.getPackets().setIFText(OFFER_SELECTION, 143, ItemConfig.get(itemId).getExamine(new Item(itemId)) + "<br>" + "Best offer: " + (offer == null ? "None" : Utils.formatNumber(offer.getPrice())));
 		});
 	}
 
@@ -350,8 +351,10 @@ public class GE {
 
 	private static boolean deleteItems(Player player, Offer offer) {
 		if (!offer.isSelling()) {
-			if (player.getInventory().removeItems(new Item(995, offer.getPrice() * offer.getAmount())))
+			if (player.getInventory().containsItem(new Item(995, offer.getPrice() * offer.getAmount()))) {
+				player.getInventory().deleteItem(new Item(995, offer.getPrice() * offer.getAmount()));
 				return true;
+			}
 			return false;
 		}
 
@@ -402,11 +405,11 @@ public class GE {
 				if (diff)
 					if (player.getTempAttribs().getL("GENotificationTime") == 0) {
 						player.getTempAttribs().setL("GENotificationTime", System.currentTimeMillis());
-						player.getPackets().sendSound(4042, 0, 1);
+						player.soundEffect(4042);
 						player.sendMessage("One or more of your grand exchange offers has been updated.");
 					} else if ((System.currentTimeMillis() - player.getTempAttribs().getL("GENotificationTime")) > 1000*60*1) { //1 minute
 						player.getTempAttribs().setL("GENotificationTime", System.currentTimeMillis());
-						player.getPackets().sendSound(4042, 0, 1);
+						player.soundEffect(4042);
 						player.sendMessage("One or more of your grand exchange offers has been updated.");
 					}
 			});

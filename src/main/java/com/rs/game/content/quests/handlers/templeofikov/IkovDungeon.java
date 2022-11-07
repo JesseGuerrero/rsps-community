@@ -22,11 +22,13 @@ import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ItemOnObjectEvent;
 import com.rs.plugin.events.NPCClickEvent;
+import com.rs.plugin.events.NPCDeathEvent;
 import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.events.PickupItemEvent;
 import com.rs.plugin.events.PlayerStepEvent;
 import com.rs.plugin.handlers.ItemOnObjectHandler;
 import com.rs.plugin.handlers.NPCClickHandler;
+import com.rs.plugin.handlers.NPCDeathHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
 import com.rs.plugin.handlers.PickupItemHandler;
 import com.rs.plugin.handlers.PlayerStepHandler;
@@ -34,6 +36,15 @@ import com.rs.utils.Ticks;
 
 @PluginEventHandler
 public class IkovDungeon {
+	
+	public static NPCDeathHandler handlePendant = new NPCDeathHandler(274, 275) {
+		@Override
+		public void handle(NPCDeathEvent e) {
+			if (e.getKiller() instanceof Player p && p.getQuestManager().isComplete(Quest.TEMPLE_OF_IKOV))
+				e.getNPC().sendDrop(p, new Item(87));
+		}
+	};
+	
 	public static ObjectClickHandler handleIkovEmergencyExitLadder = new ObjectClickHandler(new Object[] { 32015 },
 			new WorldTile(2637, 9808, 0)) {
 		@Override
@@ -206,7 +217,7 @@ public class IkovDungeon {
 	public static ObjectClickHandler handleSouthIceGate = new ObjectClickHandler(new Object[]{ 89, 90 }) {
 		@Override
 		public void handle(ObjectClickEvent e) {
-			if(e.getPlayer().getQuestManager().isComplete(Quest.TEMPLE_OF_IKOV) || e.getPlayer().getQuestManager().getAttribs(Quest.TEMPLE_OF_IKOV).getB("LeverIcePulled")) {
+			if(e.getPlayer().isQuestComplete(Quest.TEMPLE_OF_IKOV) || e.getPlayer().getQuestManager().getAttribs(Quest.TEMPLE_OF_IKOV).getB("LeverIcePulled")) {
 				handleDoubleDoor(e.getPlayer(), e.getObject());
 				return;
 			}

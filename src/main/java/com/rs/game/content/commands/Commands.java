@@ -20,16 +20,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.lang.SuppressWarnings;
 
 import com.rs.Settings;
 import com.rs.cache.loaders.NPCDefinitions;
 import com.rs.cache.loaders.ObjectType;
 import com.rs.db.WorldDB;
 import com.rs.game.World;
+import com.rs.game.content.pet.Pet;
 import com.rs.game.content.skills.summoning.Familiar;
 import com.rs.game.model.entity.BodyGlow;
 import com.rs.game.model.entity.npc.NPC;
-import com.rs.game.model.entity.npc.pet.Pet;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.object.GameObject;
 import com.rs.lib.game.GroundItem;
@@ -37,8 +38,8 @@ import com.rs.lib.game.GroundItem.GroundItemType;
 import com.rs.lib.game.Item;
 import com.rs.lib.game.Rights;
 import com.rs.lib.game.WorldTile;
+import com.rs.lib.util.Logger;
 import com.rs.lib.util.Utils;
-
 
 public final class Commands {
 
@@ -121,7 +122,7 @@ public final class Commands {
 				return true;
 			p.getPackets().sendDevConsoleMessage(Integer.valueOf(args[1]) + ": " + defs.getCompatibleAnimations().toString());
 			p.sendMessage(Integer.valueOf(args[1]) + ": " + defs.getCompatibleAnimations().toString());
-			System.out.println(defs.getCompatibleAnimations().toString());
+			Logger.debug(Commands.class, "REFACTOR.compAnim", defs.getCompatibleAnimations().toString());
 			return true;
 
 		case "trenttitle":
@@ -259,46 +260,6 @@ public final class Commands {
 					if (Utils.getDistance(npc.getTile(), p.getTile()) < 9)
 						npc.sendDeath(p);
 				}
-			return true;
-
-		case "voice":
-			p.getPackets().sendVoice(Integer.valueOf(args[1]));
-			return true;
-
-		case "sound":
-			if (args.length < 2) {
-				p.getPackets().sendDevConsoleMessage("Use: ::sound soundid effecttype");
-				return true;
-			}
-			try {
-				p.getPackets().sendSound(Integer.valueOf(args[1]), 0, args.length > 2 ? Integer.valueOf(args[2]) : 1);
-			} catch (NumberFormatException e) {
-				p.getPackets().sendDevConsoleMessage("Use: ::sound soundid");
-			}
-			return true;
-
-		case "music":
-			if (args.length < 2) {
-				p.getPackets().sendDevConsoleMessage("Use: ::sound soundid effecttype");
-				return true;
-			}
-			try {
-				p.getPackets().sendMusic(Integer.valueOf(args[1]));
-			} catch (NumberFormatException e) {
-				p.getPackets().sendDevConsoleMessage("Use: ::sound soundid");
-			}
-			return true;
-
-		case "emusic":
-			if (args.length < 2) {
-				p.getPackets().sendDevConsoleMessage("Use: ::emusic soundid effecttype");
-				return true;
-			}
-			try {
-				p.getPackets().sendMusicEffect(Integer.valueOf(args[1]));
-			} catch (NumberFormatException e) {
-				p.getPackets().sendDevConsoleMessage("Use: ::emusic soundid");
-			}
 			return true;
 
 		case "cutscene":

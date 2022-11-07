@@ -18,6 +18,7 @@ package com.rs.net.decoders;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
+import java.lang.SuppressWarnings;
 
 import com.rs.Settings;
 import com.rs.cache.Cache;
@@ -32,10 +33,11 @@ import com.rs.lib.net.Decoder;
 import com.rs.lib.net.Session;
 import com.rs.lib.net.decoders.GameDecoder;
 import com.rs.lib.net.packets.encoders.WorldLoginDetails;
+import com.rs.lib.util.Logger;
 import com.rs.lib.util.Utils;
 import com.rs.net.LobbyCommunicator;
 import com.rs.net.encoders.WorldEncoder;
-import com.rs.utils.AntiFlood;
+import com.rs.utils.AccountLimiter;
 import com.rs.utils.MachineInformation;
 
 public final class WorldLoginDecoder extends Decoder {
@@ -113,11 +115,11 @@ public final class WorldLoginDecoder extends Decoder {
 		int[] prefs = new int[prefSize];
 		for (int i = 0;i < prefs.length;i++)
 			prefs[i] = stream.readUnsignedByte();
-		//System.out.println(i+": " + prefs[i]);
+		//Logger.debug(i+": " + prefs[i]);
 
 		int success = stream.readUnsignedByte();
 		if (success != 6)
-			System.out.println("Failed to parse machine info");
+			Logger.error(WorldLoginDecoder.class, "decodeWorldLogin", "Failed to parse machine info " + username);
 		MachineInformation mInformation = MachineInformation.parse(stream);
 		stream.readInt();
 		stream.readLong();
@@ -140,7 +142,7 @@ public final class WorldLoginDecoder extends Decoder {
 			int crc = Cache.STORE.getIndices()[index] == null ? -1011863738 : Cache.STORE.getIndices()[index].getCRC();
 			int receivedCRC = stream.readInt();
 			if (crc != receivedCRC && index < 32) {
-				System.out.println("CRC mismatch: " + crc + ", " + receivedCRC);
+				Logger.error(WorldLoginDecoder.class, "decodeWorldLogin", "CRC mismatch: " + crc + ", " + receivedCRC + " from " + username);
 				session.sendClientPacket(6);
 				return -1;
 			}
@@ -151,7 +153,7 @@ public final class WorldLoginDecoder extends Decoder {
 			return -1;
 		}
 
-		if (AntiFlood.getSessionsIP(session.getIP()) > 3) {
+		if (AccountLimiter.getSessionsIP(session.getIP()) > 3) {
 			session.sendClientPacket(9);
 			return -1;
 		}
@@ -175,10 +177,11 @@ public final class WorldLoginDecoder extends Decoder {
 			return -1;
 		}
 
-		WorldDB.getPlayers().getByUsername(account.getUsername(), player -> {
-			if (player == null)
-				player = new Player(account);
-
+		WorldDB.getPlayers().getByUsername(account.getUsername(), pRes -> {
+			if (pRes == null)
+				pRes = new Player(account);
+			final Player player = pRes;
+			
 			if (account.isBanned()) {
 				session.sendClientPacket(4);
 				return;

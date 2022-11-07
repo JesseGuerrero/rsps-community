@@ -17,8 +17,8 @@
 package com.rs.game.content.skills.magic;
 
 import com.rs.cache.loaders.ItemDefinitions;
+import com.rs.game.World;
 import com.rs.game.content.ItemConstants;
-import com.rs.game.content.dialogues_matrix.SimpleMessage;
 import com.rs.game.content.skills.smithing.Smelting.SmeltingBar;
 import com.rs.game.model.entity.player.Equipment;
 import com.rs.game.model.entity.player.Player;
@@ -43,16 +43,16 @@ public class Alchemy {
 		}
 
 		if (!player.getInventory().containsItem(bar.getItemsRequired()[0].getId(), bar.getItemsRequired()[0].getAmount())) {
-			player.getDialogueManager().execute(new SimpleMessage(), "You need " + bar.getItemsRequired()[0].getDefinitions().getName() + " to create a " + bar.getProducedBar().getDefinitions().getName() + ".");
+			player.simpleDialogue("You need " + bar.getItemsRequired()[0].getDefinitions().getName() + " to create a " + bar.getProducedBar().getDefinitions().getName() + ".");
 			return false;
 		}
 		if (bar.getItemsRequired().length > 1)
 			if (!player.getInventory().containsItem(bar.getItemsRequired()[1].getId(), bar.getItemsRequired()[1].getAmount()) && !(bar.getItemsRequired()[1].getId() == 453 && (player.getI("coalBag")+player.getInventory().getAmountOf(453)) >= bar.getItemsRequired()[1].getAmount())) {
-				player.getDialogueManager().execute(new SimpleMessage(), "You need " + bar.getItemsRequired()[1].getDefinitions().getName() + " to create a " + bar.getProducedBar().getDefinitions().getName() + ".");
+				player.simpleDialogue("You need " + bar.getItemsRequired()[1].getDefinitions().getName() + " to create a " + bar.getProducedBar().getDefinitions().getName() + ".");
 				return false;
 			}
 		if (player.getSkills().getLevel(Constants.SMITHING) < bar.getLevelRequired()) {
-			player.getDialogueManager().execute(new SimpleMessage(), "You need a Smithing level of at least " + bar.getLevelRequired() + " to smelt " + bar.getProducedBar().getDefinitions().getName());
+			player.simpleDialogue("You need a Smithing level of at least " + bar.getLevelRequired() + " to smelt " + bar.getProducedBar().getDefinitions().getName());
 			return false;
 		}
 
@@ -110,7 +110,7 @@ public class Alchemy {
 				player.setNextSpotAnim(new SpotAnim(112));
 
 			}
-			player.playSound(98, 1);
+			World.soundEffect(player, 98);
 			player.getInventory().deleteItem(item.getId(), 1);
 			player.getInventory().addItem(995, def.getSellPrice());
 			player.getSkills().addXp(Constants.MAGIC, 31);
@@ -123,7 +123,7 @@ public class Alchemy {
 				player.setNextAnimation(new Animation(713));
 				player.setNextSpotAnim(new SpotAnim(113));
 			}
-			player.playSound(98, 1); //low alch id... high alch doesnt match osrs... reeeee
+			World.soundEffect(player, 98); //low alch id... high alch doesnt match osrs... reeeee
 			player.getInventory().deleteItem(item.getId(), 1);
 			player.getInventory().addItem(995, def.getHighAlchPrice());
 			player.getSkills().addXp(Constants.MAGIC, 65);

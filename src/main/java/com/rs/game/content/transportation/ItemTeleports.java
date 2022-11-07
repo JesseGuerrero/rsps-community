@@ -16,7 +16,7 @@
 //
 package com.rs.game.content.transportation;
 
-import com.rs.game.content.dialogues_matrix.Transportation;
+import com.rs.game.content.dialogue.impl.Transportation;
 import com.rs.game.content.skills.magic.Magic;
 import com.rs.game.content.world.HeroesGuild;
 import com.rs.game.model.entity.player.Equipment;
@@ -92,7 +92,7 @@ public class ItemTeleports {
 		int index = getIndex(item);
 		if (!checkAll(player, item, index, 0, 1))
 			return false;
-		player.getDialogueManager().execute(new Transportation(), TELEPORT_NAMES[index], item.getId());
+		player.startConversation(new Transportation(player, null, item.getId(), TELEPORT_NAMES[index]));
 		return true;
 	}
 
@@ -100,7 +100,7 @@ public class ItemTeleports {
 		int index = getIndex(new Item(itemId, 1));
 		if (index == -1)
 			return false;
-		player.getDialogueManager().execute(new Transportation(), TELEPORT_NAMES[index], itemId, new Item(itemId, 1));
+		player.startConversation(new Transportation(player, new Item(itemId, 1), itemId, TELEPORT_NAMES[index]));
 		return true;
 	}
 
@@ -129,7 +129,11 @@ public class ItemTeleports {
 		int index = getIndex(item);
 		if (index < 0)
 			return;
-		Magic.sendTeleportSpell(player, getFirstEmote(index), -1, getFirstGFX(index), -1, 0, 0, COORDINATES[index][optionIndex], 4, true, Magic.OBJECT_TELEPORT, null);
+		if (optionIndex > COORDINATES[index].length) {
+			player.sendMessage("Error handling teleport option. Report this to administrators.");
+			return;
+		}
+		Magic.sendTeleportSpell(player, getFirstEmote(index), -2, getFirstGFX(index), -1, 0, 0, COORDINATES[index][optionIndex], 4, true, Magic.OBJECT_TELEPORT, null);
 	}
 
 	public static void sendTeleport(Player player, Item item, int optionIndex, boolean equipmentTeleport) {
@@ -142,7 +146,7 @@ public class ItemTeleports {
 			return;
 		if (HeroesGuild.isGloryOrROW(item.getId()))
 			player.getTempAttribs().setB("glory", true);
-		if (Magic.sendTeleportSpell(player, getFirstEmote(index), -1, getFirstGFX(index), -1, 0, 0, COORDINATES[index][optionIndex], 4, true, Magic.ITEM_TELEPORT, null)) {
+		if (Magic.sendTeleportSpell(player, getFirstEmote(index), -2, getFirstGFX(index), -1, 0, 0, COORDINATES[index][optionIndex], 4, true, Magic.ITEM_TELEPORT, null)) {
 			if (!hasCharges(index))
 				return;
 			int newItemId = item.getId() + ((isNegative(index) ? -1 : 1) * (isIncremented(index) ? 2 : 1)), slot = equipmentTeleport ? Equipment.getItemSlot(item.getId()) : player.getInventory().getItems().getThisItemSlot(item);

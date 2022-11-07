@@ -1,12 +1,10 @@
 package com.rs.game.content.skills.runecrafting.runespan;
 
 import com.rs.game.World;
-import com.rs.game.content.controllers.Controller;
-import com.rs.game.content.controllers.RunespanController;
-import com.rs.game.content.dialogues_matrix.SimpleMessage;
 import com.rs.game.content.skills.runecrafting.Runecrafting;
 import com.rs.game.model.WorldProjectile;
 import com.rs.game.model.entity.npc.NPC;
+import com.rs.game.model.entity.player.Controller;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.entity.player.actions.PlayerAction;
 import com.rs.game.tasks.WorldTask;
@@ -45,7 +43,7 @@ public class SiphonAction extends PlayerAction {
 		if (player.isLocked() || creature.hasFinished())
 			return false;
 		if (player.getSkills().getLevel(Constants.RUNECRAFTING) < creatures.levelRequired) {
-			player.getDialogueManager().execute(new SimpleMessage(), "This creature requires level " + creatures.levelRequired + " to siphon.");
+			player.simpleDialogue("This creature requires level " + creatures.levelRequired + " to siphon.");
 			return false;
 		}
 		if ((!creatures.rune.isPureEss() && !player.getInventory().containsOneItem(Runecrafting.PURE_ESS, Runecrafting.RUNE_ESS)) || (creatures.rune.isPureEss() && !player.getInventory().containsItem(Runecrafting.PURE_ESS))) {

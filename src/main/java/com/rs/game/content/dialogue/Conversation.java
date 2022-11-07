@@ -30,6 +30,7 @@ import com.rs.game.content.dialogue.statements.OptionStatement;
 import com.rs.game.content.dialogue.statements.PlayerStatement;
 import com.rs.game.content.dialogue.statements.SimpleStatement;
 import com.rs.game.content.dialogue.statements.Statement;
+import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.util.Utils;
 
@@ -42,6 +43,7 @@ public class Conversation {
 	protected Player player;
 	protected Dialogue current;
 	private int npcId;
+	private boolean created = false;
 
 	public Conversation(Dialogue current) {
 		this(null, current);
@@ -54,7 +56,8 @@ public class Conversation {
 	public Conversation(Player player, Dialogue current) {
 		this.player = player;
 		this.current = current;
-		markedStages = new HashMap<>();
+		this.firstDialogue = current;
+		this.markedStages = new HashMap<>();
 	}
 
 	public Conversation(Statement statement) {
@@ -73,11 +76,13 @@ public class Conversation {
 	}
 
 	public void create(String stageName) {
+		created = true;
 		setFirst(getStage(stageName).getHead());
 	}
 
 	public boolean create() {
 		try {
+			created = true;
 			if (current != null) {
 				setFirst(firstDialogue);
 				return true;
@@ -189,6 +194,16 @@ public class Conversation {
 		return addOptions(title, options);
 	}
 	
+	public Dialogue addOptions(String stageName, String title, Consumer<Options> create) {
+		Options options = new Options(stageName, this) {
+			@Override
+			public void create() {
+				create.accept(this);
+			}
+		};
+		return addOptions(title, options);
+	}
+	
 	public Dialogue addNext(String name, Statement statement, Dialogue... options) {
 		Dialogue option = addNext(name, statement);
 		for (Dialogue option2 : options)
@@ -215,7 +230,7 @@ public class Conversation {
 		if (options.getOptions().size() <= 1) {
 			for (String opName : options.getOptions().keySet()) {
 				Option op = options.getOptions().get(opName);
-				if (op.show()) {
+				if (op.show() && op.getDialogue() != null) {
 					Dialogue next = addNext(op.getDialogue());
 					if (options.getConv() != null)
 						options.getConv().addStage(options.getStageName(), next);
@@ -234,7 +249,7 @@ public class Conversation {
 			Dialogue op = new Dialogue(new OptionStatement(title, ops.stream().toArray(String[] ::new)));
 			for (String opName : options.getOptions().keySet()) {
 				Option o = options.getOptions().get(opName);
-				if (o.show())
+				if (o.show() && o.getDialogue() != null)
 					op.addNext(o.getDialogue());
 			}
 			if (options.getConv() != null)
@@ -251,7 +266,7 @@ public class Conversation {
 		Dialogue currPage = baseOption;
 		for (int i = 0;i < ops.length;i++) {
 			Option op = options.getOptions().get(ops[i]);
-			if (op.show()) {
+			if (op.show() && op.getDialogue() != null) {
 				currPage.addNext(op.getDialogue());
 				if (i >= 3 && ((i+1) % 4) == 0) {
 					String[] nextOps = new String[Utils.clampI(ops.length-i, 0, 5)];
@@ -298,6 +313,14 @@ public class Conversation {
 	public Dialogue addNPC(HeadE expression, String text, Runnable extraFunctionality) {
 		return addNext(new Dialogue(new NPCStatement(npcId, expression, text), extraFunctionality));
 	}
+	
+	public Dialogue addNPC(NPC npc, HeadE expression, String text) {
+		return addNext(new NPCStatement(npc.getCustomName(), npc.getId(), expression, text));
+	}
+
+	public Dialogue addNPC(NPC npc, HeadE expression, String text, Runnable extraFunctionality) {
+		return addNext(new Dialogue(new NPCStatement(npc.getCustomName(), npc.getId(), expression, text), extraFunctionality));
+	}
 
 	public Dialogue addSimple(String... text) {
 		return addNext(new SimpleStatement(text));
@@ -318,13 +341,21 @@ public class Conversation {
 	}
 	
 	public void process(int opIndex) {
+		if (current != null) {
+			current.close(player);
+			if (current.getVoiceEffect() > -1)
+				player.getPackets().resetSounds();
+		}
 		current = current.getNext(opIndex);
 		if (current == null) {
 			player.endConversation();
 			return;
 		}
-		if (current instanceof StageSelectDialogue d)
+		if (current instanceof StageSelectDialogue d) {
+			if (d.getFunc() != null)
+				d.getFunc().run();
 			current = d.getConversation().getStage(d.getStageName());
+		}
 		if (player.getInterfaceManager().containsChatBoxInter())
 			player.getInterfaceManager().closeChatBoxInterface();
 		current.run(player);
@@ -352,6 +383,11 @@ public class Conversation {
 				break;
 		}
 		curr = head;
+		str.append(created);
 		return str.toString();
+	}
+
+	public boolean isCreated() {
+		return created;
 	}
 }

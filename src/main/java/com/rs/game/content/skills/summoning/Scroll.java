@@ -34,8 +34,8 @@ import com.rs.cache.loaders.ItemDefinitions;
 import com.rs.game.World;
 import com.rs.game.content.Effect;
 import com.rs.game.content.combat.PlayerCombat;
-import com.rs.game.content.controllers.StealingCreationController;
 import com.rs.game.content.minigames.creations.Score;
+import com.rs.game.content.minigames.creations.StealingCreationController;
 import com.rs.game.content.skills.crafting.Jewelry;
 import com.rs.game.content.skills.dungeoneering.FamiliarSpecs;
 import com.rs.game.content.skills.farming.FarmPatch;
@@ -303,7 +303,7 @@ public enum Scroll {
 			}
 			familiar.faceObject(object);
 			familiar.setNextFaceEntity(null);
-			familiar.walkToAndExecute(object, () -> familiar.getActionManager().setAction(new Woodcutting(object, type)));
+			familiar.walkToAndExecute(object, () -> familiar.getActionManager().setAction(new Woodcutting(object, type).setLevel(60)));
 			return true;
 		}
 	},

@@ -81,6 +81,8 @@ public enum Effect {
 	DUNG_HS_SCROLL_BOOST("hoardstalker boost", true),
 	
 	AGGRESSION_POTION("aggression potion", false),
+	
+	OVERLOAD_PVP_REDUCTION(true),
 
 	BONFIRE("bonfire boost", false) {
 		@Override
@@ -135,6 +137,7 @@ public enum Effect {
 						player.getSkills().set(Constants.RANGE, realLevel);
 					player.heal(500);
 				}
+				player.soundEffect(2607);
 				player.sendMessage("<col=480000>The effects of overload have worn off and you feel normal again.");
 			}
 		}

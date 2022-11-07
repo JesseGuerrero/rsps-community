@@ -16,6 +16,7 @@
 //
 package com.rs.game.content.achievements;
 
+import com.rs.game.content.DropCleaners;
 import com.rs.game.content.SkillCapeCustomizer;
 import com.rs.game.content.achievements.AchievementDef.Area;
 import com.rs.game.content.achievements.AchievementDef.Difficulty;
@@ -23,8 +24,8 @@ import com.rs.game.content.dialogue.Dialogue;
 import com.rs.game.content.dialogue.Options;
 import com.rs.game.content.skills.magic.Alchemy;
 import com.rs.game.content.skills.magic.Magic;
+import com.rs.game.content.world.areas.Rellekka;
 import com.rs.game.content.world.doors.Doors;
-import com.rs.game.content.world.regions.Rellekka;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.Constants;
 import com.rs.lib.game.Animation;
@@ -54,6 +55,8 @@ public class AchievementSetRewards {
 		public void handle(NPCDropEvent e) {
 			if (e.getPlayer().getEquipment().getBootsId() == 19766)
 				e.getItem().setId(e.getItem().getDefinitions().getCertId());
+			else
+				DropCleaners.bonecrusher.handle(e);
 		}
 	};
 

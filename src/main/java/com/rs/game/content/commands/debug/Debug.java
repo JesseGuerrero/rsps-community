@@ -23,18 +23,21 @@ import java.util.Arrays;
 import com.rs.Settings;
 import com.rs.cache.loaders.ItemDefinitions;
 import com.rs.game.World;
+import com.rs.game.content.combat.CombatDefinitions.Spellbook;
 import com.rs.game.content.commands.Commands;
-import com.rs.game.content.controllers.DemonSlayer_PlayerVSDelrith;
-import com.rs.game.content.controllers.DemonSlayer_WallyVSDelrith;
-import com.rs.game.content.controllers.DragonSlayer_BoatScene;
-import com.rs.game.content.controllers.MerlinsCrystalCrateScene;
+import com.rs.game.content.minigames.fightkiln.FightKilnController;
 import com.rs.game.content.quests.Quest;
+import com.rs.game.content.quests.handlers.demonslayer.DemonSlayer_PlayerVSDelrith;
+import com.rs.game.content.quests.handlers.demonslayer.DemonSlayer_WallyVSDelrith;
+import com.rs.game.content.quests.handlers.dragonslayer.DragonSlayer_BoatScene;
+import com.rs.game.content.quests.handlers.merlinscrystal.MerlinsCrystalCrateScene;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.entity.player.Skills;
 import com.rs.lib.Constants;
 import com.rs.lib.game.Item;
 import com.rs.lib.game.Rights;
 import com.rs.lib.game.WorldTile;
+import com.rs.lib.util.Logger;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.annotations.ServerStartupEvent;
@@ -42,16 +45,19 @@ import com.rs.plugin.events.ButtonClickEvent;
 import com.rs.plugin.events.EnterChunkEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
 import com.rs.plugin.handlers.EnterChunkHandler;
+import com.rs.utils.music.Music;
 
 
 @PluginEventHandler
 public class Debug {
-
+	private static boolean musicMoveOn = false;
 	public static EnterChunkHandler handleTempleChunks = new EnterChunkHandler() {
 		@Override
 		public void handle(EnterChunkEvent e) {
 			if (!Settings.getConfig().isDebug())
 				return;
+			if(musicMoveOn && e.getPlayer() != null && e.getPlayer().hasStarted())
+				e.getPlayer().sendMessage("Region: " + e.getPlayer().getRegionId() + ", Chunk: " + e.getChunkId() + ", Genre: " + Music.getGenre(e.getPlayer()).getGenreName());
 			if (e.getEntity() instanceof Player player)
 				if (player.getNSV().getB("visChunks") && player.hasStarted()) {
 					player.devisualizeChunk(e.getEntity().getLastChunkId());
@@ -64,8 +70,7 @@ public class Debug {
 	public static ButtonClickHandler debugButtons = new ButtonClickHandler() {
 		@Override
 		public boolean handleGlobal(ButtonClickEvent e) {
-			if (Settings.getConfig().isDebug())
-				System.out.println(e.getInterfaceId() + ", " + e.getComponentId() + ", " + e.getSlotId() + ", " + e.getSlotId2());
+			Logger.debug(Debug.class, "debugButtons", e.getPacket() + ", " + e.getInterfaceId() + ", " + e.getComponentId() + ", " + e.getSlotId() + ", " + e.getSlotId2());
 			return false;
 		}
 
@@ -83,11 +88,14 @@ public class Debug {
 		//
 		//		});
 
+		Commands.add(Rights.ADMIN, "shapemusic", "Starts showing music shape.", (p, args) -> {
+			musicMoveOn = !musicMoveOn;
+		});
+
 		Commands.add(Rights.PLAYER, "coords,getpos,mypos,pos,loc", "Gets the coordinates for the tile.", (p, args) -> {
 			p.sendMessage("Coords: " + p.getX() + "," + p.getY() + "," + p.getPlane() + ", regionId: " + p.getRegionId() + ", chunkX: " + p.getChunkX() + ", chunkY: " + p.getChunkY());
 			p.sendMessage("JagCoords: " + p.getPlane() + "," + p.getRegionX() + "," + p.getRegionY() + "," + p.getXInScene(p.getSceneBaseChunkId()) + "," + p.getYInScene(p.getSceneBaseChunkId()));
-			if (Settings.getConfig().isDebug())
-				System.out.println("new WorldTile(" + p.getX() + "," + p.getY() + "," + p.getPlane() +")");
+			Logger.debug(Debug.class, "coordsCommand", "new WorldTile(" + p.getX() + "," + p.getY() + "," + p.getPlane() +")");
 		});
 
 		Commands.add(Rights.PLAYER, "search,si,itemid [item name]", "Searches for items containing the words searched.", (p, args) -> {
@@ -104,7 +112,7 @@ public class Debug {
 			}
 		});
 
-		Commands.add(Rights.ADMIN, "cutscene2 [id]", "Starts crate scene.", (p, args) -> {
+		Commands.add(Rights.PLAYER, "cutscene2 [id]", "Starts crate scene.", (p, args) -> {
 			switch (Integer.valueOf(args[0])) {
 				case 0 -> {
 					p.getControllerManager().startController(new DemonSlayer_WallyVSDelrith());
@@ -126,10 +134,30 @@ public class Debug {
 			p.sendMessage("Controller -> " + (p.getControllerManager().getController() == null ? "does not exist..." : p.getControllerManager().getController().getClass().getName()));
 		});
 
+		Commands.add(Rights.PLAYER, "fightkiln [wave]", "Starts Fight kiln at a wave", (p, args) -> {
+			if(args.length != 1) {
+				p.sendMessage("Must be one argument.");
+				return;
+			}
+			if(p.getControllerManager().getController() != null) {
+				p.sendMessage("You are already in a minigame, dedicated area(controller)!");
+				return;
+			}
+			if(Integer.valueOf(args[0]) > 37 || Integer.valueOf(args[0]) < 1) {
+				p.sendMessage("Invalid wave, must be between 1 and 37.");
+				return;
+			}
+			p.getControllerManager().startController(new FightKilnController(Integer.valueOf(args[0]), true));
+		});
+
 		Commands.add(Rights.PLAYER, "random", "Forces a random event.", (p, args) -> {
 			attemptSpawnRandom(p, true);
 		});
 
+		Commands.add(Rights.PLAYER, "fightcaves", "Marks fight caves as having been completed.", (p, args) -> {
+			p.incrementCount("Fight Caves clears");
+		});
+		
 		Commands.add(Rights.PLAYER, "showhitchance", "Toggles the display of your hit chance when attacking opponents.", (p, args) -> {
 			p.getNSV().setB("hitChance", !p.getNSV().getB("hitChance"));
 			p.sendMessage("Hit chance display: " + p.getNSV().getB("hitChance"));
@@ -151,6 +179,40 @@ public class Debug {
 					p.getQuestManager().setStage(quest, stage, true);
 					p.sendMessage("Set " + quest.name() + " to stage " + stage);
 					return;
+				}
+		});
+		
+		Commands.add(Rights.PLAYER, "resetquest [questName]", "Resets the specified quest.", (p, args) -> {
+			for (Quest quest : Quest.values())
+				if (quest.name().toLowerCase().contains(args[0]) && quest.isImplemented()) {
+					p.getQuestManager().resetQuest(quest);
+					p.sendMessage("Resetted quest: " + quest.name());
+					return;
+				}
+		});
+
+		Commands.add(Rights.PLAYER, "completequest [questName]", "Resets the specified quest.", (p, args) -> {
+			for (Quest quest : Quest.values())
+				if (quest.name().toLowerCase().contains(args[0])) {
+					p.getQuestManager().completeQuest(quest);
+					p.sendMessage("Completed quest: " + quest.name());
+					return;
+				}
+		});
+
+		Commands.add(Rights.PLAYER, "completeallquests", "Completes all quests.", (p, args) -> {
+			for (Quest quest : Quest.values())
+				if (quest.isImplemented()) {
+					p.getQuestManager().completeQuest(quest);
+					p.sendMessage("Completed quest: " + quest.name());
+				}
+		});
+
+		Commands.add(Rights.PLAYER, "resetallquests", "Resets all quests.", (p, args) -> {
+			for (Quest quest : Quest.values())
+				if (quest.isImplemented()) {
+					p.getQuestManager().resetQuest(quest);
+					p.sendMessage("Reset quest: " + quest.name());
 				}
 		});
 
@@ -197,6 +259,10 @@ public class Debug {
 				p.getSkills().setXp(skill, 0);
 			p.getSkills().init();
 		});
+		
+		Commands.add(Rights.PLAYER, "spec", "Restores special attack energy to full.", (p, args) -> {
+			p.getCombatDefinitions().resetSpecialAttack();
+		});
 
 		Commands.add(Rights.PLAYER, "copy [player name]", "Copies the other player's levels, equipment, and inventory.", (p, args) -> {
 			Player target = World.getPlayerByDisplay(Utils.concat(args));
@@ -231,15 +297,15 @@ public class Debug {
 			switch (args[0].toLowerCase()) {
 				case "modern":
 				case "normal":
-					p.getCombatDefinitions().setSpellBook(0);
+					p.getCombatDefinitions().setSpellbook(Spellbook.MODERN);
 					break;
 				case "ancient":
 				case "ancients":
-					p.getCombatDefinitions().setSpellBook(1);
+					p.getCombatDefinitions().setSpellbook(Spellbook.ANCIENT);
 					break;
 				case "lunar":
 				case "lunars":
-					p.getCombatDefinitions().setSpellBook(2);
+					p.getCombatDefinitions().setSpellbook(Spellbook.LUNAR);
 					break;
 				default:
 					p.sendMessage("Invalid spellbook. Spellbooks are modern, lunar, and ancient.");
@@ -316,11 +382,11 @@ public class Debug {
 				int complexity = Integer.parseInt(args[4]);
 
 				if (!p.getDungManager().isInsideDungeon()) {
-					System.out.println("floor: " + args[0]);
-					System.out.println("seed: " + args[1]);
-					System.out.println("difficulty: " + args[2]);
-					System.out.println("size: " + args[3]);
-					System.out.println("complexity: " + args[4]);
+					Logger.debug(Debug.class, "startdung", "floor: " + args[0]);
+					Logger.debug(Debug.class, "startdung", "seed: " + args[1]);
+					Logger.debug(Debug.class, "startdung", "difficulty: " + args[2]);
+					Logger.debug(Debug.class, "startdung", "size: " + args[3]);
+					Logger.debug(Debug.class, "startdung", "complexity: " + args[4]);
 
 					p.getDungManager().getParty().setFloor(floor);
 					p.getDungManager().getParty().setStartingSeed(seed);
@@ -344,7 +410,7 @@ public class Debug {
 			}
 			for (Item item : p.getInventory().getItems().array()) {
 				if (item != null)
-					System.out.println(item.getName() + ": " + item.getAmount());
+					Logger.debug(Debug.class, "droptest", item.getName() + ": " + item.getAmount());
 				if (item == null || item.getName().contains("(b)") || item.getName().contains("kinship"))
 					continue;
 				World.addGroundItem(item, new WorldTile(p.getTile()));

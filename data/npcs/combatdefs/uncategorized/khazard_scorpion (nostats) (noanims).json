@@ -1,14 +1,18 @@
 {
   "ids": [
-    7523
+    7523,
+    271
   ],
   "names": [
     "Khazard scorpion"
   ],
-  "attackAnim": -1,
-  "defenceAnim": -1,
-  "deathAnim": -1,
+  "attackAnim": 6254,
+  "attackSound": -1,
+  "defenceAnim": 6255,
+  "defendSound": -1,
+  "deathAnim": 6256,
   "deathDelay": 6,
+  "deathSound": -1,
   "respawnDelay": 39,
   "hitpoints": 400,
   "maxHit": 50,
@@ -24,7 +28,7 @@
   "attackGfx": -1,
   "attackProjectile": -1,
   "agressivenessType": "AGGRESSIVE",
-  "aggroDistance": 16,
+  "aggroDistance": 4,
   "deAggroDistance": -1,
   "maxDistFromSpawn": -1
 }

@@ -16,8 +16,12 @@
 //
 package com.rs.game.model.entity.player;
 
+import java.util.List;
+
 import com.rs.cache.loaders.Bonus;
 import com.rs.cache.loaders.ItemDefinitions;
+import com.rs.cache.loaders.interfaces.IFEvents;
+import com.rs.cache.loaders.interfaces.IFEvents.UseFlag;
 import com.rs.game.content.Effect;
 import com.rs.game.content.ItemConstants;
 import com.rs.game.content.interfacehandlers.ItemsKeptOnDeath;
@@ -36,8 +40,7 @@ import com.rs.plugin.events.ButtonClickEvent;
 import com.rs.plugin.events.ItemClickEvent;
 import com.rs.plugin.events.ItemEquipEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
-import com.rs.utils.ItemExamines;
-import com.rs.utils.ItemWeights;
+import com.rs.utils.ItemConfig;
 
 @PluginEventHandler
 public final class Equipment {
@@ -134,7 +137,7 @@ public final class Equipment {
 		Item item = items.get(slotId);
 		if (item == null)
 			return;
-		player.sendMessage(ItemExamines.getExamine(item));
+		player.sendMessage(ItemConfig.get(item.getId()).getExamine(item));
 		if (item.getMetaData("combatCharges") != null)
 			player.sendMessage("<col=FF0000>It looks like it will last another " + Utils.ticksToTime(item.getMetaDataI("combatCharges")));
 		else if (item.getMetaData("brawlerCharges") != null)
@@ -144,6 +147,13 @@ public final class Equipment {
 	public boolean containsOneItem(int... itemIds) {
 		for (int itemId : itemIds)
 			if (items.containsOne(new Item(itemId, 1)))
+				return true;
+		return false;
+	}
+	
+	public boolean hasItemInSlot(int... slots) {
+		for (int slot : slots)
+			if (getId(slot) != -1)
 				return true;
 		return false;
 	}
@@ -191,7 +201,7 @@ public final class Equipment {
 		for (Item item : items.array()) {
 			if (item == null)
 				continue;
-			w += ItemWeights.getWeight(item, true);
+			w += ItemConfig.get(item.getId()).getWeight(true);
 		}
 		equipmentWeight = w;
 		player.getPackets().refreshWeight(player.getInventory().getInventoryWeight() + equipmentWeight);
@@ -538,6 +548,58 @@ public final class Equipment {
 				e.getPlayer().getCombatDefinitions().switchAutoRetaliate();
 		}
 	};
+	
+	public static void compareItems(Player p, Item item1, Item item2) {
+		if (item1 == null || item2 == null || item1.getDefinitions().getEquipSlot() != item2.getDefinitions().getEquipSlot()) {
+			p.sendMessage("These two items cannot be compared because they are not the same type.");
+			return;
+		}
+		p.getPackets().sendVarcString(321, "Comparison");
+		String categories = "";
+		String subCategories = "";
+		String item1Desc = item1.getDefinitions().name;
+		String item2Desc = item2.getDefinitions().name;
+		for (Bonus b : Bonus.values()) {
+			if (Equipment.getBonus(p, item1, b) != 0 || Equipment.getBonus(p, item2, b) != 0) {
+				if (!categories.contains("Attack Bonuses") && b.ordinal() >= Bonus.STAB_ATT.ordinal() && b.ordinal() <= Bonus.RANGE_ATT.ordinal()) {
+					categories += "<br>Attack Bonuses<br>";
+					subCategories += "<br><br>";
+					item1Desc += "<br>";
+					item2Desc += "<br>";
+				}
+				if (!categories.contains("Defense Bonuses") && b.ordinal() >= Bonus.STAB_DEF.ordinal() && b.ordinal() <= Bonus.ABSORB_RANGE.ordinal()) {
+					categories += "<br>Defense Bonuses<br>";
+					subCategories += "<br><br>";
+					item1Desc += "<br><br>";
+					item2Desc += "<br><br>";
+				}
+				if (!categories.contains("Other") && b.ordinal() >= Bonus.MELEE_STR.ordinal() && b.ordinal() <= Bonus.MAGIC_STR.ordinal()) {
+					categories += "<br>Other<br>";
+					subCategories += "<br><br>";
+					item1Desc += "<br><br>";
+					item2Desc += "<br><br>";
+				}
+				categories += "<br>";
+				subCategories += Utils.formatPlayerNameForDisplay(b.name().replace("_ATT", "").replace("_DEF", "")) + ":<br>";
+				item1Desc += "<br>" + wrapIfSuperior(Equipment.getBonus(p, item1, b) + (List.of(Bonus.ABSORB_MELEE, Bonus.ABSORB_MAGIC, Bonus.ABSORB_RANGE, Bonus.MAGIC_STR).contains(b) ? "%" : ""), Equipment.getBonus(p, item1, b), Equipment.getBonus(p, item2, b));
+				item2Desc += "<br>" + wrapIfSuperior(Equipment.getBonus(p, item2, b) + (List.of(Bonus.ABSORB_MELEE, Bonus.ABSORB_MAGIC, Bonus.ABSORB_RANGE, Bonus.MAGIC_STR).contains(b) ? "%" : ""), Equipment.getBonus(p, item2, b), Equipment.getBonus(p, item1, b));
+			}
+		}
+		categories += "<br> ";
+		subCategories += "<br> ";
+		item1Desc += "<br> ";
+		item2Desc += "<br> ";
+		p.getPackets().sendVarcString(322, categories);
+		p.getPackets().sendVarcString(323, subCategories);
+		p.getPackets().sendVarcString(324, item1Desc);
+		p.getPackets().sendVarcString(325, item2Desc);
+	}
+	
+	private static String wrapIfSuperior(String in, int bonus1, int bonus2) {
+		if (bonus1 > bonus2)
+			return "<col=FFFFFF>"+in+"</col>";
+		return in;
+	}
 
 	public static ButtonClickHandler handleEquipmentStatsInterface = new ButtonClickHandler(667, 670) {
 		@Override
@@ -550,7 +612,7 @@ public final class Equipment {
 					if (item == null)
 						return;
 					if (e.getPacket() == ClientPacket.IF_OP10) {
-						e.getPlayer().sendMessage(ItemExamines.getExamine(item));
+						e.getPlayer().sendMessage(ItemConfig.get(item.getId()).getExamine(item));
 						if (item.getMetaData("combatCharges") != null)
 							e.getPlayer().sendMessage("<col=FF0000>It looks like it will last another " + Utils.ticksToTime(item.getMetaDataI("combatCharges")));
 					} else if (e.getPacket() == ClientPacket.IF_OP1) {
@@ -714,6 +776,7 @@ public final class Equipment {
 			if (!player.getInventory().addItem(player.getEquipment().getItem(SHIELD))) {
 				player.getInventory().getItems().set(slotId, item);
 				player.getInventory().refresh(slotId);
+				player.getPackets().sendVarc(779, player.getAppearance().getRenderEmote());
 				return true;
 			}
 			player.getEquipment().setNoPluginTrigger(SHIELD, null);
@@ -721,6 +784,7 @@ public final class Equipment {
 			if (!player.getInventory().addItem(player.getEquipment().getItem(WEAPON))) {
 				player.getInventory().getItems().set(slotId, item);
 				player.getInventory().refresh(slotId);
+				player.getPackets().sendVarc(779, player.getAppearance().getRenderEmote());
 				return true;
 			}
 			player.getEquipment().setNoPluginTrigger(WEAPON, null);
@@ -743,7 +807,7 @@ public final class Equipment {
 		
 		player.getAppearance().generateAppearanceData();
 		player.getPackets().sendVarc(779, player.getAppearance().getRenderEmote());
-		player.getPackets().sendSound(2240, 0, 1);
+		player.soundEffect(ItemConfig.get(item.getId()).getEquipSound());
 		if (targetSlot == WEAPON)
 			player.getCombatDefinitions().drainSpec(0);
 		return true;
@@ -788,13 +852,17 @@ public final class Equipment {
 		player.getVars().setVarBit(8348, 1);
 		player.getVars().syncVarsToClient();
 		player.getPackets().sendItems(93, player.getInventory().getItems());
-		player.getPackets().sendInterSetItemsOptionsScript(670, 0, 93, 4, 7, "Equip", "Compare", "Stats", "Examine");
-		player.getPackets().setIFRightClickOps(670, 0, 0, 27, 0, 1, 2, 3);
-		player.getPackets().setIFRightClickOps(667, 9, 0, 20, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+		player.getPackets().setIFEvents(new IFEvents(667, 9, 0, 20).enableUseOption(UseFlag.ICOMPONENT)
+				.enableUseTargetability()
+				.enableRightClickOptions(0, 1, 2, 3, 4, 5, 6, 7, 8, 9));
+		player.getPackets().setIFEvents(new IFEvents(670, 0, 0, 27).enableUseOption(UseFlag.ICOMPONENT)
+				.enableUseTargetability()
+				.enableRightClickOptions(0, 1, 2, 3));
 		refreshEquipBonuses(player);
 		player.getInterfaceManager().sendInventoryInterface(670);
 		player.getInterfaceManager().sendInterface(667);
 		WorldTasks.delay(0, () -> {
+			player.getPackets().sendVarc(779, player.getAppearance().getRenderEmote());
 			player.getPackets().sendRunScript(2319);
 		});
 		if (banking) {
@@ -822,6 +890,27 @@ public final class Equipment {
 		player.getPackets().setIFText(667, 43, "Ranged Str: " + player.getCombatDefinitions().getBonus(Bonus.RANGE_STR));
 		player.getPackets().setIFText(667, 44, "Prayer: " + player.getCombatDefinitions().getBonus(Bonus.PRAYER));
 		player.getPackets().setIFText(667, 45, "Magic Damage: " + player.getCombatDefinitions().getBonus(Bonus.MAGIC_STR) + "%");
+	}
+	
+	public static int getBonus(Player player, Item item, Bonus bonus) {
+		int value = item.getDefinitions().getBonuses()[bonus.ordinal()];
+		switch(item.getId()) {
+		case 11283, 11284 -> {
+			return switch(bonus) {
+			case STAB_DEF, SLASH_DEF, CRUSH_DEF, RANGE_DEF -> value + item.getMetaDataI("dfsCharges", 0);
+			default -> value;
+			};
+		}
+		case 19152, 19157, 19162 -> {
+			return switch(bonus) {
+			case RANGE_STR -> value + Utils.clampI((int) (player.getSkills().getLevelForXp(Constants.RANGE) * 0.7), 0, 49);
+			default -> value;
+			};
+		}
+		default -> {
+				return value;
+			}
+		}
 	}
 
 	public boolean wearingRingOfWealth() {
