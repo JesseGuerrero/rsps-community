@@ -1,6 +1,8 @@
 package com.rs.rsps.jessecustom;
 
 import com.rs.game.content.ItemConstants;
+import com.rs.game.content.quests.Quest;
+import com.rs.game.content.quests.handlers.shieldofarrav.ShieldOfArrav;
 import com.rs.game.content.skills.slayer.Master;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.player.Equipment;
@@ -9,6 +11,8 @@ import com.rs.lib.Constants;
 import com.rs.lib.game.Item;
 import com.rs.lib.game.WorldTile;
 import com.rs.plugin.annotations.PluginEventHandler;
+import com.rs.plugin.events.LoginEvent;
+import com.rs.plugin.handlers.LoginHandler;
 
 @PluginEventHandler
 public class CustomScripts {
@@ -77,5 +81,32 @@ public class CustomScripts {
 			return false;
 		player.sendMessage("This cannot be done with strengthened items!");
 		return true;
+	}
+
+	public static int getAverageCombatLevelDung(int level, int teamSize) {
+		return (int)((level / teamSize) * 0.9);
+	}
+
+	public static int getTokenReward(double totalXp) {
+		return (int) ((totalXp / 10.0)*3);
+	}
+
+	public static LoginHandler onLoginUpdates = new LoginHandler() {
+		@Override
+		public void handle(LoginEvent e) {
+			questsEnabled(e.getPlayer(), false);
+		}
+	};
+	public static void questsEnabled(Player p, boolean enabled) {
+		if(!enabled) {
+			ShieldOfArrav.setGang(p, "Phoenix");
+			if (!p.getQuestManager().completedAllQuests())
+				for (Quest quest : Quest.values())
+					if (quest.isImplemented()) {
+						p.getQuestManager().setStage(quest, quest.getHandler().getCompletedStage());
+						p.getQuestManager().sendQuestStage(quest, true);
+						p.getQuestManager().sendQuestPoints();
+					}
+		}
 	}
 }

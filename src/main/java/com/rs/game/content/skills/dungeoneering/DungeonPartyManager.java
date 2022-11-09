@@ -20,7 +20,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.Constants;
-
+import com.rs.rsps.jessecustom.CustomScripts;
 
 
 public final class DungeonPartyManager {
@@ -261,7 +261,8 @@ public final class DungeonPartyManager {
 		int level = 0;
 		for (Player player : team)
 			level += player.getSkills().getCombatLevelWithSummoning();
-		return level / team.size();
+		return CustomScripts.getAverageCombatLevelDung(level, team.size());
+		//return (level / team.size();
 	}
 
 	public int getDefenceLevel() {

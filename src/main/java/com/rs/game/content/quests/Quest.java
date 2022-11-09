@@ -25,6 +25,7 @@ import com.rs.game.content.quests.data.QuestDefinitions;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.entity.player.Skills;
 import com.rs.lib.util.Utils;
+import com.rs.rsps.jessecustom.CustomScripts;
 
 public enum Quest {
 	COOKS_ASSISTANT(6, 1),

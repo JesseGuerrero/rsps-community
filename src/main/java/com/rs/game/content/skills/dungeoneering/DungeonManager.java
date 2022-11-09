@@ -98,6 +98,7 @@ import com.rs.lib.game.Item;
 import com.rs.lib.game.WorldTile;
 import com.rs.lib.util.Logger;
 import com.rs.lib.util.Utils;
+import com.rs.rsps.jessecustom.CustomScripts;
 
 public class DungeonManager {
 
@@ -1267,12 +1268,13 @@ public class DungeonManager {
 			double averageXP = (floorXP + prestigeXP) / 2;
 			multiplier = Math.max(0.1, multiplier);
 			double totalXp = averageXP * multiplier;
-			int tokens = (int) (totalXp / 10.0);
+//			int tokens = (int) (totalXp / 10.0);
+			int tokens = CustomScripts.getTokenReward(totalXp);
 			player.getPackets().sendVarc(1237, (int) (floorXP * 10));
 			player.getPackets().sendVarc(1238, (int) (prestigeXP * 10));
 			player.getPackets().sendVarc(1239, (int) (averageXP * 10));
 			player.getSkills().addXp(Constants.DUNGEONEERING, totalXp); //force rs xp, cuz we do * xp rate in calcs to make inter show correct xp
-			player.getDungManager().addTokens(tokens*3);
+			player.getDungManager().addTokens(tokens);
 			player.getMusicsManager().forcePlayMusic(770);
 			player.incrementCount("Dungeons completed");
 			player.incrementCount(DungeonUtils.getFloorTypeName(party.getFloor()) + " floors completed");
