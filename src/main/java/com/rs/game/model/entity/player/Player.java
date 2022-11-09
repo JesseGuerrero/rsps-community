@@ -164,6 +164,7 @@ import com.rs.plugin.events.InputIntegerEvent;
 import com.rs.plugin.events.InputStringEvent;
 import com.rs.plugin.events.ItemEquipEvent;
 import com.rs.plugin.events.LoginEvent;
+import com.rs.rsps.jessecustom.GamemodeSelectionCustom;
 import com.rs.utils.MachineInformation;
 import com.rs.utils.Ticks;
 import com.rs.utils.record.Recorder;
@@ -1353,7 +1354,8 @@ public class Player extends Entity {
 			else
 				setStarter(1);
 			PlayerLook.openCharacterCustomizing(this);
-			startConversation(new GamemodeSelection(this));
+//			startConversation(new GamemodeSelection(this));
+			startConversation(new GamemodeSelectionCustom(this));
 		}
 		//getPackets().write(new UpdateRichPresence("state", "Logged in as " + getDisplayName()));
 		PluginManager.handle(new LoginEvent(this));
@@ -3539,6 +3541,9 @@ public class Player extends Entity {
 			setTitleColor("FF0000");
 			setTitleShading("000000");
 		}
+	}
+	public void setGIM(boolean isGIM) {
+		save("Group IronMan", isGIM);
 	}
 
 	public void applyAccountTitle() {

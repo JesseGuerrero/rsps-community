@@ -141,7 +141,7 @@ public class DeathOfficeController extends Controller {
 	public static Hub getRespawnHub(Player player) {
 		return getCurrentHub(player, new WorldTile(player.getTile()));
 	}
-
+	public static final WorldTile[] RESPAWN_LOCATIONS = { new WorldTile(3222, 3219, 0), new WorldTile(2971, 3343, 0), new WorldTile(2758, 3486, 0), new WorldTile(1891, 3177, 0), new WorldTile(2889, 3528, 0) };
 	private transient DynamicRegionReference region = new DynamicRegionReference(2, 2);
 	private Stages stage;
 	private Integer[][] slots;
@@ -325,7 +325,7 @@ public class DeathOfficeController extends Controller {
 		player.getPackets().setIFRightClickOps(18, 17, 0, 100, 0);
 		player.getPackets().setIFRightClickOps(18, 45, 0, 6, 0);
 		player.setCloseInterfacesEvent(() -> {
-			WorldTile respawnTile = currentHub >= 256 ? RESPAWN_LOCATIONS[currentHub - 256] : HUBS[currentHub];
+			WorldTile respawnTile = Hub.LUMBRIDGE.tile;
 			synchronized (slots) {
 				if (!player.hasRights(Rights.ADMIN))
 					player.sendItemsOnDeath(null, getDeathTile(), currentHub.tile, false, slots);

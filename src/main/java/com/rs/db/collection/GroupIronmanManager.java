@@ -57,7 +57,7 @@ public class GroupIronmanManager extends DBItemManager  {
 		try {
 			return JsonFileManager.fromJSONString(JsonFileManager.toJson(accDoc), GroupIronMan.class);
 		} catch (JsonIOException | IOException e) {
-			Logger.handle(e);
+			Logger.handle(this.getClass(), "syncname", e);
 			return null;
 		}
 	}

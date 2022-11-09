@@ -2,9 +2,9 @@ package com.rs.rsps;
 
 import com.rs.cache.loaders.ObjectType;
 import com.rs.game.World;
-import com.rs.game.content.controllers.WildernessController;
 import com.rs.game.content.dialogue.Dialogue;
 import com.rs.game.content.dialogue.Options;
+import com.rs.game.content.world.areas.wilderness.WildernessController;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.pathing.Direction;
 import com.rs.game.model.object.GameObject;
@@ -21,6 +21,7 @@ import com.rs.rsps.teleports.BossTeleport;
 import com.rs.rsps.teleports.SlayerTeleport;
 import com.rs.rsps.teleports.Teleport;
 import com.rs.utils.shop.ShopsHandler;
+import com.rs.game.content.combat.CombatDefinitions.Spellbook;
 
 @PluginEventHandler
 public class Home {
@@ -106,9 +107,9 @@ public class Home {
 			e.getPlayer().getSkills().set(Constants.SUMMONING, e.getPlayer().getSkills().getLevelForXp(Constants.SUMMONING));
 			e.getPlayer().sendOptionDialogue("Would you like to switch up your prayers or magic?", o1 -> {
 				o1.add("Select new magic book", new Dialogue().addOptions(o2 -> {
-					o2.add("Modern", () -> e.getPlayer().getCombatDefinitions().setSpellBook(0));
-					o2.add("Ancient", () -> e.getPlayer().getCombatDefinitions().setSpellBook(1));
-					o2.add("Lunar", () -> e.getPlayer().getCombatDefinitions().setSpellBook(2));
+					o2.add("Modern", () -> e.getPlayer().getCombatDefinitions().setSpellbook(Spellbook.MODERN));
+					o2.add("Ancient", () -> e.getPlayer().getCombatDefinitions().setSpellbook(Spellbook.ANCIENT));
+					o2.add("Lunar", () -> e.getPlayer().getCombatDefinitions().setSpellbook(Spellbook.LUNAR));
 				}));
 				o1.add("Select new prayer book", new Dialogue().addOptions(o2 -> {
 					o2.add("Modern", () -> e.getPlayer().getPrayer().setPrayerBook(false));

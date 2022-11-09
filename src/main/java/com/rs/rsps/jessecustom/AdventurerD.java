@@ -284,7 +284,7 @@ public class AdventurerD extends Conversation {
 			});
 			return;
 		}
-		addNPC(NPC, HeadE.CALM_TALK, "You must be on an Iron Man account to access Group IronMan.");
+		addNPC(NPC, HeadE.CALM_TALK, "You must be on a Group Iron Man account to access Group Iron Man.");
 		create();
 	}
 	private static boolean groupNamesMatch(String group1, String group2) {

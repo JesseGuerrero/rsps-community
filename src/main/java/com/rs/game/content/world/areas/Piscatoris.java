@@ -51,7 +51,8 @@ public class Piscatoris {
 		@Override
 		public void handle(NPCClickEvent e) {
 			if(e.getOption().equalsIgnoreCase("Talk-to"))
-				e.getPlayer().startConversation(new Banker(e.getPlayer(), e.getNPC()));
+				e.getPlayer().startConversation(new BankerCustom(e.getPlayer(), e.getNPC()));
+//				e.getPlayer().startConversation(new Banker(e.getPlayer(), e.getNPC()));
 			if(e.getOption().equalsIgnoreCase("Trade"))
 				ShopsHandler.openShop(e.getPlayer(), "arnolds_eclectic_supplies");
 			if(e.getOption().equalsIgnoreCase("Bank"))

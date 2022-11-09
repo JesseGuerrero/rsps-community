@@ -50,7 +50,7 @@ public class GIM {
 		}
 	};
 
-	public static ObjectClickHandler openChest = new ObjectClickHandler(new Object[] { 170 }, new WorldTile[]{new WorldTile(3091, 3493, 0)}) {
+	public static ObjectClickHandler openChest = new ObjectClickHandler(new Object[] { 170 }, new WorldTile[]{new WorldTile(3083, 3496, 0)}) {
 		@Override
 		public void handle(ObjectClickEvent e) {
 			if (e.getPlayer().getBool("Group IronMan")) {
@@ -58,7 +58,7 @@ public class GIM {
 					e.getPlayer().sendMessage("You need to be part of a group to access a shared bank...");
 					return;
 				}
-				e.getPlayer().getBank().open();
+				e.getPlayer().getBank().openGIMBank();
 			}
 		}
 	};

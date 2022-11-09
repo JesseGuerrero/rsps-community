@@ -14,7 +14,7 @@
 //  Copyright (C) 2021 Trenton Kress
 //  This file is part of project: Darkan
 //
-package com.rs.game.content.world.npcs;
+package com.rs.rsps.jessecustom;
 
 import com.rs.game.content.dialogue.Conversation;
 import com.rs.game.content.dialogue.Dialogue;
@@ -30,12 +30,11 @@ import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.NPCClickHandler;
 import com.rs.plugin.handlers.NPCInteractionDistanceHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
-import com.rs.rsps.jessecustom.BankerCustom;
 
 @PluginEventHandler
-public class Banker extends Conversation {
+public class BankerCustom extends Conversation {
 
-	public Banker(Player player, NPC npc) {
+	public BankerCustom(Player player, NPC npc) {
 		super(player);
 
 		addNPC(npc.getId(), HeadE.CHEERFUL_EXPOSITION, "Good day. How may I help you?");
@@ -45,17 +44,7 @@ public class Banker extends Conversation {
 				option("I'd like to access my bank account, please.", () -> player.getBank().open());
 				option("I'd like to check my PIN settings.", () -> player.getBank().openPinSettings());
 				option("I'd like to see my collection box.", () -> GE.openCollection(player));
-				option("What is this place?", new Dialogue()
-						.addNPC(npc.getId(), HeadE.CHEERFUL_EXPOSITION, "This is a branch of the Bank of Gielinor. We have branches in many towns.")
-						.addOptions(new Options() {
-							@Override
-							public void create() {
-								option("And what do you do?", new Dialogue()
-										.addNPC(npc.getId(), HeadE.CHEERFUL_EXPOSITION, "We will look after your items and money for you. Leave your valuables with us if you want to keep them safe."));
-								option("Didn't you used to be called the Bank of Varrock?", new Dialogue()
-										.addNPC(npc.getId(), HeadE.CALM_TALK, "Yes we did, but people kept on coming into our branches outside of Varrock and telling us that our signs were wrong. They acted as if we didn't know what town we were in or something."));
-							}
-						}));
+				option("GIM bank, please.", () -> player.getBank().openGIMBank());
 				option("I'd like to change my theshold for valuable loot notifications.", new Dialogue()
 						.addPlayer(HeadE.HAPPY_TALKING, "I'd like to change my theshold for valuable loot notifications.")
 						.addNPC(npc.getId(), HeadE.HAPPY_TALKING, "Okay, your current threshold is " + player.getI("lootbeamThreshold", 90000) + " GP. What would you like to set it to?")
@@ -93,7 +82,6 @@ public class Banker extends Conversation {
 				GE.openCollection(e.getPlayer());
 				break;
 			case "Talk-to":
-//				e.getPlayer().startConversation(new Banker(e.getPlayer(), e.getNPC()));
 				e.getPlayer().startConversation(new BankerCustom(e.getPlayer(), e.getNPC()));
 				break;
 			}

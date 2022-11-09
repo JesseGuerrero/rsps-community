@@ -628,6 +628,30 @@ public class Bank {
 	}
 
 	public void open() {
+		if (!checkPin())
+			return;
+		player.getTempAttribs().removeB("viewingOtherBank");
+		player.getVars().setVar(638, 0);
+		player.getVars().setVarBit(8348, 0);
+		refreshTabs();
+		refreshViewingTab();
+		refreshLastX();
+		refreshTab(currentTab);
+		player.getVars().syncVarsToClient();
+		player.getInterfaceManager().sendInterface(762);
+		player.getInterfaceManager().sendInventoryInterface(763);
+		player.getPackets().sendRunScript(2319);
+		player.getPackets().setIFText(762, 47, "Bank of " + Settings.getConfig().getServerName());
+		unlockButtons();
+		sendItems();
+		refreshItems();
+		player.setCloseInterfacesEvent(() -> {
+			player.getSession().writeToQueue(ServerPacket.TRIGGER_ONDIALOGABORT);
+			Familiar.sendLeftClickOption(player);
+		});
+	}
+
+	public void openGIMBank() {
 		if(player.getO("GIM Team") == null) {
 			player.sendMessage("You need to be part of a group to access a bank...");
 			return;
