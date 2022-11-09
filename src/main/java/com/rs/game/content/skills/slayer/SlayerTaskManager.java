@@ -25,6 +25,7 @@ import com.rs.game.model.entity.player.Player;
 import com.rs.lib.Constants;
 import com.rs.lib.game.WorldTile;
 import com.rs.lib.util.Utils;
+import com.rs.rsps.jessecustom.TaskFromSlayerMaster;
 import com.rs.utils.shop.ShopsHandler;
 
 public class SlayerTaskManager {
@@ -141,16 +142,8 @@ public class SlayerTaskManager {
 		killsLeft = Utils.random(chosenTask.getMin(), chosenTask.getMax());
 	}
 
-	public void getTaskFrom(Player player, Master masterfill) {
-		if(player.withinDistance(new WorldTile(3088, 3484, 0)))
-			for(int i = Master.values().length-1; i >= 0; i--) {
-				 if(player.getSkills().getCombatLevelWithSummoning() >= Master.values()[i].requiredCombatLevel
-					&& player.getSkills().getLevelForXp(Constants.SLAYER) >= Master.values()[i].reqSlayerLevel) {
-					 masterfill = Master.values()[i];
-					 break;
-				 }
-			}
-		final Master master = masterfill;
+	public void getTaskFrom(Player player, Master master1) {
+		final Master master = TaskFromSlayerMaster.highestSlayerMaster(player, master1);
 		if (player.hasSlayerTask()) {
 			if ((master == Master.Turael) && (player.getSlayer().getTask().getMaster().name().indexOf("Turael") == -1)) {
 				player.sendOptionDialogue("You already have a task, would you like me to assign you something easier?", ops -> {

@@ -37,18 +37,18 @@ public class GIM {
 		}
 	};
 
-	public static LoginHandler updateHintGIM = new LoginHandler() {
-		@Override
-		public void handle(LoginEvent e) {
-			if(!e.getPlayer().getBool("Group IronMan")) {
-				if(e.getPlayer().getRegionId() == 12342) {
-					for(NPC npc : World.getNPCsInRegion(12342))
-						if(npc.getId() == 1512)
-							e.getPlayer().getHintIconsManager().addHintIcon(6, npc, 0, -1, true);
-				}
-			}
-		}
-	};
+//	public static LoginHandler updateHintGIM = new LoginHandler() {
+//		@Override
+//		public void handle(LoginEvent e) {
+//			if(!e.getPlayer().getBool("Group IronMan")) {
+//				if(e.getPlayer().getRegionId() == 12342) {
+//					for(NPC npc : World.getNPCsInRegion(12342))
+//						if(npc.getId() == 1512)
+//							e.getPlayer().getHintIconsManager().addHintIcon(6, npc, 0, -1, true);
+//				}
+//			}
+//		}
+//	};
 
 	public static ObjectClickHandler openChest = new ObjectClickHandler(new Object[] { 170 }, new WorldTile[]{new WorldTile(3083, 3496, 0)}) {
 		@Override
