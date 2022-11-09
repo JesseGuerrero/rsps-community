@@ -67,6 +67,7 @@ import com.rs.lib.util.Utils;
 import com.rs.plugin.PluginManager;
 import com.rs.plugin.events.NPCDeathEvent;
 import com.rs.plugin.events.NPCDropEvent;
+import com.rs.rsps.jessecustom.CustomScripts;
 import com.rs.tools.old.CharmDrop;
 import com.rs.utils.DropSets;
 import com.rs.utils.EffigyDrop;
@@ -488,6 +489,8 @@ public class NPC extends Entity {
 			source.setFindTargetDelay(0);
 		}
 		setNextAnimation(null);
+		if(source instanceof Player p)
+			CustomScripts.increaseWeaponStats(p, this);
 		PluginManager.handle(new NPCDeathEvent(this, source));
 		WorldTasks.scheduleTimer(loop -> {
 			if (loop == 0) {

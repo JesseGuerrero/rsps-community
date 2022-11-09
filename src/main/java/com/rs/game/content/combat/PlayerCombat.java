@@ -54,6 +54,7 @@ import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ItemClickEvent;
 import com.rs.plugin.handlers.ItemClickHandler;
+import com.rs.rsps.jessecustom.CustomScripts;
 import com.rs.utils.Ticks;
 
 @PluginEventHandler
@@ -1625,6 +1626,7 @@ public class PlayerCombat extends PlayerAction {
 			if (hit < perc25MaxHit)
 				hit += perc25MaxHit;
 		}
+		hit = CustomScripts.increaseHitByWeaponBonus(player, hit);
 		return hit;
 	}
 

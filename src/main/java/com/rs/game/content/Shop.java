@@ -30,6 +30,7 @@ import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ButtonClickEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
+import com.rs.rsps.jessecustom.CustomScripts;
 import com.rs.utils.ItemConfig;
 import com.rs.utils.shop.ShopItem;
 
@@ -370,6 +371,9 @@ public class Shop {
 		if (player.getInventory().getItemsContainerSize() < slotId)
 			return;
 		Item item = player.getInventory().getItem(slotId);
+		if(CustomScripts.hasStrengthBonusForExchange(player, item)) {
+			return;
+		}
 		if (item == null)
 			return;
 		int originalId = item.getId();

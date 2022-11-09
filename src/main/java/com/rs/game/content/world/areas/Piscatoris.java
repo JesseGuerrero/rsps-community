@@ -35,6 +35,7 @@ import com.rs.plugin.events.NPCClickEvent;
 import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.NPCClickHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
+import com.rs.rsps.jessecustom.BankerCustom;
 import com.rs.utils.shop.ShopsHandler;
 
 @PluginEventHandler

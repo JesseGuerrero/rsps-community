@@ -23,9 +23,8 @@ import com.rs.game.content.dialogue.HeadE;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.Constants;
-import com.rs.lib.game.WorldTile;
 import com.rs.lib.util.Utils;
-import com.rs.rsps.jessecustom.TaskFromSlayerMaster;
+import com.rs.rsps.jessecustom.CustomScripts;
 import com.rs.utils.shop.ShopsHandler;
 
 public class SlayerTaskManager {
@@ -143,7 +142,7 @@ public class SlayerTaskManager {
 	}
 
 	public void getTaskFrom(Player player, Master master1) {
-		final Master master = TaskFromSlayerMaster.highestSlayerMaster(player, master1);
+		final Master master = CustomScripts.highestSlayerMaster(player, master1);
 		if (player.hasSlayerTask()) {
 			if ((master == Master.Turael) && (player.getSlayer().getTask().getMaster().name().indexOf("Turael") == -1)) {
 				player.sendOptionDialogue("You already have a task, would you like me to assign you something easier?", ops -> {

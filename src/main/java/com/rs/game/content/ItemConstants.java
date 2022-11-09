@@ -32,6 +32,7 @@ import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ItemClickEvent;
 import com.rs.plugin.handlers.ItemClickHandler;
+import com.rs.rsps.jessecustom.CustomScripts;
 import com.rs.utils.Ticks;
 
 @PluginEventHandler
@@ -405,7 +406,7 @@ public class ItemConstants {
 	}
 
 	public static boolean isTradeable(Item item) {
-		if (item.getMetaData() != null)
+		if (/*item.getMetaData() != null*/ CustomScripts.checkTradeable(item))
 			return false;
 		switch(item.getId()) {
 		//tradeable non-exchangeable item exceptions
