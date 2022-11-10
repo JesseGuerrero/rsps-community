@@ -1270,6 +1270,9 @@ public class DungeonManager {
 			double totalXp = averageXP * multiplier;
 //			int tokens = (int) (totalXp / 10.0);
 			int tokens = CustomScripts.getTokenReward(totalXp);
+			floorXP = CustomScripts.increaseByXPRateForInterfaceDungeoneering(floorXP);
+			prestigeXP = CustomScripts.increaseByXPRateForInterfaceDungeoneering(prestigeXP);
+			averageXP = CustomScripts.increaseByXPRateForInterfaceDungeoneering(averageXP);
 			player.getPackets().sendVarc(1237, (int) (floorXP * 10));
 			player.getPackets().sendVarc(1238, (int) (prestigeXP * 10));
 			player.getPackets().sendVarc(1239, (int) (averageXP * 10));
