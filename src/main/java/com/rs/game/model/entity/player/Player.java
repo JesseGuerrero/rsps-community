@@ -1246,10 +1246,11 @@ public class Player extends Entity {
 	}
 
 	public void run() {
-		if (getAccount().getRights() == null) {
-			setRights(Rights.PLAYER);
-			LobbyCommunicator.updateRights(this);
-		}
+		if(CustomScripts.updateRightsOnRun(this))
+			if (getAccount().getRights() == null) {
+				setRights(Rights.PLAYER);
+				LobbyCommunicator.updateRights(this);
+			}
 		LobbyCommunicator.addWorldPlayer(account, response -> {
 			if (!response) {
 				forceLogout();

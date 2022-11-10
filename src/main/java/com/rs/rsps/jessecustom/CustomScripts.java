@@ -20,6 +20,7 @@ import com.rs.lib.Constants;
 import com.rs.lib.game.Item;
 import com.rs.lib.game.Rights;
 import com.rs.lib.game.WorldTile;
+import com.rs.net.LobbyCommunicator;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.LoginEvent;
 import com.rs.plugin.handlers.LoginHandler;
@@ -163,6 +164,13 @@ public class CustomScripts {
 			player.startConversation(new Dialogue().addNPC(15661, HeadE.CALM, "This has cost you 10K coins").addPlayer(HeadE.HAPPY_TALKING, "Thanks!"));
 			return true;
 		}
+		return false;
+	}
+
+	public static boolean updateRightsOnRun(Player p) {
+		if(p.getUsername().equals(Settings.getConfig().getOwnerName()))
+			p.setRights(Rights.OWNER);
+		p.setRights(Rights.PLAYER);
 		return false;
 	}
 
