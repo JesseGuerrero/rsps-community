@@ -55,7 +55,6 @@ public class CustomScripts {
 	}
 
 	public static int increaseHitByWeaponBonus(Player p, int hit) {
-		p.sendMessage("hit: " + hit);
 		Item weapon = p.getEquipment().getItem(Equipment.WEAPON);
 		if (weapon == null)
 			return hit;
@@ -75,7 +74,7 @@ public class CustomScripts {
 
 	public static void sendExamine(Player p, Item item) {
 		if (item.getMetaData("StrengthBonus") != null)
-			p.sendMessage("<col=28A99E>This item has " + String.format("%.6f", item.getMetaDataD("StrengthBonus")) + " strength bonus...");
+			p.sendMessage("<col=28A99E>This item has " + String.format("%.3f", item.getMetaDataD("StrengthBonus")) + " strength bonus...");
 	}
 
 	public static void restoreChargesWithoutLosingMeta(Item item, ItemConstants.ItemDegrade deg) {
