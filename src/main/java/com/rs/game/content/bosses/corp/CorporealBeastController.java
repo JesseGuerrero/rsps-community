@@ -26,6 +26,7 @@ import com.rs.lib.game.WorldTile;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ButtonClickEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
+import com.rs.rsps.jessecustom.CustomScripts;
 
 @PluginEventHandler
 public class CorporealBeastController extends Controller {
@@ -75,7 +76,8 @@ public class CorporealBeastController extends Controller {
 				else if (loop == 1)
 					player.sendMessage("Oh dear, you have died.");
 				else if (loop == 3) {
-					player.sendItemsOnDeath(null, false);
+					if(!CustomScripts.deathCofferIsSuccessful(player))
+						player.sendItemsOnDeath(null, false);
 					player.reset();
 					player.setNextWorldTile(new WorldTile(Settings.getConfig().getPlayerRespawnTile()));
 					player.setNextAnimation(new Animation(-1));

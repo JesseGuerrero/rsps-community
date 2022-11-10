@@ -38,6 +38,7 @@ import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ButtonClickEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
+import com.rs.rsps.jessecustom.CustomScripts;
 import com.rs.utils.DropSets;
 import com.rs.utils.drop.DropTable;
 
@@ -250,6 +251,8 @@ public class TreasureTrailsManager {
 	}
 	public boolean useItem(Item item, int slot) {
 		int level = getScrollboxLevel(item.getId());
+		if(CustomScripts.completeTreasureTrail(player, level, item))
+			return true;
 		if (level != -1) {
 			if (hasClueScrollItem()) {
 				player.sendMessage("You should finish the clue you already have first.");

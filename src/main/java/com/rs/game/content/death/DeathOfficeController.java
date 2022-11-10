@@ -20,9 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.rs.game.content.dialogue.Dialogue;
-import com.rs.game.content.dialogue.HeadE;
-import com.rs.game.content.dialogue.Options;
 import com.rs.game.content.miniquests.Miniquest;
 import com.rs.game.content.quests.Quest;
 import com.rs.game.content.skills.magic.Magic;
@@ -141,7 +138,7 @@ public class DeathOfficeController extends Controller {
 	public static Hub getRespawnHub(Player player) {
 		return getCurrentHub(player, new WorldTile(player.getTile()));
 	}
-	public static final WorldTile[] RESPAWN_LOCATIONS = { new WorldTile(3222, 3219, 0), new WorldTile(2971, 3343, 0), new WorldTile(2758, 3486, 0), new WorldTile(1891, 3177, 0), new WorldTile(2889, 3528, 0) };
+
 	private transient DynamicRegionReference region = new DynamicRegionReference(2, 2);
 	private Stages stage;
 	private Integer[][] slots;
@@ -247,29 +244,6 @@ public class DeathOfficeController extends Controller {
 	@Override
 	public boolean processObjectClick1(GameObject object) {
 		if (object.getId() == 45803) {
-			if(player.getI("death coffer") > 10_000) {
-				player.startConversation(new Dialogue().addOptions("Choose an option:", new Options() {
-					@Override
-					public void create() {
-						option("Use 10K to overwrite death?", new Dialogue()
-								.addPlayer(HeadE.HAPPY_TALKING, "I want to overwrite my death!")
-								.addNPC(15661, HeadE.CALM, "Okay but it will cost you!")
-								.addNext(()->{
-									player.save("death is saved", true);
-									player.sendMessage("You will keep your items!");
-									getReadyToRespawn();
-								})
-						);
-						option("Just respawn me...", new Dialogue()
-								.addNPC(15661, HeadE.CALM, "Are you sure you want to leave a gravestone?")
-								.addPlayer(HeadE.HAPPY_TALKING, "Yes I am sure")
-								.addNext(()->{getReadyToRespawn();})
-						);
-					}
-				}));
-				return false;
-			}
-			player.sendMessage("Your death coffer was empty!");
 			getReadyToRespawn();
 			return false;
 		}
@@ -325,14 +299,9 @@ public class DeathOfficeController extends Controller {
 		player.getPackets().setIFRightClickOps(18, 17, 0, 100, 0);
 		player.getPackets().setIFRightClickOps(18, 45, 0, 6, 0);
 		player.setCloseInterfacesEvent(() -> {
-			WorldTile respawnTile = Hub.LUMBRIDGE.tile;
 			synchronized (slots) {
 				if (!player.hasRights(Rights.ADMIN))
 					player.sendItemsOnDeath(null, getDeathTile(), currentHub.tile, false, slots);
-				if (!player.hasRights(Rights.ADMIN) || player.getBool("death is saved")) {
-					player.delete("death is saved");
-					player.sendItemsOnDeath(null, getDeathTile(), respawnTile, false, slots);
-				}
 				else
 					player.sendMessage("Slots saved: " + Arrays.deepToString(GraveStone.getItemsKeptOnDeath(player, slots)));
 			}

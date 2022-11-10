@@ -191,35 +191,36 @@ public class WildernessController extends Controller {
 
 	@Override
 	public boolean sendDeath() {
-		WorldTasks.scheduleTimer(0, 1, loop -> {
-			if (loop == 0)
-				player.setNextAnimation(new Animation(836));
-			else if (loop == 1)
-				player.sendMessage("Oh dear, you have died.");
-			else if (loop == 3) {
-				Player killer = player.getMostDamageReceivedSourcePlayer();
-				if (killer != null) {
-					killer.removeDamage(player);
-					killer.increaseKillCount(player);
-				}
-				player.sendItemsOnDeath(killer);
-				player.getEquipment().init();
-				player.getInventory().init();
-				player.reset();
-				if (player.get("customspawn") instanceof WorldTile spawn)
-					player.setNextWorldTile(spawn);
-				else
-					player.setNextWorldTile(new WorldTile(Settings.getConfig().getPlayerRespawnTile()));
-				player.setNextAnimation(new Animation(-1));
-			} else if (loop == 4) {
-				removeIcon();
-				removeController();
-				player.jingle(90);
-				return false;
-			}
-			return true;
-		});
-		return false;
+		return true;
+//		WorldTasks.scheduleTimer(0, 1, loop -> {
+//			if (loop == 0)
+//				player.setNextAnimation(new Animation(836));
+//			else if (loop == 1)
+//				player.sendMessage("Oh dear, you have died.");
+//			else if (loop == 3) {
+//				Player killer = player.getMostDamageReceivedSourcePlayer();
+//				if (killer != null) {
+//					killer.removeDamage(player);
+//					killer.increaseKillCount(player);
+//				}
+//				player.sendItemsOnDeath(killer);
+//				player.getEquipment().init();
+//				player.getInventory().init();
+//				player.reset();
+//				if (player.get("customspawn") instanceof WorldTile spawn)
+//					player.setNextWorldTile(spawn);
+//				else
+//					player.setNextWorldTile(new WorldTile(Settings.getConfig().getPlayerRespawnTile()));
+//				player.setNextAnimation(new Animation(-1));
+//			} else if (loop == 4) {
+//				removeIcon();
+//				removeController();
+//				player.jingle(90);
+//				return false;
+//			}
+//			return true;
+//		});
+//		return false;
 	}
 
 	@Override

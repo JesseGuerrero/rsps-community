@@ -26,6 +26,7 @@ import com.rs.plugin.events.ItemClickEvent;
 import com.rs.plugin.events.NPCClickEvent;
 import com.rs.plugin.handlers.ItemClickHandler;
 import com.rs.plugin.handlers.NPCClickHandler;
+import com.rs.rsps.jessecustom.CustomScripts;
 
 @PluginEventHandler
 public class ReaperAssignments  {
@@ -54,7 +55,7 @@ public class ReaperAssignments  {
 				});
 			} else {
 				addNPC(15661, HeadE.CALM, "What is it, mortal? Time is ticking.");
-				addOptions("What would you like to say?", new Options() {
+				addOptions("What would you like to say?", CustomScripts.getDeathsOptions(player) /*new Options() {
 					@Override
 					public void create() {
 						option("I need an assignment.", () -> {
@@ -109,7 +110,7 @@ public class ReaperAssignments  {
 								.addNPC(15661, HeadE.CALM, player.getI("death coffer")+" coins...")
 						);
 					}
-				});
+				}*/);
 			}
 			create();
 		}
@@ -187,6 +188,8 @@ public class ReaperAssignments  {
 				break;
 			case 4:
 				e.getPlayer().sendMessage("Rewards are not implemented at the moment, but you can still gain points. Feel free to post suggestions for rewards in Discord.");
+				break;
+			case 5:
 				break;
 			}
 		}

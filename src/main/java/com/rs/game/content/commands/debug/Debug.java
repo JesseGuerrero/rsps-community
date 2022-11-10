@@ -45,6 +45,7 @@ import com.rs.plugin.events.ButtonClickEvent;
 import com.rs.plugin.events.EnterChunkEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
 import com.rs.plugin.handlers.EnterChunkHandler;
+import com.rs.rsps.jessecustom.CustomScripts;
 import com.rs.utils.music.Music;
 
 
@@ -207,6 +208,8 @@ public class Debug {
 					p.sendMessage("Completed quest: " + quest.name());
 				}
 		});
+
+		CustomScripts.customDebugCommands();
 
 		Commands.add(Rights.PLAYER, "resetallquests", "Resets all quests.", (p, args) -> {
 			for (Quest quest : Quest.values())

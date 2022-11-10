@@ -16,6 +16,7 @@
 //
 package com.rs.game.content.world;
 
+import com.rs.game.content.ItemConstants;
 import com.rs.game.content.bosses.qbd.QueenBlackDragonController;
 import com.rs.game.content.dialogue.Conversation;
 import com.rs.game.content.dialogue.Dialogue;
@@ -30,6 +31,7 @@ import com.rs.plugin.events.ItemClickEvent;
 import com.rs.plugin.events.NPCClickEvent;
 import com.rs.plugin.handlers.ItemClickHandler;
 import com.rs.plugin.handlers.NPCClickHandler;
+import com.rs.rsps.jessecustom.CustomScripts;
 
 @PluginEventHandler
 public class RoyalCrossbow {
@@ -70,7 +72,8 @@ public class RoyalCrossbow {
 				WorldTasks.delay(4, () -> e.getPlayer().resetReceivedHits());
 				e.getPlayer().sendMessage("You brandish the crossbow and it absorbs the dragon's extremely hot fire.");
 				e.getItem().setId(24338);
-				e.getItem().deleteMetaData();
+				//e.getItem().deleteMetaData();
+				CustomScripts.restoreChargesWithoutLosingMeta(e.getItem(), ItemConstants.ItemDegrade.forId(e.getItem().getId()));
 				e.getPlayer().getEquipment().refresh(Equipment.WEAPON);
 				e.getPlayer().getInventory().refresh();
 				break;

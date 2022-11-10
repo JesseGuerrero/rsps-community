@@ -113,7 +113,7 @@ public class Daemonheim {
 							e.getPlayer().getInventory().deleteItem(995, cost);
 							item.setId(deg.getItemId());
 //							item.deleteMetaData();
-							CustomScripts.restoreChaotic(item, deg);
+							CustomScripts.restoreChargesWithoutLosingMeta(item, deg);
 							e.getPlayer().getInventory().refresh(e.getItem().getSlot());
 						});
 						ops.add(Utils.formatNumber(cost / 10) + " coins and " + Utils.formatNumber(cost / 100) + " dungeoneering tokens", () -> {
@@ -134,7 +134,7 @@ public class Daemonheim {
 							e.getPlayer().getDungManager().removeTokens(tokenCost);
 							item.setId(deg.getItemId());
 //							item.deleteMetaData();
-							CustomScripts.restoreChaotic(item, deg);
+							CustomScripts.restoreChargesWithoutLosingMeta(item, deg);
 							e.getPlayer().getInventory().refresh(e.getItem().getSlot());
 						});
 						ops.add("Nevermind.");

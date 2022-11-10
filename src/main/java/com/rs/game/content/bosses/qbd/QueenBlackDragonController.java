@@ -40,6 +40,7 @@ import com.rs.lib.net.ClientPacket;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.ObjectClickHandler;
+import com.rs.rsps.jessecustom.CustomScripts;
 
 @PluginEventHandler
 public final class QueenBlackDragonController extends Controller {
@@ -308,7 +309,8 @@ public final class QueenBlackDragonController extends Controller {
 					player.sendMessage("Oh dear, you have died.");
 				else if (loop == 3) {
 					end(0);
-					player.getControllerManager().startController(new DeathOfficeController(OUTSIDE, player.hasSkull()));
+					if(!CustomScripts.deathCofferIsSuccessful(player))
+						player.getControllerManager().startController(new DeathOfficeController(OUTSIDE, player.hasSkull()));
 				} else if (loop == 4) {
 					player.jingle(90);
 					stop();

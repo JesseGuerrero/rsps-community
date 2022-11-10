@@ -94,7 +94,6 @@ import com.rs.game.content.skills.slayer.TaskMonster;
 import com.rs.game.content.skills.summoning.Familiar;
 import com.rs.game.content.skills.summoning.Pouch;
 import com.rs.game.content.transportation.FadingScreen;
-import com.rs.game.content.tutorialisland.GamemodeSelection;
 import com.rs.game.content.tutorialisland.TutorialIslandController;
 import com.rs.game.content.world.Musician;
 import com.rs.game.ge.GE;
@@ -164,6 +163,7 @@ import com.rs.plugin.events.InputIntegerEvent;
 import com.rs.plugin.events.InputStringEvent;
 import com.rs.plugin.events.ItemEquipEvent;
 import com.rs.plugin.events.LoginEvent;
+import com.rs.rsps.jessecustom.CustomScripts;
 import com.rs.rsps.jessecustom.GamemodeSelectionCustom;
 import com.rs.utils.MachineInformation;
 import com.rs.utils.Ticks;
@@ -2177,6 +2177,9 @@ public class Player extends Entity {
 
 	}
 
+	private Player getSelf() {
+		return this;
+	}
 	@Override
 	public void sendDeath(final Entity source) {
 		incrementCount("Deaths");
@@ -2300,8 +2303,10 @@ public class Player extends Entity {
 					reset();
 					if (source instanceof Player opp && opp.hasRights(Rights.ADMIN))
 						setNextWorldTile(Settings.getConfig().getPlayerRespawnTile());
-					else
-						controllerManager.startController(new DeathOfficeController(deathTile, hasSkull()));
+					else {
+						if(!CustomScripts.deathCofferIsSuccessful(getSelf()))
+							controllerManager.startController(new DeathOfficeController(deathTile, hasSkull()));
+					}
 				} else if (loop == 3) {
 					setNextAnimation(new Animation(-1));
 				} else if (loop == 4) {
@@ -2334,25 +2339,26 @@ public class Player extends Entity {
 		WorldDB.getPlayers().save(this);
 		for (Item item : items[0])
 			inventory.addItem(item);
-		for (Item item : items[1]) {
-			if (item == null)
-				continue;
-			ItemDegrade deg = null;
-			for(ItemDegrade d : ItemDegrade.values())
-				if (d.getDegradedId() == item.getId() || d.getItemId() == item.getId()) {
-					deg = d;
-					break;
-				}
-			if (deg != null)
-				if (deg.getBrokenId() != -1) {
-					item.setId(deg.getBrokenId());
-					item.deleteMetaData();
-				} else {
-					item.setAmount(ItemDefinitions.getDefs(item.getId()).getValue());
-					item.setId(995);
-					item.deleteMetaData();
-				}
-		}
+		if(CustomScripts.dontConvertItemsOnDeathTileDrop())
+			for (Item item : items[1]) {
+				if (item == null)
+					continue;
+				ItemDegrade deg = null;
+				for(ItemDegrade d : ItemDegrade.values())
+					if (d.getDegradedId() == item.getId() || d.getItemId() == item.getId()) {
+						deg = d;
+						break;
+					}
+				if (deg != null)
+					if (deg.getBrokenId() != -1) {
+						item.setId(deg.getBrokenId());
+						item.deleteMetaData();
+					} else {
+						item.setAmount(ItemDefinitions.getDefs(item.getId()).getValue());
+						item.setId(995);
+						item.deleteMetaData();
+					}
+			}
 		if (items[1].length != 0)
 			if (noGravestone)
 				for (Item item : items[1])
@@ -3242,6 +3248,7 @@ public class Player extends Entity {
 		sendMessage("Welcome to " + Settings.getConfig().getServerName() + ".");
 		if (!Settings.getConfig().getLoginMessage().isEmpty())
 			sendMessage(Settings.getConfig().getLoginMessage());
+		CustomScripts.giveToolsLoadestones(this);
 		getAppearance().generateAppearanceData();
 	}
 
