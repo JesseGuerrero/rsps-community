@@ -46,6 +46,7 @@ import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
 import com.rs.plugin.handlers.ItemClickHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
+import com.rs.rsps.jessecustom.CustomScripts;
 
 @PluginEventHandler
 public class DungManager {
@@ -359,7 +360,11 @@ public class DungManager {
 
 	public void bind(Item item, int slot) {
 		ItemDefinitions defs = item.getDefinitions();
-		int bindId = DungeonUtils.getBindedId(item);
+		int bindId = -1;
+		if(CustomScripts.isBindedItem(item))
+			bindId = item.getId();
+		if(!CustomScripts.isBindedItem(item))
+			bindId = DungeonUtils.getBindedId(item);
 		if (bindId == -1)
 			return;
 		if (DungeonUtils.isBindAmmo(item)) {
@@ -383,9 +388,11 @@ public class DungManager {
 			}
 			item.setId(bindId);
 			player.getInventory().refresh(slot);
-			bindedItems.add(new Item(item));
+//			bindedItems.add(new Item(item));
+			CustomScripts.bindItemDirectly(bindedItems, item);
 		}
-		player.sendMessage("You bind the " + defs.getName() + " to you. Check in the smuggler to manage your bound items.");
+		if(CustomScripts.silenceBoundNotice(true))
+			player.sendMessage("You bind the " + defs.getName() + " to you. Check in the smuggler to manage your bound items.");
 	}
 
 	public void unbind(Item item) {

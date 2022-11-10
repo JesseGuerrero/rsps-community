@@ -1,6 +1,7 @@
 package com.rs.rsps.jessecustom;
 
 import com.rs.Settings;
+import com.rs.cache.loaders.ItemDefinitions;
 import com.rs.game.World;
 import com.rs.game.content.ItemConstants;
 import com.rs.game.content.Toolbelt;
@@ -16,6 +17,7 @@ import com.rs.game.model.entity.actions.LodestoneAction;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.player.Equipment;
 import com.rs.game.model.entity.player.Player;
+import com.rs.game.model.item.ItemsContainer;
 import com.rs.lib.Constants;
 import com.rs.lib.game.Item;
 import com.rs.lib.game.Rights;
@@ -144,6 +146,40 @@ public class CustomScripts {
 		player.getInventory().deleteItem(item.getId(), 1);
 		player.getTreasureTrailsManager().openReward(level);
 		return true;
+	}
+
+	public static void updateMetasOnWeapons(Player player) {
+		ItemsContainer<Item> boundItems = player.getDungManager().getBindedItems().asItemContainer();
+		Item weapon = player.getEquipment().get(Equipment.WEAPON);
+		for(Item boundItem : boundItems.asList()) {
+			if (weapon.getId() == boundItem.getId()) {
+				if (weapon.containsMetaData() && weapon.getMetaData("StrengthBonus") != null) {
+					int slot = player.getDungManager().getBindedItems().getThisItemSlot(boundItem);
+					player.getDungManager().getBindedItems().remove(boundItem);
+					player.getDungManager().bind(weapon, slot);
+				}
+			}
+		}
+	}
+
+	public static boolean silenceBoundNotice(boolean isDisabled) {
+		return !isDisabled;
+	}
+
+	public static boolean isBindedItem(Item item) {
+		String name = item.getName();
+		for (int i = 15775; i <= 16272; i++)
+			if (item.getId() == i)
+				return true;
+		for (int i = 19865; i <= 19866; i++)
+			if (item.getId() == i)
+				return true;
+		return false;
+
+	}
+
+	public static void bindItemDirectly(ItemsContainer<Item> bindedItems, Item item) {
+		bindedItems.add(item);
 	}
 
 	public static boolean deathCofferIsSuccessful(Player player) {
