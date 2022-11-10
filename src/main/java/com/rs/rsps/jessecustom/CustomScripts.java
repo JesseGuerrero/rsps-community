@@ -50,11 +50,12 @@ public class CustomScripts {
 			return;
 		initializeMetas(weapon);
 		double bonusValue = weapon.getMetaDataD("StrengthBonus");
-		bonusValue += ((double) killedNPC.getCombatLevel()) / ((double) 500_0000);
+		bonusValue += ((double) killedNPC.getCombatLevel()) / ((double) (500_000/10)); //1 classical hit every 500k levelled monsters killed
 		weapon.addMetaData("StrengthBonus", bonusValue);
 	}
 
 	public static int increaseHitByWeaponBonus(Player p, int hit) {
+		p.sendMessage("hit: " + hit);
 		Item weapon = p.getEquipment().getItem(Equipment.WEAPON);
 		if (weapon == null)
 			return hit;
@@ -292,13 +293,4 @@ public class CustomScripts {
 		}
 		Toolbelt.refreshToolbelt(p);
 	}
-
-	public static LoginHandler handleGivingToolsLoadestones = new LoginHandler() {
-		@Override
-		public void handle(LoginEvent e) {
-			if (e.getPlayer().getStarter() <= 0) {
-
-			}
-		}
-	};
 }
