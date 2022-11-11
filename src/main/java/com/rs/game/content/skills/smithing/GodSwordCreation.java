@@ -21,6 +21,7 @@ import com.rs.lib.Constants;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ItemClickEvent;
 import com.rs.plugin.handlers.ItemClickHandler;
+import com.rs.rsps.jessecustom.CustomScripts;
 
 /**
  *
@@ -191,7 +192,7 @@ public class GodSwordCreation {
 				player.sendMessage("You need 85 smithing and 90 prayer to attach the sigil.");
 				return true;
 			}
-		} else if (itemUsed == 21369 && usedWith == 4151 || usedWith == 21369 && itemUsed == 4151) {
+		} else if (/*itemUsed == 21369 && usedWith == 4151 || usedWith == 21369 && itemUsed == 4151*/ CustomScripts.dontDeleteWhip()) {
 			player.getInventory().deleteItem(4151, 1);
 			player.getInventory().deleteItem(21369, 1); // WHIP VINE
 			player.getInventory().addItem(21371, 1);
@@ -212,13 +213,14 @@ public class GodSwordCreation {
 	public static ItemClickHandler handleAbyssalVineWhip = new ItemClickHandler(new Object[] { "Abyssal vine whip" }, new String[] { "Split" }) {
 		@Override
 		public void handle(ItemClickEvent e) {
-			if (e.getPlayer().getInventory().getFreeSlots() >= 1) {
-				e.getPlayer().getInventory().deleteItem(e.getItem());
-				e.getPlayer().getInventory().addItem(4151);
-				e.getPlayer().getInventory().addItem(21369);
-				e.getPlayer().sendMessage("You split the vine from the whip.");
-			} else
-				e.getPlayer().sendMessage("Not enough space in your inventory.");
+			CustomScripts.handleWhipSplit(e.getPlayer(), e.getItem());
+//			if (e.getPlayer().getInventory().getFreeSlots() >= 1) {
+//				e.getPlayer().getInventory().deleteItem(e.getItem());
+//				e.getPlayer().getInventory().addItem(4151);
+//				e.getPlayer().getInventory().addItem(21369);
+//				e.getPlayer().sendMessage("You split the vine from the whip.");
+//			} else
+//				e.getPlayer().sendMessage("Not enough space in your inventory.");
 		}
 	};
 }

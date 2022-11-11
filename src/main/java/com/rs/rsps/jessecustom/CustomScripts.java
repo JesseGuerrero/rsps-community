@@ -1,8 +1,6 @@
 package com.rs.rsps.jessecustom;
 
 import com.rs.Settings;
-import com.rs.cache.loaders.ItemDefinitions;
-import com.rs.game.World;
 import com.rs.game.content.ItemConstants;
 import com.rs.game.content.Toolbelt;
 import com.rs.game.content.commands.Commands;
@@ -12,7 +10,6 @@ import com.rs.game.content.dialogue.Options;
 import com.rs.game.content.quests.Quest;
 import com.rs.game.content.quests.handlers.shieldofarrav.ShieldOfArrav;
 import com.rs.game.content.skills.slayer.Master;
-import com.rs.game.model.entity.Entity;
 import com.rs.game.model.entity.actions.LodestoneAction;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.player.Equipment;
@@ -22,11 +19,11 @@ import com.rs.lib.Constants;
 import com.rs.lib.game.Item;
 import com.rs.lib.game.Rights;
 import com.rs.lib.game.WorldTile;
-import com.rs.net.LobbyCommunicator;
 import com.rs.plugin.annotations.PluginEventHandler;
+import com.rs.plugin.events.ItemOnItemEvent;
 import com.rs.plugin.events.LoginEvent;
+import com.rs.plugin.handlers.ItemOnItemHandler;
 import com.rs.plugin.handlers.LoginHandler;
-import com.rs.utils.Ticks;
 
 import static com.rs.game.content.skills.slayer.ReaperAssignments.talkAboutAssignment;
 
@@ -95,10 +92,39 @@ public class CustomScripts {
 		});
 	}
 
-	public static boolean checkTradeable(Item item) {
+	public static boolean isTradeable(Item item) {
 		if (item.getMetaData() == null)
 			return true;
-		return (item.getMetaData().size() > 1 && item.getMetaData("StrengthBonus") != null);
+		if(item.getMetaData().size() == 1)
+			if(item.getMetaData("StrengthBonus") != null)
+				return true;
+		return false;
+	}
+
+	public static ItemOnItemHandler handleMakeVineWhip = new ItemOnItemHandler(new int[]{21369}, new int[]{4151}) {//blamish oil, fly fishing rod
+		@Override
+		public void handle(ItemOnItemEvent e) {
+			if(e.getItem1().getId() == 4151)
+				e.getItem1().setId(21371);
+			if(e.getItem2().getId() == 4151)
+				e.getItem2().setId(21371);
+			e.getPlayer().getInventory().deleteItem(21369, 1); // WHIP VINE
+			e.getPlayer().getInventory().refresh();
+		}
+	};
+
+	public static void handleWhipSplit(Player p, Item item) {
+		if (p.getInventory().getFreeSlots() >= 1) {
+			item.setId(4151);
+			p.getInventory().addItem(21369);
+			p.sendMessage("You split the vine from the whip.");
+			p.getInventory().refresh();
+		} else
+			p.sendMessage("Not enough space in your inventory.");
+	}
+
+	public static boolean dontDeleteWhip() {
+		return false;
 	}
 
 	/**

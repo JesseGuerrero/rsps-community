@@ -406,7 +406,7 @@ public class ItemConstants {
 	}
 
 	public static boolean isTradeable(Item item) {
-		if (/*item.getMetaData() != null*/ CustomScripts.checkTradeable(item))
+		if (/*item.getMetaData() != null*/ !CustomScripts.isTradeable(item))
 			return false;
 		switch(item.getId()) {
 		//tradeable non-exchangeable item exceptions
