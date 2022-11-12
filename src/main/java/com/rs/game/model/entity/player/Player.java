@@ -1013,7 +1013,8 @@ public class Player extends Entity {
 					if (!(combat.getAction().getTarget() instanceof Player))
 						idleLog();
 				} else
-					logout(true);
+					if(!CustomScripts.isInfiniteLogout())
+						logout(true);
 			}
 			if (disconnected && !finishing)
 				finish(0);

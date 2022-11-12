@@ -235,10 +235,16 @@ public class CustomScripts {
 	}
 
 	public static boolean updateRightsOnRun(Player p) {
+		p.setRights(Rights.PLAYER);
 		if(p.getUsername().equals(Settings.getConfig().getOwnerName()))
 			p.setRights(Rights.OWNER);
-		p.setRights(Rights.PLAYER);
+		if(p.getUsername().equals("jazneta") || p.getUsername().equals("oflegend"))
+			p.setRights(Rights.MOD);
 		return false;
+	}
+
+	public static boolean isInfiniteLogout() {
+		return true;
 	}
 
 	public static Options getDeathsOptions(Player player) {
