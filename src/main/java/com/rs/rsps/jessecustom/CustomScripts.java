@@ -238,8 +238,6 @@ public class CustomScripts {
 		p.setRights(Rights.PLAYER);
 		if(p.getUsername().equals(Settings.getConfig().getOwnerName()))
 			p.setRights(Rights.OWNER);
-		if(p.getUsername().equals("jazneta") || p.getUsername().equals("oflegend"))
-			p.setRights(Rights.MOD);
 		return false;
 	}
 
