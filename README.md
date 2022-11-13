@@ -12,7 +12,7 @@ A world server with RSPS features, world 4 on Darkan's public lobby.
 [bug-link]: https://github.com/titandino/darkan-world-server/issues
 [bug-badge]: https://img.shields.io/github/issues-raw/titandino/darkan-world-server/bug?label=open%20bugs
 
-Current Features:<br>
+Current Mods:<br>
 -All base game features<br>
 -XP Rate: 3X<br>
 -All Quests pre-finished<br>
