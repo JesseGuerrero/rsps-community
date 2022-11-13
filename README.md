@@ -1,4 +1,4 @@
-# A 3x Darkan RSPS
+# A Modded 3x Darkan Runescape
 A world server with RSPS features, world 4 on Darkan's public lobby.
 
 [![discord][discord-badge]][discord-link] [![license][license-badge]][gnu-gpl-link] [![open-bugs][bug-badge]][bug-link] [![darkan](https://snapcraft.io/darkan/badge.svg)](https://snapcraft.io/darkan)
