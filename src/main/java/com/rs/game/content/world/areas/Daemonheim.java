@@ -60,14 +60,7 @@ public class Daemonheim {
 			Player p = e.getPlayer();
 			int NPC = e.getNPCId();
 			if(e.getOption().equalsIgnoreCase("talk-to"))
-				p.startConversation(new Conversation(p) {
-					{
-						addNPC(NPC, HeadE.CALM_TALK, "Oh, hello, I didn't see...");
-						addPlayer(HeadE.HAPPY_TALKING, "Hey. I was wondering if you could help me?");
-						addNPC(NPC, HeadE.CALM_TALK, "Help? Uh... I'm not sure that I can... uh...");
-						create();
-					}
-				});
+				p.startConversation(CustomScripts.customRewardTraderConversations(e.getPlayer(), e.getNPCId()));
 			if(e.getOption().equalsIgnoreCase("shop"))
 				DungeonRewards.openRewardsShop(p);
 			if(e.getOption().equalsIgnoreCase("recharge"))

@@ -4,6 +4,7 @@ import com.rs.Settings;
 import com.rs.game.content.ItemConstants;
 import com.rs.game.content.Toolbelt;
 import com.rs.game.content.commands.Commands;
+import com.rs.game.content.dialogue.Conversation;
 import com.rs.game.content.dialogue.Dialogue;
 import com.rs.game.content.dialogue.HeadE;
 import com.rs.game.content.dialogue.Options;
@@ -174,6 +175,8 @@ public class CustomScripts {
 	}
 
 	public static boolean completeTreasureTrail(Player player, int level, Item item) {
+		if(level == -1)
+			return false;
 		player.getInventory().deleteItem(item.getId(), 1);
 		player.getTreasureTrailsManager().openReward(level);
 		return true;
@@ -232,6 +235,39 @@ public class CustomScripts {
 			return true;
 		}
 		return false;
+	}
+
+	public static Conversation customRewardTraderConversations(Player p, int NPC) {
+		return new Conversation(p) {
+			{
+				addNPC(NPC, HeadE.CALM_TALK, "Oh, hello, I didn't see...");
+				addPlayer(HeadE.HAPPY_TALKING, "Hey. I was wondering if you could help me?");
+				addNPC(NPC, HeadE.CALM_TALK, "Help? Uh... I'm not sure that I can... uh...");
+				addPlayer(HeadE.HAPPY_TALKING, "What is that in your pocket?");
+				addNPC(NPC, HeadE.CALM_TALK, "I'm not sure, its some kind of imp...");
+				addItem(25350, "He pulls out the imp and shows it to you...");
+				addPlayer(HeadE.AMAZED_MILD, "I have seen these!");
+				addNPC(NPC, HeadE.CALM_TALK, "You want it so bad, you know what I will give it for 50k Dungeoneering Token...");
+				addOptions("Pay 50k tokens for charming imp?", options -> {
+					options.add("No thank you...", new Dialogue());
+					if(p.getDungManager().getTokens() < 5)
+						options.add("I don't have enough tokens!", new Dialogue());
+					if(p.getDungManager().getTokens() >= 5) {
+						if(!p.getInventory().hasFreeSlots())
+							options.add("I don't have enough space!", new Dialogue());
+						if(p.getInventory().hasFreeSlots())
+							options.add("Okay I will take it", new Dialogue()
+								.addPlayer(HeadE.HAPPY_TALKING, "Okay I will take it!")
+								.addNPC(NPC, HeadE.CALM_TALK, "Sounds good...")
+								.addSimple("He gives you the charming imp", ()->{
+									p.getInventory().addItem(25350, 1);
+									p.getDungManager().removeTokens(5);
+								}));
+					}
+				});
+				create();
+			}
+		};
 	}
 
 	public static boolean updateRightsOnRun(Player p) {
