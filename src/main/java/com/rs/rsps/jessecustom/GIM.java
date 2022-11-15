@@ -50,7 +50,7 @@ public class GIM {
 //		}
 //	};
 
-	public static ObjectClickHandler openChest = new ObjectClickHandler(new Object[] { 170 }, new WorldTile[]{new WorldTile(3083, 3496, 0)}) {
+	public static ObjectClickHandler openChest = new ObjectClickHandler(new Object[] { 170 }, new WorldTile[]{new WorldTile(3171, 3467, 0)}) {
 		@Override
 		public void handle(ObjectClickEvent e) {
 			if (e.getPlayer().getBool("Group IronMan")) {
@@ -59,7 +59,8 @@ public class GIM {
 					return;
 				}
 				e.getPlayer().getBank().openGIMBank();
-			}
+			} else
+				e.getPlayer().startConversation(new AdventurerD(e.getPlayer()));
 		}
 	};
 }

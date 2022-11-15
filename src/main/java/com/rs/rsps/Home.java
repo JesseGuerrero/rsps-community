@@ -38,8 +38,8 @@ public class Home {
 //		spawnNPC(1598, new WorldTile(3094, 3487, 0), Direction.SOUTH, false);
 //		spawnNPC(7779, new WorldTile(3095, 3487, 0), Direction.SOUTH, false);
 //		spawnNPC(8466, new WorldTile(3096, 3487, 0), Direction.SOUTH, false);
-		spawnNPC(9085, new WorldTile(3088, 3483, 0), Direction.NORTH, false);
-		spawnNPC(15661, new WorldTile(3085, 3483, 0), Direction.NORTH, false);
+		spawnNPC(9085, new WorldTile(3161, 3461, 0), Direction.EAST, false);
+		spawnNPC(15661, new WorldTile(3168, 3461, 0), Direction.WEST, false);
 
 		/* GE Clarks */
 //		spawnNPC(2240, new WorldTile(3096, 3492, 0), Direction.WEST, false);
@@ -49,10 +49,10 @@ public class Home {
 //		spawnNPC(2241, new WorldTile(3096, 3488, 0), Direction.WEST, false);
 
 		/* Loyalty point shop */
-		spawnNPC(13727, new WorldTile(3090, 3493, 0), Direction.WEST, false);
+//		spawnNPC(13727, new WorldTile(3090, 3493, 0), Direction.WEST, false);
 
 		/* GIM */
-		spawnNPC(1512, new WorldTile(3083, 3495, 0), Direction.EAST, false);
+		spawnNPC(1512, new WorldTile(3170, 3467, 0), Direction.NORTH, false);
 	}
 
 	public static ObjectClickHandler handleShops = new ObjectClickHandler(new Object[] { 18789 }, new WorldTile(3090, 3497, 0)) {
@@ -96,7 +96,7 @@ public class Home {
 			null
 	};
 
-	public static ObjectClickHandler healingWell = new ObjectClickHandler(new Object[] { 28715 }, new WorldTile(3082, 3489, 0)) {
+	public static ObjectClickHandler healingWell = new ObjectClickHandler(new Object[] { 28715 }, new WorldTile(3175, 3466, 0)) {
 		@Override
 		public void handle(ObjectClickEvent e) {
 			e.getPlayer().sendMessage("You feel refreshed.");

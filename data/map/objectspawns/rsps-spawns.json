@@ -5,8 +5,8 @@
     "type": 10,
     "rotation": 0,
     "tile": {
-      "x": 3082,
-      "y": 3489,
+      "x": 3172,
+      "y": 3466,
       "plane": 0
     }
   },
@@ -14,10 +14,10 @@
     "comment": "GIM",
     "objectId": 170,
     "type": 10,
-    "rotation": 1,
+    "rotation": 0,
     "tile": {
-      "x": 3083,
-      "y": 3496,
+      "x": 3171,
+      "y": 3467,
       "plane": 0
     }
   }
