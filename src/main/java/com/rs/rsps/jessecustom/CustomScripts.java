@@ -168,7 +168,13 @@ public class CustomScripts {
 	public static LoginHandler onLoginUpdates = new LoginHandler() {
 		@Override
 		public void handle(LoginEvent e) {
-			questsEnabled(e.getPlayer(), false);
+			if(!ShieldOfArrav.hasGang(e.getPlayer()))
+				questsEnabled(e.getPlayer(), false);
+			if((boolean)e.getPlayer().get("resetQuestsNovember") == false) {
+				e.getPlayer().save("resetQuestsNovember", true);
+				e.getPlayer().getQuestManager().resetQuest(Quest.KNIGHTS_SWORD);
+				e.getPlayer().getQuestManager().resetQuest(Quest.WATERFALL_QUEST);
+			}
 		}
 	};
 
