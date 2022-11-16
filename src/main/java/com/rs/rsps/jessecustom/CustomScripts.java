@@ -1,6 +1,7 @@
 package com.rs.rsps.jessecustom;
 
 import com.rs.Settings;
+import com.rs.game.World;
 import com.rs.game.content.ItemConstants;
 import com.rs.game.content.Toolbelt;
 import com.rs.game.content.commands.Commands;
@@ -227,6 +228,14 @@ public class CustomScripts {
 
 	public static void bindItemDirectly(ItemsContainer<Item> bindedItems, Item item) {
 		bindedItems.add(item);
+	}
+
+	public static boolean chargesLostOnDeath() {
+		return false;
+	}
+
+	public static World.DropMethod untradeablesDropNormal() {
+		return World.DropMethod.NORMAL;
 	}
 
 	public static boolean deathCofferIsSuccessful(Player player) {

@@ -2351,7 +2351,7 @@ public class Player extends Entity {
 						deg = d;
 						break;
 					}
-				if (deg != null)
+				if (deg != null && CustomScripts.chargesLostOnDeath())
 					if (deg.getBrokenId() != -1) {
 						item.setId(deg.getBrokenId());
 						item.deleteMetaData();
@@ -2364,7 +2364,7 @@ public class Player extends Entity {
 		if (items[1].length != 0)
 			if (noGravestone)
 				for (Item item : items[1])
-					World.addGroundItem(item, deathTile, killer == null ? this : killer, true, 210, (killer == null || killer == this) ? DropMethod.NORMAL : DropMethod.TURN_UNTRADEABLES_TO_COINS);
+					World.addGroundItem(item, deathTile, killer == null ? this : killer, true, 210, (killer == null || killer == this) ? DropMethod.NORMAL : CustomScripts.untradeablesDropNormal()/*DropMethod.TURN_UNTRADEABLES_TO_COINS*/);
 			else
 				new GraveStone(this, deathTile, items[1]);
 	}
