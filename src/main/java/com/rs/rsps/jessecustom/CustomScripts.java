@@ -22,8 +22,10 @@ import com.rs.lib.game.Rights;
 import com.rs.lib.game.WorldTile;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ItemOnItemEvent;
+import com.rs.plugin.events.ItemOnNPCEvent;
 import com.rs.plugin.events.LoginEvent;
 import com.rs.plugin.handlers.ItemOnItemHandler;
+import com.rs.plugin.handlers.ItemOnNPCHandler;
 import com.rs.plugin.handlers.LoginHandler;
 
 import static com.rs.game.content.skills.slayer.ReaperAssignments.talkAboutAssignment;
@@ -71,6 +73,14 @@ public class CustomScripts {
 	}
 
 	public static void sendExamine(Player p, Item item) {
+		String weaponName = "";
+		if(item.getMetaData("WeaponName") != null) {
+			weaponName = (String)item.getMetaDataO("WeaponName");
+			p.sendMessage("<col=F01E2C>" + weaponName + "<col=28A99E> has " + String.format("%.3f", item.getMetaDataD("StrengthBonus"))
+					+ " strength bonus...");
+
+			return;
+		}
 		if (item.getMetaData("StrengthBonus") != null)
 			p.sendMessage("<col=28A99E>This item has " + String.format("%.3f", item.getMetaDataD("StrengthBonus")) + " strength bonus...");
 	}
@@ -185,6 +195,9 @@ public class CustomScripts {
 	public static void updateMetasOnWeapons(Player player) {
 		ItemsContainer<Item> boundItems = player.getDungManager().getBindedItems().asItemContainer();
 		Item weapon = player.getEquipment().get(Equipment.WEAPON);
+		if(weapon == null) {
+			return;
+		}
 		for(Item boundItem : boundItems.asList()) {
 			if (weapon.getId() == boundItem.getId()) {
 				if (weapon.containsMetaData() && weapon.getMetaData("StrengthBonus") != null) {
@@ -363,4 +376,54 @@ public class CustomScripts {
 		}
 		Toolbelt.refreshToolbelt(p);
 	}
+
+	public static ItemOnNPCHandler handleLightCreatures = new ItemOnNPCHandler(true, new Object[] { 15661 }) {
+		@Override
+		public void handle(ItemOnNPCEvent e) {
+			int NPC = e.getNPC().getId();
+			Player player = e.getPlayer();
+			Item weapon = e.getItem();
+
+			if (weapon.getMetaData("StrengthBonus") == null) {
+				player.startConversation(new Dialogue().addNPC(NPC, HeadE.CALM_TALK, "Your weapon must first taste death before taking on a name..."));
+				return;
+			}
+
+			if(weapon.getMetaData("WeaponName") != null) {
+				player.startConversation(new Dialogue()
+						.addNPC(NPC, HeadE.CALM_TALK, "Mortal, you have already named this weapon..."));
+				return;
+			}
+
+			if (weapon.getMetaData("StrengthBonus") != null && weapon.getMetaData("WeaponName") == null)
+				player.startConversation(new Dialogue()
+						.addNPC(NPC, HeadE.CALM_TALK, "I see you have a weapon of death...")
+						.addPlayer(HeadE.EVIL_LAUGH, "Yes I do, thank you very much.")
+						.addPlayer(HeadE.CALM_TALK, "What of it?")
+						.addNPC(NPC, HeadE.CALM_TALK, "I can name your weapon once and forever that will be its brand...")
+						.addOptions("Name your weapon?", options -> {
+							options.add("No");
+							options.add("Yes", new Dialogue()
+									.addPlayer(HeadE.CALM_TALK, "Yes, ill name it")
+									.addNext(()->{
+										player.sendInputName("What name for your weapon?", name -> {
+											player.startConversation(new Dialogue()
+													.addNPC(NPC, HeadE.CALM_TALK, "Are you sure you want \"" + name + "\"?")
+													.addOptions("Set name to \"" + name + "\"?", option -> {
+														option.add("No");
+														option.add("Yes", () -> {
+															weapon.setMetaDataO("WeaponName", name);
+															player.sendMessage("Your weapon is now named \"" + name + "\"...");
+														});
+													})
+											);
+
+										});
+									})
+							);
+						})
+				);
+
+		}
+	};
 }
