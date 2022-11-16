@@ -226,6 +226,10 @@ public class CustomScripts {
 
 	}
 
+	public static int slayerPointsMultiplier(int amount) {
+		return amount*3;
+	}
+
 	public static void bindItemDirectly(ItemsContainer<Item> bindedItems, Item item) {
 		bindedItems.add(item);
 	}

@@ -87,6 +87,7 @@ public class SlayerTaskManager {
 					amount = player.getSlayer().getMaster().getPoints();
 			} else
 				amount = player.getSlayer().getMaster().getPoints();
+			amount = CustomScripts.slayerPointsMultiplier(amount);
 			player.addSlayerPoints(amount);
 			player.sendMessage("You have completed " + player.consecutiveTasks + " tasks in a row and receive "+amount+" slayer points!");
 			player.sendMessage("You have finished your slayer task, talk to a slayer master for a new one.");
