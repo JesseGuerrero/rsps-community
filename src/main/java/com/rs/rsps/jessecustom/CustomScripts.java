@@ -1,6 +1,8 @@
 package com.rs.rsps.jessecustom;
 
 import com.rs.Settings;
+import com.rs.cache.loaders.Bonus;
+import com.rs.cache.loaders.ItemDefinitions;
 import com.rs.game.World;
 import com.rs.game.content.ItemConstants;
 import com.rs.game.content.Toolbelt;
@@ -28,6 +30,7 @@ import com.rs.plugin.events.LoginEvent;
 import com.rs.plugin.handlers.ItemOnItemHandler;
 import com.rs.plugin.handlers.ItemOnNPCHandler;
 import com.rs.plugin.handlers.LoginHandler;
+import com.rs.rsps.jessecustom.bosses.kalphitequeen.KalphiteQueenScalingInstanceController;
 
 import static com.rs.game.content.skills.slayer.ReaperAssignments.talkAboutAssignment;
 
@@ -74,16 +77,42 @@ public class CustomScripts {
 	}
 
 	public static void sendExamine(Player p, Item item) {
-		String weaponName = "";
-		if(item.getMetaData("WeaponName") != null) {
-			weaponName = (String)item.getMetaDataO("WeaponName");
-			p.sendMessage("<col=F01E2C>" + weaponName + "<col=28A99E> has " + String.format("%.3f", item.getMetaDataD("StrengthBonus"))
-					+ " strength bonus...");
+		boolean hasStats = false;
+		String nameColor = "<col=F01E2C>";
+		String bonusesColor = "<col=28A99E>";
+		String weaponName = bonusesColor + "This item";
+		String strengthBonus = "";
+		String attackBonus = "";
+		String defenseBonus = "";
+		String magicAttackBonus = "";
+		String magicDefenseBonus = "";
 
-			return;
+		if(item.getMetaData("WeaponName") != null)
+			weaponName = nameColor + (String) item.getMetaDataO("WeaponName");
+		if (item.getMetaData("StrengthBonus") != null) {
+			strengthBonus = " " + String.format("%.3f", item.getMetaDataD("StrengthBonus")) + " strength ";
+			hasStats = true;
 		}
-		if (item.getMetaData("StrengthBonus") != null)
-			p.sendMessage("<col=28A99E>This item has " + String.format("%.3f", item.getMetaDataD("StrengthBonus")) + " strength bonus...");
+		if (item.getMetaData("AttackBonus") != null) {
+			attackBonus = " " + String.format("%.3f", item.getMetaDataD("AttackBonus")) + " attack ";
+			hasStats = true;
+		}
+		if (item.getMetaData("DefenseBonus") != null) {
+			defenseBonus = " " + String.format("%.3f", item.getMetaDataD("DefenseBonus")) + " defense ";
+			hasStats = true;
+		}
+		if (item.getMetaData("MagicAttackBonus") != null) {
+			magicAttackBonus = " " + String.format("%.3f", item.getMetaDataD("MagicAttackBonus")) + " mage attack ";
+			hasStats = true;
+		}
+		if (item.getMetaData("MagicDefenseBonus") != null) {
+			magicDefenseBonus = " " + String.format("%.3f", item.getMetaDataD("MagicDefenseBonus")) + " mage defense ";
+			hasStats = true;
+		}
+
+		if(hasStats)
+			p.sendMessage(weaponName + bonusesColor + " has" + strengthBonus + attackBonus + defenseBonus + magicAttackBonus + magicDefenseBonus);
+
 	}
 
 	public static void restoreChargesWithoutLosingMeta(Item item, ItemConstants.ItemDegrade deg) {
@@ -102,6 +131,107 @@ public class CustomScripts {
 		Commands.add(Rights.PLAYER, "rights", "Completes all quests.", (p, args) -> {
 			p.sendMessage("Rights: " + p.getRights());
 		});
+
+		Commands.add(Rights.PLAYER, "iscaled [itemId scale]", "Spawns an item with specified id and scaling.", (p, args) -> {
+			if (ItemDefinitions.getDefs(Integer.valueOf(args[0])).getName().equals("null")) {
+				p.sendMessage("That item is unused.");
+				return;
+			}
+			Item item = new Item(Integer.valueOf(args[0]), 1);
+			item.addMetaData("AttackBonus", Double.valueOf(args[1]));
+			item.addMetaData("StrengthBonus", Double.valueOf(args[1]));
+			p.getInventory().addItem(item);
+			p.stopAll();
+		});
+
+		Commands.add(Rights.PLAYER, "kq [scale]", "Start qbd", (p, args) -> {
+			p.getControllerManager().startController(new KalphiteQueenScalingInstanceController(Integer.parseInt(args[0])));
+		});
+
+		Commands.add(Rights.PLAYER, "ipeek [itemId]", "Spawns an item with specified id and scaling.", (p, args) -> {
+			if (ItemDefinitions.getDefs(Integer.valueOf(args[0])).getName().equals("null")) {
+				p.sendMessage("That item is unused.");
+				return;
+			}
+			Item item = new Item(Integer.valueOf(args[0]), 1);
+			int[] bonuses = item.getDefinitions().bonuses;
+			int defenseAvg = (bonuses[Bonus.STAB_DEF.ordinal()] + bonuses[Bonus.SLASH_DEF.ordinal()] + bonuses[Bonus.CRUSH_DEF.ordinal()]
+					+ bonuses[Bonus.RANGE_DEF.ordinal()]) / 4;
+			int attackAvg = (bonuses[Bonus.STAB_ATT.ordinal()] + bonuses[Bonus.SLASH_ATT.ordinal()] + bonuses[Bonus.CRUSH_ATT.ordinal()]
+					 + bonuses[Bonus.RANGE_ATT.ordinal()]) / 4;
+			int strengthAvg = bonuses[Bonus.MELEE_STR.ordinal()] + bonuses[Bonus.RANGE_STR.ordinal()] / 2;
+			int magicDefenseAvg = bonuses[Bonus.MAGIC_DEF.ordinal()];
+			int magicAttackAvg = bonuses[Bonus.MAGIC_ATT.ordinal()];
+			p.sendMessage("Def avg: " + defenseAvg + "Str avg: " + strengthAvg + " Att avg: " + attackAvg
+					+ " Mag def avg: " + magicDefenseAvg + " Mag att avg: " + magicAttackAvg);
+		});
+	}
+
+	/*
+	* Scales the equipment by 10% of the scale parameter to the bonus on the item.
+	* defense
+	* attack
+	* strength
+	* magicdefense
+	* magicattack
+	* */
+	public static void scaleEquipmentBonus(Item item, String bonus, double scale) {
+		String metaName = "";
+		switch(bonus) {
+			case "defense" -> {metaName = "DefenseBonus";}
+			case "attack" -> {metaName = "AttackBonus";}
+			case "strength" -> {metaName = "StrengthBonus";}
+			case "magicdefense" -> {metaName = "MagicDefenseBonus";}
+			case "magicattack" -> {metaName = "MagicAttackBonus";}
+			default -> {
+				System.out.println("Defaulted on scaleEquipmentBonus");
+				return;
+			}
+		}
+		item.setMetaDataO(metaName, CustomScripts.getAverage(item, bonus) * (scale - 1));
+	}
+
+	private static double getAverage(Item item, String type) {
+		int[] bonuses = item.getDefinitions().bonuses;
+		int defenseAvg = (bonuses[Bonus.STAB_DEF.ordinal()] + bonuses[Bonus.SLASH_DEF.ordinal()] + bonuses[Bonus.CRUSH_DEF.ordinal()]
+				+ bonuses[Bonus.RANGE_DEF.ordinal()]) / 4;
+		int attackAvg = (bonuses[Bonus.STAB_ATT.ordinal()] + bonuses[Bonus.SLASH_ATT.ordinal()] + bonuses[Bonus.CRUSH_ATT.ordinal()]
+				+ bonuses[Bonus.RANGE_ATT.ordinal()]) / 4;
+		int strengthAvg = bonuses[Bonus.MELEE_STR.ordinal()] + bonuses[Bonus.RANGE_STR.ordinal()] / 2;
+		int magicDefenseAvg = bonuses[Bonus.MAGIC_DEF.ordinal()];
+		int magicAttackAvg = bonuses[Bonus.MAGIC_ATT.ordinal()];
+
+		switch(type.toLowerCase()) {
+			case "defense" -> {
+				if(defenseAvg < 0)
+					return 0;
+				return defenseAvg;
+			}
+			case "attack" -> {
+				if(attackAvg < 0)
+					return 0;
+				return attackAvg;
+			}
+			case "strength" -> {
+				if(strengthAvg < 0)
+					return 0;
+				return strengthAvg;
+			}
+			case "magicdefense" -> {
+				if(magicDefenseAvg < 0)
+					return 0;
+				return magicDefenseAvg;
+			}
+			case "magicattack" -> {
+				if(magicAttackAvg < 0)
+					return 0;
+				return magicAttackAvg;
+			}
+			default -> {
+				System.out.println("Defaulted on getAverage");
+				return 0;
+			}
+		}
 	}
 
 	public static boolean isTradeable(Item item) {
@@ -178,6 +308,11 @@ public class CustomScripts {
 		}
 	};
 
+	public static void getNPCCombatExamine(NPC npc, Player player) {
+		player.sendMessage(npc.getName() + " has HP: "+ npc.getMaxHitpoints() +  ", Attack: " + npc.getAttackLevel()
+				+ ", Strength: " + npc.getStrengthLevel() + ", Defense: " + npc.getDefenseLevel() + ", Magic: " + npc.getMagicLevel());
+	}
+
 	public static void questsEnabled(Player p, boolean enabled) {
 		if (!enabled) {
 			ShieldOfArrav.setGang(p, "Phoenix");
@@ -212,6 +347,30 @@ public class CustomScripts {
 					player.getDungManager().getBindedItems().remove(boundItem);
 					player.getDungManager().bind(weapon, slot);
 				}
+			}
+		}
+	}
+
+	public static int addBonusToEquip(Item item, Bonus bonus) {
+		int value = item.getDefinitions().getBonuses()[bonus.ordinal()];
+		switch(bonus) {
+			case STAB_DEF, SLASH_DEF, CRUSH_DEF, RANGE_DEF-> {
+				return (value + (item.getMetaData("DefenseBonus") == null ? 0 : (int)item.getMetaDataD("DefenseBonus", 0)));
+			}
+			case MELEE_STR, RANGE_STR -> {
+				return (value + (item.getMetaData("StrengthBonus") == null ? 0 : (int)item.getMetaDataD("StrengthBonus", 0)));
+			}
+			case CRUSH_ATT, RANGE_ATT, SLASH_ATT, STAB_ATT -> {
+				return (value + (item.getMetaData("AttackBonus") == null ? 0 : (int)item.getMetaDataD("AttackBonus", 0)));
+			}
+			case MAGIC_ATT -> {
+				return (value + (item.getMetaData("MagicAttackBonus") == null ? 0 : (int)item.getMetaDataD("MagicAttackBonus", 0)));
+			}
+			case MAGIC_DEF -> {
+				return (value + (item.getMetaData("MagicDefenseBonus") == null ? 0 : (int)item.getMetaDataD("MagicDefenseBonus", 0)));
+			}
+			default -> {
+				return value;
 			}
 		}
 	}

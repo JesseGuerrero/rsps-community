@@ -68,7 +68,7 @@ public class KalphiteQueen extends NPC {
 					setLocation(getRespawnTile());
 					finish();
 					if (!isSpawned())
-						setRespawnTask();
+						setRespawnTask(15);
 					transformIntoNPC(1158);
 				}
 				return false;

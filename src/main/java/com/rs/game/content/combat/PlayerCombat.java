@@ -1611,7 +1611,7 @@ public class PlayerCombat extends PlayerAction {
 			if (prob <= Math.random() && !veracsProc)
 				return 0;
 		}
-		int hit = Utils.random(minHit, CustomScripts.increaseHitByWeaponBonus(player, maxHit));
+		int hit = Utils.random(minHit, /*CustomScripts.increaseHitByWeaponBonus(player, maxHit)*/ maxHit);
 		if (veracsProc)
 			hit += 1.0;
 		if (target instanceof NPC n)

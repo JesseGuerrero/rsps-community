@@ -910,7 +910,8 @@ public final class Equipment {
 			};
 		}
 		default -> {
-				return value;
+			return CustomScripts.addBonusToEquip(item, bonus);
+//				return value;
 			}
 		}
 	}
