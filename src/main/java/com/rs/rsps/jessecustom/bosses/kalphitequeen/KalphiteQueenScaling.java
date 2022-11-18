@@ -16,24 +16,35 @@
 //
 package com.rs.rsps.jessecustom.bosses.kalphitequeen;
 
+import com.rs.db.WorldDB;
 import com.rs.game.content.bosses.kalphitequeen.KalphiteQueen;
+import com.rs.game.content.dialogue.Dialogue;
 import com.rs.game.model.entity.npc.combat.NPCCombatDefinitions;
+import com.rs.game.model.entity.pathing.RouteEvent;
+import com.rs.game.model.entity.player.Player;
+import com.rs.lib.Constants;
+import com.rs.lib.game.Item;
 import com.rs.lib.game.WorldTile;
+import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.NPCDropEvent;
+import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.NPCDropHandler;
+import com.rs.plugin.handlers.ObjectClickHandler;
 import com.rs.rsps.jessecustom.CustomScripts;
+import com.rs.rsps.jessecustom.GroupIronMan;
+import com.rs.rsps.jessecustom.bosses.ScalingItems;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @PluginEventHandler
 public class KalphiteQueenScaling extends KalphiteQueen {
-	double combatScale = 1;
+	public double combatScale = 1;
 
-	public KalphiteQueenScaling(int id, WorldTile tile, boolean spawned, int scale) {
+	public KalphiteQueenScaling(int id, WorldTile tile, boolean spawned, double scale) {
 		super(id, tile, spawned);
-		this.combatScale = scale + (scale/10.0);
+		this.combatScale = 1 + (scale/10.0);
 	}
 
 	@Override
@@ -63,17 +74,41 @@ public class KalphiteQueenScaling extends KalphiteQueen {
 		this.setLevels(upgradedStats);
 	}
 
-	public static NPCDropHandler addMetas = new NPCDropHandler(new Object[]{1158, 1160}, new Object[]{
-			"Dragon 2h sword", "Dragon chainbody", "Adamant longsword", "Rune 2h sword", "Rune warhammer",
-			"Rune hatchet", "Rune battleaxe", "Lava battlestaff"
-	}) {
+	//TODO: FIX MULTI
+	//TODO: FIX Hit bonus not adding on non-NPC
+	public static ObjectClickHandler handleKalphiteQueenLairEntrance = new ObjectClickHandler(true, new Object[] { 48803 }) {
 		@Override
-		public void handle(NPCDropEvent e) {
-			if(e.getNPC() instanceof KalphiteQueenScaling npc) {
-				if(e.getItem().getName().equalsIgnoreCase("Dragon chainbody")) {
-					CustomScripts.scaleEquipmentBonus(e.getItem(), "defense", npc.combatScale);
+		public void handle(ObjectClickEvent e) {
+			Player player = e.getPlayer();
+			if(e.getPlayer().isKalphiteLairSetted()) {
+				if(e.getPlayer().getInventory().getAmountOf(995) >= 5_000) {
+					e.getPlayer().startConversation(new Dialogue()
+							.addOptions("Do you want to create a boss instance?", option -> {
+								option.add("Yes", ()->{
+									e.getPlayer().sendInputName("What instanced combat scale would you like? (1-10000)", scaleString -> {
+										try {
+											int scale = Integer.parseInt(scaleString);
+											if(scale < 0)
+												throw new NumberFormatException();
+											player.getInventory().removeItems(new Item(995, 5000));
+											player.getControllerManager().startController(new KalphiteQueenScalingInstanceController(scale));
+										} catch(NumberFormatException n) {
+											player.sendMessage("Improper scale formatting, try again.");
+											return;
+										}
+									});
+								});
+								option.add("No", () -> {e.getPlayer().setNextWorldTile(new WorldTile(3508, 9494, 0));});
+							})
+					);
+					return;
 				}
+				e.getPlayer().sendMessage("You need 5k coins for an instance");
+				e.getPlayer().setNextWorldTile(new WorldTile(3508, 9494, 0));
 			}
 		}
 	};
+
+/*else if (id == 48803 && player.isKalphiteLairSetted())
+				player.setNextWorldTile(new WorldTile(3508, 9494, 0));*/
 }

@@ -37,16 +37,13 @@ import java.util.List;
 
 @PluginEventHandler
 public final class KalphiteQueenScalingInstanceController extends Controller {
-	private transient KalphiteQueenScaling npc;
 	private DynamicRegionReference instance;
-	private int scale = 1;
+	private double scale = 1;
 	final WorldTile locationOnExit = new WorldTile(3509, 9499, 2);
 	WorldTile spawn;
 
-	//TODO: Fix logout bug
-	//TODO: Finish boss drop table
-	//TODO: Add dialogue to lair
-	public KalphiteQueenScalingInstanceController(int scale) {
+	//Multicombat
+	public KalphiteQueenScalingInstanceController(double scale) {
 		super();
 		this.scale = scale;
 	}
@@ -62,11 +59,14 @@ public final class KalphiteQueenScalingInstanceController extends Controller {
 			npcs.add(new NPCScaling(1157, instance.getLocalTile(19, 46), false, scale));
 			npcs.add(new NPCScaling(1157, instance.getLocalTile(17, 31), false, scale));
 			npcs.add(new KalphiteQueenScaling(1158, instance.getLocalTile(16, 25), false, scale));
-			for(NPC npc : npcs)
+			for(NPC npc : npcs) {
 				npc.setRespawnTask();
+				npc.setForceMultiArea(true);
+			}
 			player.fadeScreen(() -> {
 				player.resetReceivedHits();
 				player.setNextWorldTile(spawn);
+				player.setForceMultiArea(true);
 			});
 		});
 	}
@@ -130,18 +130,13 @@ public final class KalphiteQueenScalingInstanceController extends Controller {
 
 	@Override
 	public boolean login() {
-		player.setNextWorldTile(locationOnExit);
-		WorldTasks.schedule(3, ()->{
-			player.setForceMultiArea(false);
-			removeController();
-		});
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean logout() {
 		removeInstance();
-		return false;
+		return true;
 	}
 
 	/**
@@ -149,13 +144,13 @@ public final class KalphiteQueenScalingInstanceController extends Controller {
 	 */
 	@Override
 	public void forceClose() {
-		player.setForceMultiArea(false);
 		removeInstance();
 		removeController();
 	}
 
 	private void removeInstance() {
-		instance.destroy();
+		player.setForceMultiArea(false);
+		instance.destroy(()->{player.setNextWorldTile(locationOnExit);});
 	}
 
 

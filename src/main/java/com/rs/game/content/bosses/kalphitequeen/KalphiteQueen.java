@@ -19,6 +19,7 @@ package com.rs.game.content.bosses.kalphitequeen;
 import com.rs.game.model.entity.Entity;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.npc.combat.NPCCombatDefinitions;
+import com.rs.game.model.entity.player.Player;
 import com.rs.game.tasks.WorldTask;
 import com.rs.game.tasks.WorldTasks;
 import com.rs.lib.game.Animation;
@@ -26,6 +27,7 @@ import com.rs.lib.game.SpotAnim;
 import com.rs.lib.game.WorldTile;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.handlers.NPCInstanceHandler;
+import com.rs.rsps.jessecustom.CustomScripts;
 
 @PluginEventHandler
 public class KalphiteQueen extends NPC {
@@ -67,8 +69,10 @@ public class KalphiteQueen extends NPC {
 					reset();
 					setLocation(getRespawnTile());
 					finish();
+					if(source instanceof Player p)
+						CustomScripts.increaseWeaponStats(p, this);
 					if (!isSpawned())
-						setRespawnTask(15);
+						setRespawnTask(CustomScripts.KalphiteQueenRespawnTime());
 					transformIntoNPC(1158);
 				}
 				return false;

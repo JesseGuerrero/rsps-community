@@ -352,8 +352,8 @@
       ]
     },
     {
-      "chance": 0,
-      "outOf": 0,
+      "chance": 1.0,
+      "outOf": 128.0,
       "dropOne": false,
       "drops": [
         {

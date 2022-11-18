@@ -371,7 +371,7 @@ public class Shop {
 		if (player.getInventory().getItemsContainerSize() < slotId)
 			return;
 		Item item = player.getInventory().getItem(slotId);
-		if(CustomScripts.hasStrengthBonusForExchange(player, item)) {
+		if(CustomScripts.hasMetaBonusWhichPreventsExchange(player, item)) {
 			return;
 		}
 		if (item == null)

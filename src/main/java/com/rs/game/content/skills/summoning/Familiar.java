@@ -269,7 +269,7 @@ public final class Familiar extends NPC {
 			owner.sendMessage("You cannot store this item.");
 			return;
 		}
-		if (CustomScripts.hasStrengthBonusForExchange(owner, item)) {
+		if (CustomScripts.hasMetaBonusWhichPreventsExchange(owner, item)) {
 			return;
 		}
 		Item[] itemsBefore = inv.getItemsCopy();

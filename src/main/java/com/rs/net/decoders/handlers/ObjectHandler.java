@@ -1317,8 +1317,8 @@ public final class ObjectHandler {
 				player.setNextWorldTile(new WorldTile(2885, 4372, 2));
 				player.getControllerManager().forceStop();
 				// TODO all reqs, skills not added
-			} else if (id == 48803 && player.isKalphiteLairSetted())
-				player.setNextWorldTile(new WorldTile(3508, 9494, 0));
+			} /*else if (id == 48803 && player.isKalphiteLairSetted())
+				player.setNextWorldTile(new WorldTile(3508, 9494, 0));*/
 			else if (id == 48802 && player.isKalphiteLairEntranceSetted())
 				player.setNextWorldTile(new WorldTile(3483, 9510, 2));
 			else if (id == 3829) {
