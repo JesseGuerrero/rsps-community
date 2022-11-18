@@ -31,6 +31,7 @@ import com.rs.plugin.handlers.ItemOnItemHandler;
 import com.rs.plugin.handlers.ItemOnNPCHandler;
 import com.rs.plugin.handlers.LoginHandler;
 import com.rs.rsps.jessecustom.bosses.ScalingItems;
+import com.rs.rsps.jessecustom.bosses.godwars.bandos.GeneralGraardorScalingInstanceController;
 import com.rs.rsps.jessecustom.bosses.kalphitequeen.KalphiteQueenScalingInstanceController;
 
 import java.util.Map;
@@ -153,6 +154,44 @@ public class CustomScripts {
 		return !true;
 	}
 
+	public static void createGodSwordOrLeftShield(Player player, int godSwordID, int hilt, int blade) {
+			Map<String, Object> metas = player.getInventory().getItemById(hilt).getMetaData();
+			player.getInventory().deleteItem(hilt, 1);
+			player.getInventory().deleteItem(blade, 1);
+			Item godSword = new Item(godSwordID, 1);
+			for(String meta : metas.keySet())
+				godSword.setMetaDataO(meta, metas.get(meta));
+			player.getInventory().addItem(godSword);
+	}
+
+	public static void createGWDScalingDialogueFromAltar(Player player, int altarID) {
+		if(altarID != 26289)
+			return;
+		if (player.getInventory().getAmountOf(995) >= 5_000) {
+			player.startConversation(new Dialogue()
+					.addOptions("Start a boss instance?", option -> {
+						option.add("Yes", () -> {
+							player.sendInputName("What instanced combat scale would you like? (1-10000)", scaleString -> {
+								try {
+									int scale = Integer.parseInt(scaleString);
+									if (scale < 0)
+										throw new NumberFormatException();
+									player.getInventory().removeItems(new Item(995, 5000));
+									if (altarID == 26289)
+										player.getControllerManager().startController(new GeneralGraardorScalingInstanceController(scale));
+								} catch (NumberFormatException n) {
+									player.sendMessage("Improper scale formatting, try again.");
+									return;
+								}
+							});
+						});
+						option.add("No", new Dialogue());
+					}));
+		} else
+			player.sendMessage("You need 5k coins for an instance");
+
+	}
+
 	public static void customDebugCommands() {
 		Commands.add(Rights.PLAYER, "rights", "Completes all quests.", (p, args) -> {
 			p.sendMessage("Rights: " + p.getRights());
@@ -172,6 +211,10 @@ public class CustomScripts {
 
 		Commands.add(Rights.PLAYER, "kq [scale]", "Start qbd", (p, args) -> {
 			p.getControllerManager().startController(new KalphiteQueenScalingInstanceController(Double.parseDouble(args[0])));
+		});
+
+		Commands.add(Rights.PLAYER, "bando [scale]", "Start qbd", (p, args) -> {
+			p.getControllerManager().startController(new GeneralGraardorScalingInstanceController(Double.parseDouble(args[0])));
 		});
 
 		Commands.add(Rights.PLAYER, "ipeek [itemId]", "Spawns an item with specified id and scaling.", (p, args) -> {
@@ -226,7 +269,7 @@ public class CustomScripts {
 			if(item.getName().equalsIgnoreCase((String)itemName))
 				if(item.getMetaData("MagicDefenseBonus") == null)
 					item.setMetaDataO("MagicDefenseBonus", CustomScripts.getAverage(item, "magicdefense") * (scale - 1));
-		for(Object itemName : ScalingItems.getDefensiveScalingItems())
+		for(Object itemName : ScalingItems.getMagicAttackScalingItems())
 			if(item.getName().equalsIgnoreCase((String)itemName))
 				if(item.getMetaData("MagicAttackBonus") == null)
 					item.setMetaDataO("MagicAttackBonus", CustomScripts.getAverage(item, "magicattack") * (scale - 1));

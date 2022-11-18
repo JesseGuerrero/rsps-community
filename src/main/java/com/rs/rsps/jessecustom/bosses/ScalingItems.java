@@ -4,6 +4,8 @@ import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.NPCDropEvent;
 import com.rs.plugin.handlers.NPCDropHandler;
 import com.rs.rsps.jessecustom.CustomScripts;
+import com.rs.rsps.jessecustom.bosses.godwars.ScaledGodWarMinion;
+import com.rs.rsps.jessecustom.bosses.godwars.bandos.ScaledGeneralGraardor;
 import com.rs.rsps.jessecustom.bosses.kalphitequeen.KalphiteQueenScaling;
 
 import java.util.ArrayList;
@@ -27,13 +29,15 @@ public class ScalingItems {
 	public static Object[] getMeleeAttackScalingItems() {
 		return new Object[]{
 				"Dragon 2h sword", "Adamant longsword", "Rune 2h sword", "Rune warhammer",
-				"Rune hatchet", "Rune battleaxe", "Amulet of power", "Adamant spear"
+				"Rune hatchet", "Rune battleaxe", "Amulet of power", "Adamant spear",
+				"Rune spear", "Dragon spear", "Rune longsword", "Bandos hilt"
 		};
 	}
 
 	public static Object[] getMeleeStrengthScalingItems() {
 		return new Object[]{
-				"Amulet of power"
+				"Amulet of power", "Bandos chestplate", "Bandos tassets", "Bandos boots",
+				"Bandos warshield", "Bandos helmet", "Bandos gloves"
 		};
 	}
 
@@ -51,7 +55,9 @@ public class ScalingItems {
 
 	public static Object[] getDefensiveScalingItems() {
 		return new Object[]{
-				"Dragon chainbody", "Amulet of power"
+				"Dragon chainbody", "Amulet of power", "Rune platebody", "Dragon med helm",
+				"Rune sq shield", "Rune kiteshield", "Shield left half", "Bandos chestplate",
+				"Bandos tassets", "Bandos boots", "Bandos warshield", "Bandos helmet", "Bandos gloves"
 		};
 	}
 	public static Object[] getMagicDefenseScalingItems() {
@@ -67,16 +73,18 @@ public class ScalingItems {
 
 	public static Object[] npcListForScalingItems() {
 		return new Object[] {
-				1158, 1160
+				1158, 1160, //Kalphite Queen
+				6260  //Bandos
 		};
 	}
 
 	public static NPCDropHandler addMetas = new NPCDropHandler(ScalingItems.npcListForScalingItems(), ScalingItems.getAllScalingItems()) {
 		@Override
 		public void handle(NPCDropEvent e) {
-			if(e.getNPC() instanceof KalphiteQueenScaling npc) {
+			if(e.getNPC() instanceof KalphiteQueenScaling npc)
 				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
-			}
+			if(e.getNPC() instanceof ScaledGeneralGraardor npc)
+				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
 		}
 	};
 

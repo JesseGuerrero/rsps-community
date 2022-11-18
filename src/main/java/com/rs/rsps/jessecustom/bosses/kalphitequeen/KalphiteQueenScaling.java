@@ -74,8 +74,6 @@ public class KalphiteQueenScaling extends KalphiteQueen {
 		this.setLevels(upgradedStats);
 	}
 
-	//TODO: FIX MULTI
-	//TODO: FIX Hit bonus not adding on non-NPC
 	public static ObjectClickHandler handleKalphiteQueenLairEntrance = new ObjectClickHandler(true, new Object[] { 48803 }) {
 		@Override
 		public void handle(ObjectClickEvent e) {

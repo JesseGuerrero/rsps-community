@@ -34,30 +34,34 @@ public class GodSwordCreation {
 		if (!player.getInventory().containsItem(usedWith, 1) || !player.getInventory().containsItem(itemUsed, 1))
 			return false;
 		if (itemUsed == 11702 && usedWith == 11690 || itemUsed == 11690 && usedWith == 11702) {
-			player.getInventory().deleteItem(usedWith, 1);
-			player.getInventory().deleteItem(itemUsed, 1);
-			player.getInventory().addItem(11694, 1);
+//			player.getInventory().deleteItem(usedWith, 1);
+//			player.getInventory().deleteItem(itemUsed, 1);
+//			player.getInventory().addItem(11694, 1);
 			player.sendMessage("You join the hilt and blade into a godsword.");
+			CustomScripts.createGodSwordOrLeftShield(player, 11694, 11702, 11690);
 			return true;
 		}
 		if (itemUsed == 11704 && usedWith == 11690 || usedWith == 11704 && itemUsed == 11690) {
-			player.getInventory().deleteItem(itemUsed, 1);
-			player.getInventory().deleteItem(usedWith, 1);
-			player.getInventory().addItem(11696, 1);
+//			player.getInventory().deleteItem(itemUsed, 1);
+//			player.getInventory().deleteItem(usedWith, 1);
+//			player.getInventory().addItem(11696, 1);
 			player.sendMessage("You join the hilt and blade into a godsword.");
+			CustomScripts.createGodSwordOrLeftShield(player, 11696, 11704, 11690);
 			return true;
 		}
 		if (itemUsed == 11706 && usedWith == 11690 || usedWith == 11706 && itemUsed == 11690) {
-			player.getInventory().deleteItem(itemUsed, 1);
-			player.getInventory().deleteItem(usedWith, 1);
-			player.getInventory().addItem(11698, 1);
+//			player.getInventory().deleteItem(itemUsed, 1);
+//			player.getInventory().deleteItem(usedWith, 1);
+//			player.getInventory().addItem(11698, 1);
 			player.sendMessage("You join the hilt and blade into a godsword.");
+			CustomScripts.createGodSwordOrLeftShield(player, 11698, 11706, 11690);
 			return true;
 		} else if (itemUsed == 11708 && usedWith == 11690 || usedWith == 11708 && itemUsed == 11690) {
-			player.getInventory().deleteItem(itemUsed, 1);
-			player.getInventory().deleteItem(usedWith, 1);
-			player.getInventory().addItem(11700, 1);
+//			player.getInventory().deleteItem(itemUsed, 1);
+//			player.getInventory().deleteItem(usedWith, 1);
+//			player.getInventory().addItem(11700, 1);
 			player.sendMessage("You join the hilt and blade into a godsword.");
+			CustomScripts.createGodSwordOrLeftShield(player, 11700, 11708, 11690);
 			return true;
 		} else if (itemUsed == 11710 && usedWith == 11712 || usedWith == 11710 && itemUsed == 11712) {
 			player.getInventory().deleteItem(itemUsed, 1);
@@ -95,9 +99,10 @@ public class GodSwordCreation {
 			player.getInventory().addItem(989, 1);
 			return true;
 		} else if (itemUsed == 2366 && usedWith == 2368 || usedWith == 2366 && itemUsed == 2368) {
-			player.getInventory().deleteItem(itemUsed, 1);
-			player.getInventory().deleteItem(usedWith, 1);
-			player.getInventory().addItem(1187, 1);
+//			player.getInventory().deleteItem(itemUsed, 1);
+//			player.getInventory().deleteItem(usedWith, 1);
+//			player.getInventory().addItem(1187, 1);
+			CustomScripts.createGodSwordOrLeftShield(player, 1187, 2366, 2368);
 			return true;
 		} else if (itemUsed == 11286 && usedWith == 1540 || usedWith == 11286 && itemUsed == 1540) {
 			if (player.getSkills().getLevel(Constants.SMITHING) >= 90) {
