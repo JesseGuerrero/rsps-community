@@ -31,7 +31,10 @@ import com.rs.plugin.handlers.ItemOnItemHandler;
 import com.rs.plugin.handlers.ItemOnNPCHandler;
 import com.rs.plugin.handlers.LoginHandler;
 import com.rs.rsps.jessecustom.bosses.ScalingItems;
+import com.rs.rsps.jessecustom.bosses.godwars.armadyl.KreeArraScalingInstanceController;
 import com.rs.rsps.jessecustom.bosses.godwars.bandos.GeneralGraardorScalingInstanceController;
+import com.rs.rsps.jessecustom.bosses.godwars.saradomin.CommanderZilyanaScalingInstanceController;
+import com.rs.rsps.jessecustom.bosses.godwars.zamorak.KrilTstsarothScalingInstanceController;
 import com.rs.rsps.jessecustom.bosses.kalphitequeen.KalphiteQueenScalingInstanceController;
 
 import java.util.Map;
@@ -165,8 +168,6 @@ public class CustomScripts {
 	}
 
 	public static void createGWDScalingDialogueFromAltar(Player player, int altarID) {
-		if(altarID != 26289)
-			return;
 		if (player.getInventory().getAmountOf(995) >= 5_000) {
 			player.startConversation(new Dialogue()
 					.addOptions("Start a boss instance?", option -> {
@@ -179,6 +180,12 @@ public class CustomScripts {
 									player.getInventory().removeItems(new Item(995, 5000));
 									if (altarID == 26289)
 										player.getControllerManager().startController(new GeneralGraardorScalingInstanceController(scale));
+									if(altarID == 26286)
+										player.getControllerManager().startController(new KrilTstsarothScalingInstanceController(scale));
+									if(altarID == 26288)
+										player.getControllerManager().startController(new KreeArraScalingInstanceController(scale));
+									if(altarID == 26287)
+										player.getControllerManager().startController(new CommanderZilyanaScalingInstanceController(scale));
 								} catch (NumberFormatException n) {
 									player.sendMessage("Improper scale formatting, try again.");
 									return;
@@ -215,6 +222,18 @@ public class CustomScripts {
 
 		Commands.add(Rights.PLAYER, "bando [scale]", "Start qbd", (p, args) -> {
 			p.getControllerManager().startController(new GeneralGraardorScalingInstanceController(Double.parseDouble(args[0])));
+		});
+
+		Commands.add(Rights.PLAYER, "zammy [scale]", "Start qbd", (p, args) -> {
+			p.getControllerManager().startController(new KrilTstsarothScalingInstanceController(Double.parseDouble(args[0])));
+		});
+
+		Commands.add(Rights.PLAYER, "arma [scale]", "Start qbd", (p, args) -> {
+			p.getControllerManager().startController(new KreeArraScalingInstanceController(Double.parseDouble(args[0])));
+		});
+
+		Commands.add(Rights.PLAYER, "sara [scale]", "Start qbd", (p, args) -> {
+			p.getControllerManager().startController(new CommanderZilyanaScalingInstanceController(Double.parseDouble(args[0])));
 		});
 
 		Commands.add(Rights.PLAYER, "ipeek [itemId]", "Spawns an item with specified id and scaling.", (p, args) -> {
@@ -415,8 +434,9 @@ public class CustomScripts {
 	};
 
 	public static void getNPCCombatExamine(NPC npc, Player player) {
-		player.sendMessage(npc.getName() + " has HP: "+ npc.getMaxHitpoints() +  ", Attack: " + npc.getAttackLevel()
-				+ ", Strength: " + npc.getStrengthLevel() + ", Defense: " + npc.getDefenseLevel() + ", Magic: " + npc.getMagicLevel());
+		if(Settings.getConfig().isDebug())
+			player.sendMessage(npc.getName() + " has HP: "+ npc.getMaxHitpoints() +  ", Attack: " + npc.getAttackLevel()
+					+ ", Strength: " + npc.getStrengthLevel() + ", Defense: " + npc.getDefenseLevel() + ", Magic: " + npc.getMagicLevel());
 	}
 
 	public static void questsEnabled(Player p, boolean enabled) {

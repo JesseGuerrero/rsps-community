@@ -12,14 +12,17 @@ public class ScalingMultipliers {
 				"Coins", "Fire rune", "Air rune", "Death rune", "Chaos rune", "Law rune",
 				"Cosmic rune", "Blood rune", "Nature rune", "Adamant javelin", "Rune arrow",
 				"Gold charm", "Green charm", "Crimson charm", "Blue charm", "Limpwurt root",
-				"Steel dart", "Steel arrow"
+				"Steel dart", "Steel arrow", "Wine of zamorak", "Smoke rune", "Feather"
 		};
 	}
 
 	public static Object[] npcListForItemAmountMultipliers() {
 		return new Object[] {
 				1157, //Kalphite queen guardian
-				6263, 6265, 6261 //Bandos minions
+				6263, 6265, 6261, //Bandos minions
+				6204, 6206, 6208, //Zammy minions
+				6223, 6225, 6227, //Arma minions
+				6248, 6250, 6252 //Sara monions
 		};
 	}
 
