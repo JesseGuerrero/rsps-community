@@ -4,6 +4,7 @@ import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.NPCDropEvent;
 import com.rs.plugin.handlers.NPCDropHandler;
 import com.rs.rsps.jessecustom.CustomScripts;
+import com.rs.rsps.jessecustom.bosses.corp.ScalingCorporealBeast;
 import com.rs.rsps.jessecustom.bosses.godwars.ScaledGodWarMinion;
 import com.rs.rsps.jessecustom.bosses.godwars.armadyl.ScaledKreeArra;
 import com.rs.rsps.jessecustom.bosses.godwars.bandos.ScaledGeneralGraardor;
@@ -35,14 +36,16 @@ public class ScalingItems {
 				"Rune hatchet", "Rune battleaxe", "Amulet of power", "Adamant spear",
 				"Rune spear", "Dragon spear", "Rune longsword", "Bandos hilt",
 				"Rune scimitar", "Rune battleaxe", "Dragon dagger(p++)", "Zamorak hilt",
-				"Zamorakian spear", "Armadyl hilt", "Saradomin hilt", "Saradomin's whisper"
+				"Zamorakian spear", "Armadyl hilt", "Saradomin hilt", "Saradomin's whisper",
+				"Regen bracelet"
 		};
 	}
 
 	public static Object[] getMeleeStrengthScalingItems() {
 		return new Object[]{
 				"Amulet of power", "Bandos chestplate", "Bandos tassets", "Bandos boots",
-				"Bandos warshield", "Bandos helmet", "Bandos gloves", "Saradomin's whisper"
+				"Bandos warshield", "Bandos helmet", "Bandos gloves", "Saradomin's whisper",
+				"Regen bracelet"
 		};
 	}
 
@@ -51,7 +54,7 @@ public class ScalingItems {
 				"Amulet of power", "Black d'hide body", "Armadyl helmet",
 				"Armadyl chestplate", "Armadyl chainskirt", "Armadyl boots",
 				"Armadyl buckler", "Armadyl gloves", "Rune crossbow", "Armadyl crossbow",
-				"Saradomin's murmer"
+				"Saradomin's murmer", "Regen bracelet"
 		};
 	}
 
@@ -68,14 +71,15 @@ public class ScalingItems {
 				"Bandos tassets", "Bandos boots", "Bandos warshield", "Bandos helmet",
 				"Bandos gloves", "Rune platelegs", "Black d'hide body", "Armadyl helmet",
 				"Armadyl chestplate", "Armadyl chainskirt", "Armadyl boots",
-				"Armadyl buckler", "Armadyl gloves", "Rune plateskirt"
+				"Armadyl buckler", "Armadyl gloves", "Rune plateskirt", "Regen bracelet",
+				"Spirit shield"
 		};
 	}
 	public static Object[] getMagicDefenseScalingItems() {
 		return new Object[]{
 				"Amulet of power","Hood of subjugation", "Garb of subjugation",
 				"Gown of subjugation", "Ward of subjugation", "Boots of subjugation",
-				"Gloves of subjugation"
+				"Gloves of subjugation", "Regen bracelet"
 		};
 	}
 	public static Object[] getMagicAttackScalingItems() {
@@ -83,7 +87,8 @@ public class ScalingItems {
 				"Lava battlestaff", "Amulet of power", "Steam battlestaff",
 				"Hood of subjugation", "Garb of subjugation", "Gown of subjugation",
 				"Ward of subjugation", "Boots of subjugation", "Gloves of subjugation",
-				"Saradomin's hiss"
+				"Saradomin's hiss", "Mystic fire staff", "Mystic water staff",
+				"Mystic air staff", "Mystic earth staff", "Regen bracelet"
 		};
 	}
 
@@ -93,7 +98,8 @@ public class ScalingItems {
 				6260,  //Bandos
 				6203, //Zammy
 				6222, //Arma
-				6247 //Zilyana
+				6247, //Zilyana
+				8133 //Corp
 		};
 	}
 
@@ -109,6 +115,8 @@ public class ScalingItems {
 			if(e.getNPC() instanceof ScaledKreeArra npc)
 				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
 			if(e.getNPC() instanceof ScaledCommanderZilyana npc)
+				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
+			if(e.getNPC() instanceof ScalingCorporealBeast npc)
 				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
 		}
 	};

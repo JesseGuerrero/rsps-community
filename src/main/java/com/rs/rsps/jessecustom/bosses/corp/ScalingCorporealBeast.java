@@ -14,16 +14,15 @@
 //  Copyright (C) 2021 Trenton Kress
 //  This file is part of project: Darkan
 //
-package com.rs.game.content.bosses.corp;
-
-import java.util.ArrayList;
-import java.util.List;
+package com.rs.rsps.jessecustom.bosses.corp;
 
 import com.rs.cache.loaders.ItemDefinitions;
+import com.rs.game.content.bosses.corp.DarkEnergyCore;
 import com.rs.game.model.entity.Entity;
 import com.rs.game.model.entity.Hit;
 import com.rs.game.model.entity.Hit.HitLook;
 import com.rs.game.model.entity.npc.NPC;
+import com.rs.game.model.entity.npc.combat.NPCCombatDefinitions;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.Animation;
 import com.rs.lib.game.SpotAnim;
@@ -34,24 +33,47 @@ import com.rs.plugin.handlers.NPCInstanceHandler;
 import com.rs.rsps.jessecustom.CustomScripts;
 import com.rs.utils.WorldUtil;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @PluginEventHandler
-public class CorporealBeast extends NPC {
+public class ScalingCorporealBeast extends NPC {
+	public double combatScale = 1;
 
-	private DarkEnergyCore core;
+	private ScalingDarkEnergyCore core;
 
-	public CorporealBeast(int id, WorldTile tile, boolean spawned) {
+	public ScalingCorporealBeast(int id, WorldTile tile, boolean spawned, double scale) {
 		super(id, tile, spawned);
 		setCapDamage(1000);
 		setLureDelay(3000);
 		setForceAggroDistance(64);
 		setIntelligentRouteFinder(true);
 		setIgnoreDocile(true);
+		this.combatScale = 1 + (scale/10.0);
+		this.setCombatLevel((int)Math.ceil(getCombatLevel()* combatScale));
+	}
+
+	@Override
+	public int getMaxHitpoints() {
+		return (int)Math.ceil(NPCCombatDefinitions.getDefs(super.getId()).getHitpoints()* combatScale);
+	}
+
+	@Override
+	public void spawn() {
+		super.spawn();
+		Map<NPCCombatDefinitions.Skill, Integer> levels = NPCCombatDefinitions.getDefs(super.getId()).getLevels();
+		Map<NPCCombatDefinitions.Skill, Integer> upgradedStats = new HashMap<>();
+		for(NPCCombatDefinitions.Skill combatSkill : levels.keySet())
+			upgradedStats.put(combatSkill, (int) Math.ceil(levels.get(combatSkill) * combatScale));
+		this.setLevels(upgradedStats);
 	}
 
 	public void spawnDarkEnergyCore() {
 		if (core != null)
 			return;
-		core = new DarkEnergyCore(this);
+		core = new ScalingDarkEnergyCore(this);
 	}
 
 	public void removeDarkEnergyCore() {
@@ -123,11 +145,4 @@ public class CorporealBeast extends NPC {
 	public double getMagePrayerMultiplier() {
 		return 0.6;
 	}
-
-	public static NPCInstanceHandler toFunc = new NPCInstanceHandler(8133) {
-		@Override
-		public NPC getNPC(int npcId, WorldTile tile) {
-			return new CorporealBeast(npcId, tile, false);
-		}
-	};
 }

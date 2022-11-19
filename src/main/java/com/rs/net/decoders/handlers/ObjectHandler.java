@@ -1296,7 +1296,7 @@ public final class ObjectHandler {
 				player.addWalkSteps(2461, player.getY() > object.getY() ? object.getY() - 1 : object.getY() + 3, -1, false);
 			} else if (id == 12230 && object.getX() == 1752 && object.getY() == 5136)
 				player.setNextWorldTile(new WorldTile(2996, 3378, 0));
-			else if (id == 38811 || id == 37929) {// corp beast
+			else if (id == 38811 /*|| id == 37929*/) {// corp beast
 				if (object.getX() == 2971 && object.getY() == 4382)
 					player.getInterfaceManager().sendInterface(650);
 				else if (object.getX() == 2918 && object.getY() == 4382) {

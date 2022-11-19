@@ -31,6 +31,8 @@ import com.rs.plugin.handlers.ItemOnItemHandler;
 import com.rs.plugin.handlers.ItemOnNPCHandler;
 import com.rs.plugin.handlers.LoginHandler;
 import com.rs.rsps.jessecustom.bosses.ScalingItems;
+import com.rs.rsps.jessecustom.bosses.corp.CorporealBeastScalingInstanceController;
+import com.rs.rsps.jessecustom.bosses.corp.ScalingCorporealBeast;
 import com.rs.rsps.jessecustom.bosses.godwars.armadyl.KreeArraScalingInstanceController;
 import com.rs.rsps.jessecustom.bosses.godwars.bandos.GeneralGraardorScalingInstanceController;
 import com.rs.rsps.jessecustom.bosses.godwars.saradomin.CommanderZilyanaScalingInstanceController;
@@ -157,7 +159,7 @@ public class CustomScripts {
 		return !true;
 	}
 
-	public static void createGodSwordOrLeftShield(Player player, int godSwordID, int hilt, int blade) {
+	public static void createGodSwordOrLeftShieldOrSigils(Player player, int godSwordID, int hilt, int blade) {
 			Map<String, Object> metas = player.getInventory().getItemById(hilt).getMetaData();
 			player.getInventory().deleteItem(hilt, 1);
 			player.getInventory().deleteItem(blade, 1);
@@ -196,7 +198,45 @@ public class CustomScripts {
 					}));
 		} else
 			player.sendMessage("You need 5k coins for an instance");
+	}
 
+	public static void createCorpScalingDialogue(Player player) {
+		if (player.getInventory().getAmountOf(995) >= 5_000) {
+			player.startConversation(new Dialogue()
+					.addOptions("Start a boss instance?", option -> {
+						option.add("Yes", () -> {
+							player.sendInputName("What instanced combat scale would you like? (1-10000)", scaleString -> {
+								try {
+									int scale = Integer.parseInt(scaleString);
+									if (scale < 0)
+										throw new NumberFormatException();
+									player.getInventory().removeItems(new Item(995, 5000));
+									player.getControllerManager().startController(new CorporealBeastScalingInstanceController(scale));
+								} catch (NumberFormatException n) {
+									player.sendMessage("Improper scale formatting, try again.");
+									return;
+								}
+							});
+						});
+						option.add("No", ()->{player.setNextWorldTile(new WorldTile(2921, player.getY(), 2));});
+					}));
+		} else {
+			player.sendMessage("You need 5k coins for an instance");
+			player.setNextWorldTile(new WorldTile(2921, player.getY(), 2));
+		}
+
+	}
+
+	public static boolean removeCorpStatReset() {
+		return false;
+	}
+
+	public static boolean isScalingCorp(NPC npc) {
+		if(npc instanceof ScalingCorporealBeast beast) {
+			beast.spawnDarkEnergyCore();
+			return true;
+		}
+		return false;
 	}
 
 	public static void customDebugCommands() {
@@ -222,6 +262,10 @@ public class CustomScripts {
 
 		Commands.add(Rights.PLAYER, "bando [scale]", "Start qbd", (p, args) -> {
 			p.getControllerManager().startController(new GeneralGraardorScalingInstanceController(Double.parseDouble(args[0])));
+		});
+
+		Commands.add(Rights.PLAYER, "corp [scale]", "Start qbd", (p, args) -> {
+			p.getControllerManager().startController(new CorporealBeastScalingInstanceController(Double.parseDouble(args[0])));
 		});
 
 		Commands.add(Rights.PLAYER, "zammy [scale]", "Start qbd", (p, args) -> {
@@ -295,6 +339,15 @@ public class CustomScripts {
 	}
 
 	private static double getAverage(Item item, String type) {
+		if(item.getName().equalsIgnoreCase("Bandos hilt"))
+			item = new Item(11696, 1);
+		if(item.getName().equalsIgnoreCase("Zamorak hilt"))
+			item = new Item(11700, 1);
+		if(item.getName().equalsIgnoreCase("Armadyl hilt"))
+			item = new Item(11694, 1);
+		if(item.getName().equalsIgnoreCase("Saradomin hilt"))
+			item = new Item(11698, 1);
+
 		int[] bonuses = item.getDefinitions().bonuses;
 		int defenseAvg = (bonuses[Bonus.STAB_DEF.ordinal()] + bonuses[Bonus.SLASH_DEF.ordinal()] + bonuses[Bonus.CRUSH_DEF.ordinal()]
 				+ bonuses[Bonus.RANGE_DEF.ordinal()]) / 4;

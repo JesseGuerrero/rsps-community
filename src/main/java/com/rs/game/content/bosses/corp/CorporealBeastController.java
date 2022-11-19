@@ -76,11 +76,12 @@ public class CorporealBeastController extends Controller {
 				else if (loop == 1)
 					player.sendMessage("Oh dear, you have died.");
 				else if (loop == 3) {
-					if(!CustomScripts.deathCofferIsSuccessful(player))
+					if(!CustomScripts.deathCofferIsSuccessful(player)) {
 						player.sendItemsOnDeath(null, false);
-					player.reset();
-					player.setNextWorldTile(new WorldTile(Settings.getConfig().getPlayerRespawnTile()));
-					player.setNextAnimation(new Animation(-1));
+						player.reset();
+						player.setNextWorldTile(new WorldTile(Settings.getConfig().getPlayerRespawnTile()));
+						player.setNextAnimation(new Animation(-1));
+					}
 				} else if (loop == 4) {
 					removeController();
 					player.jingle(90);

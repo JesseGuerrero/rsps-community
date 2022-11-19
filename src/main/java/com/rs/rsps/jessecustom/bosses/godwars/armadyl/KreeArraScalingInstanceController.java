@@ -124,7 +124,8 @@ public class KreeArraScalingInstanceController extends Controller {
 
 	@Override
 	public boolean sendDeath() {
-		removeController();
+		teled = true;
+		forceClose();
 		return true;
 	}
 
