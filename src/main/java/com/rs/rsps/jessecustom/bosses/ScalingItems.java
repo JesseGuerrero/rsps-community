@@ -72,7 +72,7 @@ public class ScalingItems {
 				"Bandos gloves", "Rune platelegs", "Black d'hide body", "Armadyl helmet",
 				"Armadyl chestplate", "Armadyl chainskirt", "Armadyl boots",
 				"Armadyl buckler", "Armadyl gloves", "Rune plateskirt", "Regen bracelet",
-				"Spirit shield"
+				"Spirit shield", "Arcane sigil", "Divine sigil", "Elysian sigil", "Spectral sigil"
 		};
 	}
 	public static Object[] getMagicDefenseScalingItems() {

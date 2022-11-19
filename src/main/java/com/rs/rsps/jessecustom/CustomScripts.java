@@ -160,12 +160,22 @@ public class CustomScripts {
 	}
 
 	public static void createGodSwordOrLeftShieldOrSigils(Player player, int godSwordID, int hilt, int blade) {
-			Map<String, Object> metas = player.getInventory().getItemById(hilt).getMetaData();
+			Map<String, Object> metas1 = player.getInventory().getItemById(hilt).getMetaData();
+			Map<String, Object> metas2 = player.getInventory().getItemById(blade).getMetaData();
 			player.getInventory().deleteItem(hilt, 1);
 			player.getInventory().deleteItem(blade, 1);
 			Item godSword = new Item(godSwordID, 1);
-			for(String meta : metas.keySet())
-				godSword.setMetaDataO(meta, metas.get(meta));
+			if(metas1 != null)
+				for(String meta : metas1.keySet())
+					if(!meta.equalsIgnoreCase("WeaponName"))
+						godSword.setMetaDataO(meta, metas1.get(meta));
+			if(metas2 != null)
+				for(String meta : metas2.keySet())
+					if(!meta.equalsIgnoreCase("WeaponName"))
+						if(metas1 != null && metas1.containsKey(meta)) {
+							godSword.setMetaDataO(meta, ((double)metas1.get(meta) + (double)metas2.get(meta)));
+						} else
+							godSword.setMetaDataO(meta, metas2.get(meta));
 			player.getInventory().addItem(godSword);
 	}
 
@@ -347,6 +357,14 @@ public class CustomScripts {
 			item = new Item(11694, 1);
 		if(item.getName().equalsIgnoreCase("Saradomin hilt"))
 			item = new Item(11698, 1);
+		if(item.getName().equalsIgnoreCase("Arcane sigil"))
+			item = new Item(13738, 1);
+		if(item.getName().equalsIgnoreCase("Divine sigil"))
+			item = new Item(13740, 1);
+		if(item.getName().equalsIgnoreCase("Elysian sigil"))
+			item = new Item(13742, 1);
+		if(item.getName().equalsIgnoreCase("Spectral sigil"))
+			item = new Item(13744, 1);
 
 		int[] bonuses = item.getDefinitions().bonuses;
 		int defenseAvg = (bonuses[Bonus.STAB_DEF.ordinal()] + bonuses[Bonus.SLASH_DEF.ordinal()] + bonuses[Bonus.CRUSH_DEF.ordinal()]

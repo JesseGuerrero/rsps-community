@@ -159,7 +159,7 @@ public class GodSwordCreation {
 //				player.getInventory().deleteItem(itemUsed, 1);
 //				player.getInventory().deleteItem(usedWith, 1);
 //				player.getInventory().addItem(13738, 1);
-				CustomScripts.createGodSwordOrLeftShieldOrSigils(player, 13738, 13736, 13746);
+				CustomScripts.createGodSwordOrLeftShieldOrSigils(player, 13738, 13746, 13736);
 				player.getSkills().addXp(Constants.SMITHING, 1800);
 				return true;
 			} else {
@@ -171,7 +171,7 @@ public class GodSwordCreation {
 //				player.getInventory().deleteItem(itemUsed, 1);
 //				player.getInventory().deleteItem(usedWith, 1);
 //				player.getInventory().addItem(13740, 1);
-				CustomScripts.createGodSwordOrLeftShieldOrSigils(player, 13740, 13736, 13748);
+				CustomScripts.createGodSwordOrLeftShieldOrSigils(player, 13740, 13748, 13736);
 				player.getSkills().addXp(Constants.SMITHING, 1800);
 				return true;
 			} else {
@@ -183,7 +183,7 @@ public class GodSwordCreation {
 //				player.getInventory().deleteItem(itemUsed, 1);
 //				player.getInventory().deleteItem(usedWith, 1);
 //				player.getInventory().addItem(13742, 1);
-				CustomScripts.createGodSwordOrLeftShieldOrSigils(player, 13742, 13736, 13750);
+				CustomScripts.createGodSwordOrLeftShieldOrSigils(player, 13742, 13750, 13736);
 				player.getSkills().addXp(Constants.SMITHING, 1800);
 				return true;
 			} else {
@@ -195,7 +195,7 @@ public class GodSwordCreation {
 //				player.getInventory().deleteItem(itemUsed, 1);
 //				player.getInventory().deleteItem(usedWith, 1);
 //				player.getInventory().addItem(13744, 1);
-				CustomScripts.createGodSwordOrLeftShieldOrSigils(player, 13744, 13736, 13752);
+				CustomScripts.createGodSwordOrLeftShieldOrSigils(player, 13744, 13752, 13736);
 				player.getSkills().addXp(Constants.SMITHING, 1800);
 				return true;
 			} else {
