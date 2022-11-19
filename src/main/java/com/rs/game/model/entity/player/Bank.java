@@ -73,6 +73,27 @@ public class Bank {
 	public static ButtonClickHandler handleDepositBox = new ButtonClickHandler(11) {
 		@Override
 		public void handle(ButtonClickEvent e) {
+			if(e.getPlayer().getO("GIM Team") == null) {
+				if (e.getComponentId() == 17) {
+					if (e.getPacket() == ClientPacket.IF_OP1)
+						e.getPlayer().getBank().depositItem(e.getSlotId(), 1, false);
+					else if (e.getPacket() == ClientPacket.IF_OP2)
+						e.getPlayer().getBank().depositItem(e.getSlotId(), 5, false);
+					else if (e.getPacket() == ClientPacket.IF_OP3)
+						e.getPlayer().getBank().depositItem(e.getSlotId(), 10, false);
+					else if (e.getPacket() == ClientPacket.IF_OP4)
+						e.getPlayer().getBank().depositItem(e.getSlotId(), Integer.MAX_VALUE, false);
+					else if (e.getPacket() == ClientPacket.IF_OP5)
+						e.getPlayer().sendInputInteger("How many would you like to deposit?", (integer) -> e.getPlayer().getBank().depositItem(e.getSlotId(), integer, true));
+					else if (e.getPacket() == ClientPacket.IF_OP6)
+						e.getPlayer().getInventory().sendExamine(e.getSlotId());
+				} else if (e.getComponentId() == 18)
+					e.getPlayer().getBank().depositAllInventory(false);
+				else if (e.getComponentId() == 22)
+					e.getPlayer().getBank().depositAllEquipment(false);
+				return;
+			}
+
 			WorldDB.getGIMS().getByGroupName(e.getPlayer().getO("GIM Team"), group -> {
 				if(group.isBank1Open()) {
 					e.getPlayer().sendMessage("The group bank is in use.");
@@ -452,7 +473,7 @@ public class Bank {
 		player.getInterfaceManager().removeSubs(Sub.TAB_INVENTORY, Sub.TAB_EQUIPMENT);
 		player.getInterfaceManager().openTab(Sub.TAB_FRIENDS);
 		sendBoxInterItems();
-		player.getPackets().setIFText(11, 13, "Bank Of " + Settings.getConfig().getServerName() + " - Deposit to Bank 1");
+		player.getPackets().setIFText(11, 13, "Bank Of " + Settings.getConfig().getServerName() + " - Deposit to Bank");
 		player.setCloseInterfacesEvent(() -> {
 			player.getSession().writeToQueue(ServerPacket.TRIGGER_ONDIALOGABORT);
 			player.getInterfaceManager().sendSubDefaults(Sub.TAB_INVENTORY, Sub.TAB_EQUIPMENT);

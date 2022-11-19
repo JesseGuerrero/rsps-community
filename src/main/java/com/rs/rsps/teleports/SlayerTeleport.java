@@ -10,8 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum SlayerTeleport {
-	
-	//TODO possibly wilderness locations if players request
+
 	
 	MONKEYS(TaskMonster.MONKEYS, 
 			new Teleport("Karamja Jungle", new WorldTile(2863, 3022, 0)),

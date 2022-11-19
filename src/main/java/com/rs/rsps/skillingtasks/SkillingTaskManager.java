@@ -316,7 +316,7 @@ public class SkillingTaskManager {
 		p.startConversation(new Dialogue().addSimple("Your new task is to " + task.getActionString() + " " + amount + " " + task.name().toString().toLowerCase().replace("_", " ")));
 	}
 	
-	public static NPCClickHandler handleTaskMaster = new NPCClickHandler(new Object[]{ 100000 }) { //TODO NPC id
+	public static NPCClickHandler handleTaskMaster = new NPCClickHandler(new Object[]{ 100000 }) {
 		@Override
 		public void handle(NPCClickEvent e) {
 			if (e.getOption().contains("Talk-to")) {

@@ -108,7 +108,7 @@ public class CorporealBeastScalingInstanceController extends Controller {
 			}
 		return true;
 	}
-	//TODO: Change GWD META CREATION for hilts
+
 	private boolean isInsideLair() {
 		return player.getX() > spawn.getX()+1;
 	}
