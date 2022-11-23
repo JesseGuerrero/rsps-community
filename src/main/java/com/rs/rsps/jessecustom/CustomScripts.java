@@ -625,6 +625,21 @@ public class CustomScripts {
 		return amount*3;
 	}
 
+	public static void saveSlayerTaskNumber(Player p) {
+		if(p.getO("SlayerTasksCompleted") != null)
+			p.save("SlayerTasksCompleted", (p.getI("SlayerTasksCompleted") + 1));
+		if(p.getO("SlayerTasksCompleted") == null)
+			p.save("SlayerTasksCompleted", 0);
+	}
+
+	public static int getSlayerTasksCompleted(Player p) {
+		if(p.getO("SlayerTasksCompleted") != null)
+			return p.getI("SlayerTasksCompleted");
+		if (p.getO("SlayerTasksCompleted") == null)
+			return 0;
+		return 0;
+	}
+
 	public static void bindItemDirectly(ItemsContainer<Item> bindedItems, Item item) {
 		bindedItems.add(item);
 	}

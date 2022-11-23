@@ -159,7 +159,7 @@ public class AdventurerD extends Conversation {
 												group.getPrestigeManager().refreshPrestige();
 											}));
 											option.add("Intermediate", new Dialogue().addNext(() -> {
-//									RanksInterfaces.noviceInterface(player);
+												RanksInterfaces.intermediateInterface(player);
 												group.getPrestigeManager().refreshPrestige();
 											}));
 											option.add("Advanced", new Dialogue().addNext(() -> {
