@@ -1,12 +1,12 @@
 [
   {
-    "comment": "Magic well",
-    "objectId": 28715,
+    "comment": "GIM",
+    "objectId": 170,
     "type": 10,
-    "rotation": 0,
+    "rotation": 2,
     "tile": {
-      "x": 3172,
-      "y": 3466,
+      "x": 3173,
+      "y": 3485,
       "plane": 0
     }
   },
@@ -14,10 +14,33 @@
     "comment": "GIM",
     "objectId": 170,
     "type": 10,
-    "rotation": 0,
+    "rotation": 2,
     "tile": {
-      "x": 3171,
-      "y": 3467,
+      "x": 3156,
+      "y": 3485,
+      "plane": 0
+    }
+  }
+,
+  {
+    "comment": "GIM",
+    "objectId": 170,
+    "type": 10,
+    "rotation": 4,
+    "tile": {
+      "x": 3173,
+      "y": 3497,
+      "plane": 0
+    }
+  },
+  {
+    "comment": "GIM",
+    "objectId": 170,
+    "type": 10,
+    "rotation": 4,
+    "tile": {
+      "x": 3156,
+      "y": 3497,
       "plane": 0
     }
   }

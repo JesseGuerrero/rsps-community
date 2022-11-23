@@ -3551,9 +3551,6 @@ public class Player extends Entity {
 			setTitleShading("000000");
 		}
 	}
-	public void setGIM(boolean isGIM) {
-		save("Group IronMan", isGIM);
-	}
 
 	public void applyAccountTitle() {
 		if (ironMan) {

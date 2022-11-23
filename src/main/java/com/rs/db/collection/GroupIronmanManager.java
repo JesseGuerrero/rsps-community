@@ -4,13 +4,10 @@ import com.google.gson.JsonIOException;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.FindOneAndReplaceOptions;
 import com.mongodb.client.model.Indexes;
-import com.rs.game.World;
-import com.rs.game.model.entity.player.Player;
 import com.rs.lib.db.DBItemManager;
 import com.rs.lib.file.JsonFileManager;
-import com.rs.lib.game.Item;
 import com.rs.lib.util.Logger;
-import com.rs.rsps.jessecustom.GroupIronMan;
+import com.rs.rsps.jessecustom.groupironman.GroupIronMan;
 import org.bson.Document;
 
 import java.io.IOException;
@@ -30,7 +27,10 @@ public class GroupIronmanManager extends DBItemManager  {
 
 	public void getByGroupName(String groupName, Consumer<GroupIronMan> func) {
 		execute(() -> {
-			func.accept(getGroupSyncName(groupName));
+			GroupIronMan group = getGroupSyncName(groupName);
+			if(group != null)
+				group.init();
+			func.accept(group);
 		});
 	}
 

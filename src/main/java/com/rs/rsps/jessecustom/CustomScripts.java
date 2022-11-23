@@ -38,6 +38,7 @@ import com.rs.rsps.jessecustom.bosses.godwars.bandos.GeneralGraardorScalingInsta
 import com.rs.rsps.jessecustom.bosses.godwars.saradomin.CommanderZilyanaScalingInstanceController;
 import com.rs.rsps.jessecustom.bosses.godwars.zamorak.KrilTstsarothScalingInstanceController;
 import com.rs.rsps.jessecustom.bosses.kalphitequeen.KalphiteQueenScalingInstanceController;
+import com.rs.rsps.jessecustom.groupironman.GIM;
 
 import java.util.Map;
 import java.util.Set;
@@ -252,6 +253,20 @@ public class CustomScripts {
 	public static void customDebugCommands() {
 		Commands.add(Rights.PLAYER, "rights", "Completes all quests.", (p, args) -> {
 			p.sendMessage("Rights: " + p.getRights());
+		});
+
+		Commands.add(Rights.PLAYER, "getprestige", "Completes all quests.", (p, args) -> {
+			GIM.openGIM(GIM.getGIMTeamName(p), group -> {
+				p.sendMessage(group.getPrestigeManager().getPrestige() + " prestige.");
+			});
+		});
+
+		Commands.add(Rights.PLAYER, "setprestige [prestige]", "Completes all quests.", (p, args) -> {
+			GIM.openGIM(GIM.getGIMTeamName(p), group -> {
+				group.getPrestigeManager().setPrestige(Integer.valueOf(args[0]));
+				p.sendMessage("Set prestige to " + args[0]);
+			});
+
 		});
 
 		Commands.add(Rights.PLAYER, "iscaled [itemId scale]", "Spawns an item with specified id and scaling.", (p, args) -> {
@@ -500,6 +515,18 @@ public class CustomScripts {
 				e.getPlayer().save("resetQuestsNovember", true);
 				e.getPlayer().getQuestManager().resetQuest(Quest.KNIGHTS_SWORD);
 				e.getPlayer().getQuestManager().resetQuest(Quest.WATERFALL_QUEST);
+			}
+		}
+	};
+
+	public static LoginHandler onLoginUpdateGIMQuests = new LoginHandler() {
+		@Override
+		public void handle(LoginEvent e) {
+			if(GIM.isGIM(e.getPlayer()) && (boolean)e.getPlayer().get("resetQuestsGIM") == false) {
+				e.getPlayer().save("resetQuestsGIM", true);
+				for (Quest quest : Quest.values())
+					if (quest.isImplemented())
+						e.getPlayer().getQuestManager().resetQuest(quest);
 			}
 		}
 	};

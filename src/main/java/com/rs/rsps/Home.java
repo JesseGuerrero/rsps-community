@@ -11,11 +11,14 @@ import com.rs.game.model.object.GameObject;
 import com.rs.lib.Constants;
 import com.rs.lib.game.WorldObject;
 import com.rs.lib.game.WorldTile;
+import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.annotations.ServerStartupEvent;
 import com.rs.plugin.events.LoginEvent;
+import com.rs.plugin.events.NPCClickEvent;
 import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.LoginHandler;
+import com.rs.plugin.handlers.NPCClickHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
 import com.rs.rsps.teleports.BossTeleport;
 import com.rs.rsps.teleports.SlayerTeleport;
@@ -30,7 +33,10 @@ public class Home {
 	public static void spawnNPCs() {
 		/* Task master */
 		//spawnNPC(14858, new WorldTile(3090, 3494, 0), "Cadet Cassandra", Direction.WEST, false);
-		
+
+		/* Prestige master */
+//		spawnNPC(2253, new WorldTile(3167, 3491, 0), "Wise Old Man", Direction.EAST, false);
+
 		/* Slayer Masters */
 //		spawnNPC(8480, new WorldTile(3091, 3487, 0), Direction.SOUTH, false);
 //		spawnNPC(8481, new WorldTile(3092, 3487, 0), Direction.SOUTH, false);
@@ -38,44 +44,25 @@ public class Home {
 //		spawnNPC(1598, new WorldTile(3094, 3487, 0), Direction.SOUTH, false);
 //		spawnNPC(7779, new WorldTile(3095, 3487, 0), Direction.SOUTH, false);
 //		spawnNPC(8466, new WorldTile(3096, 3487, 0), Direction.SOUTH, false);
-		spawnNPC(9085, new WorldTile(3161, 3461, 0), Direction.EAST, false);
-		spawnNPC(15661, new WorldTile(3168, 3461, 0), Direction.WEST, false);
-
-		/* GE Clarks */
-//		spawnNPC(2240, new WorldTile(3096, 3492, 0), Direction.WEST, false);
-//		spawnNPC(2241, new WorldTile(3096, 3490, 0), Direction.WEST, false);
-//		spawnNPC(2593, new WorldTile(3096, 3494, 0), Direction.NORTHWEST, false);
-//		spawnNPC(2240, new WorldTile(3098, 3494, 0), Direction.NORTH, false);
-//		spawnNPC(2241, new WorldTile(3096, 3488, 0), Direction.WEST, false);
-
-		/* Loyalty point shop */
-//		spawnNPC(13727, new WorldTile(3090, 3493, 0), Direction.WEST, false);
+		spawnNPC(9085, new WorldTile(3165, 3489, 0), "Master Slayer", Direction.SOUTH, false);
+		spawnNPC(15661, new WorldTile(3166, 3486, 0), Direction.WEST, false);
+		spawnNPC(15147, new WorldTile(3164, 3489, 0), "Slayer Assistant", Direction.SOUTH, false);//Slayer teleport
 
 		/* GIM */
-		spawnNPC(1512, new WorldTile(3170, 3467, 0), Direction.NORTH, false);
+		spawnNPC(1512, new WorldTile(3165, 3482, 0), "GIM Tutor", Direction.SOUTH, false);
+		World.unclipTile(new WorldTile(3165, 3482, 0));
 	}
 
-	public static ObjectClickHandler handleShops = new ObjectClickHandler(new Object[] { 18789 }, new WorldTile(3090, 3497, 0)) {
+	public static LoginHandler loginBlockThings = new LoginHandler() {
 		@Override
-		public void handle(ObjectClickEvent e) {
-//			e.getPlayer().startConversation(new Dialogue().addOptions("Which shops would you like to see?", new Options() {
-//				@Override
-//				public void create() {
-//					option("Melee shops", new Dialogue().addOptions("Which shop would you like to see?", ops -> {
-//						ops.add("Melee weapons", () -> ShopsHandler.openShop(e.getPlayer(), "hs_melee_weapons"));
-//						ops.add("Melee armor", () -> ShopsHandler.openShop(e.getPlayer(), "hs_melee_armor"));
-//					}));
-//					option("Ranged shops", new Dialogue().addOptions("Which shop would you like to see?", ops -> {
-//						ops.add("Ranged weapons", () -> ShopsHandler.openShop(e.getPlayer(), "hs_range_weapons"));
-//						ops.add("Ranged armor", () -> ShopsHandler.openShop(e.getPlayer(), "hs_range_armor"));
-//					}));
-//					option("Magic shops", new Dialogue().addOptions("Which shop would you like to see?", ops -> {
-//						ops.add("Magic weapons", () -> ShopsHandler.openShop(e.getPlayer(), "hs_mage_weapons"));
-//						ops.add("Magic armor", () -> ShopsHandler.openShop(e.getPlayer(), "hs_mage_armor"));
-//					}));
-//					option("Supply shop", () -> ShopsHandler.openShop(e.getPlayer(), "hs_supplies"));
-//				}
-//			}));
+		public void handle(LoginEvent e) {
+			if(e.getPlayer().getBool("Group IronMan"))
+				if(e.getPlayer().getO("GIM Team") == null) {
+					e.getPlayer().sendMessage("<col=FF0000><shad=000000>You are XP locked until you are in a team...");
+					e.getPlayer().setXpLocked(true);
+				}
+				if(e.getPlayer().getO("GIM Team") != null)
+					e.getPlayer().setXpLocked(false);
 		}
 	};
 
@@ -163,6 +150,29 @@ public class Home {
 	public static ObjectClickHandler slayerPortal = new ObjectClickHandler(new Object[] { 46934 }, new WorldTile(3095, 3483, 0)) {
 		@Override
 		public void handle(ObjectClickEvent e) {
+			if (e.getPlayer().getSlayer().getTask() == null) {
+				e.getPlayer().sendMessage("You don't have a slayer task to teleport to currently.");
+				return;
+			}
+			Teleport[] teleports = SlayerTeleport.forMonster(e.getPlayer().getSlayer().getTask().getMonster()).getTeleports();
+			if (teleports == null || teleports.length <= 0) {
+				e.getPlayer().sendMessage("Your task doesn't have any teleports configured for it. Suggest it in discord.");
+				return;
+			}
+			e.getPlayer().startConversation(new Dialogue().addOptions("Where would you like to go?", new Options() {
+				@Override
+				public void create() {
+					for (Teleport t : teleports)
+						option(t.getName(), new Dialogue().addNext(() -> t.teleport(e.getPlayer())));
+					option("Nowhere.");
+				}
+			}));
+		}
+	};
+
+		public static NPCClickHandler slayerTeleHandler = new NPCClickHandler(new Object[] { 15147 }) {
+		@Override
+		public void handle(NPCClickEvent e) {
 			if (e.getPlayer().getSlayer().getTask() == null) {
 				e.getPlayer().sendMessage("You don't have a slayer task to teleport to currently.");
 				return;

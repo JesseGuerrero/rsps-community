@@ -16,24 +16,15 @@
 //
 package com.rs.rsps.jessecustom.bosses.kalphitequeen;
 
-import com.rs.db.WorldDB;
 import com.rs.game.content.bosses.kalphitequeen.KalphiteQueen;
 import com.rs.game.content.dialogue.Dialogue;
 import com.rs.game.model.entity.npc.combat.NPCCombatDefinitions;
-import com.rs.game.model.entity.pathing.RouteEvent;
 import com.rs.game.model.entity.player.Player;
-import com.rs.lib.Constants;
 import com.rs.lib.game.Item;
 import com.rs.lib.game.WorldTile;
-import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.plugin.events.NPCDropEvent;
 import com.rs.plugin.events.ObjectClickEvent;
-import com.rs.plugin.handlers.NPCDropHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
-import com.rs.rsps.jessecustom.CustomScripts;
-import com.rs.rsps.jessecustom.GroupIronMan;
-import com.rs.rsps.jessecustom.bosses.ScalingItems;
 
 import java.util.HashMap;
 import java.util.Map;

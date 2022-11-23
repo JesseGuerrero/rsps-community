@@ -1,6 +1,5 @@
-package com.rs.rsps.jessecustom;
+package com.rs.rsps.jessecustom.adventurer_dialogue;
 
-import com.rs.Settings;
 import com.rs.db.WorldDB;
 import com.rs.game.World;
 import com.rs.game.content.dialogue.Conversation;
@@ -8,11 +7,29 @@ import com.rs.game.content.dialogue.Dialogue;
 import com.rs.game.content.dialogue.HeadE;
 import com.rs.game.content.dialogue.Options;
 import com.rs.game.model.entity.player.Player;
-import com.rs.lib.Constants;
 import com.rs.lib.util.Utils;
+import com.rs.plugin.annotations.PluginEventHandler;
+import com.rs.plugin.events.NPCClickEvent;
+import com.rs.plugin.handlers.NPCClickHandler;
+import com.rs.rsps.jessecustom.groupironman.GIM;
+import com.rs.rsps.jessecustom.groupironman.GroupIronMan;
+import com.rs.rsps.jessecustom.groupironman.PrestigeGIMManager;
 
+@PluginEventHandler
 public class AdventurerD extends Conversation {
 	int NPC = 1512;
+
+	String[] ranks = new String[] {"Nubby", "Novice", "Intermediate", "Advanced", "Veteran", "Completionist"};
+
+	public static NPCClickHandler handleGIMDialogue = new NPCClickHandler(new Object[] { 1512 }) {
+		@Override
+		public void handle(NPCClickEvent e) {
+			if(!e.getPlayer().getBank().checkPin())
+				return;
+			e.getPlayer().startConversation(new AdventurerD(e.getPlayer()));
+		}
+	};
+
 	public AdventurerD(Player player) {
 		super(player);
 		if(player.getBool("Group IronMan")) {
@@ -36,8 +53,9 @@ public class AdventurerD extends Conversation {
 												final String groupName = groupNameDisplay;
 												if (!WorldDB.getGIMS().groupExists(groupName)) {
 													WorldDB.getGIMS().save(new GroupIronMan(groupName, player), () -> {
-														player.sendMessage("Group created!");
+														player.sendMessage("Group created! You are no longer xp locked...");
 														player.save("GIM Team", groupName);
+														player.setXpLocked(false);
 													});
 													return;
 												}
@@ -85,6 +103,9 @@ public class AdventurerD extends Conversation {
 			addPlayer(HeadE.HAPPY_TALKING, "Hi!");
 			addNPC(NPC, HeadE.CALM_TALK, "Hey.");
 			addNPC(NPC, HeadE.CALM_TALK, "What would you like to do?");
+			addPlayer(HeadE.HAPPY_TALKING, "I don't know, you tell me...");
+			addNPC(NPC, HeadE.CALM_TALK, "Try asking me about prestige...");
+			addPlayer(HeadE.HAPPY_TALKING, "Sure...");
 			addOptions("I would like to...", new Options() {
 				@Override
 				public void create() {
@@ -128,9 +149,35 @@ public class AdventurerD extends Conversation {
 					);
 
 
-					option("What is the XP rate?", new Dialogue()
-							.addNPC(NPC, HeadE.CALM_TALK, "The xp rate is " + (Settings.getConfig().getXpRate()))
-					);
+					option("Tell me about prestige...", new Dialogue().addNext(()-> {
+							GIM.openGIM(GIM.getGIMTeamName(player), group -> {
+								player.startConversation(new Dialogue()
+										.addNPC(NPC, HeadE.CALM_TALK, "Your current rank is " + ranks[group.getPrestigeManager().getPrestige()] + ".")
+										.addOptions("Which rank would you like to inquire?", option -> {
+											option.add("Novice", new Dialogue().addNext(() -> {
+												RanksInterfaces.noviceInterface(player);
+												group.getPrestigeManager().refreshPrestige();
+											}));
+											option.add("Intermediate", new Dialogue().addNext(() -> {
+//									RanksInterfaces.noviceInterface(player);
+												group.getPrestigeManager().refreshPrestige();
+											}));
+											option.add("Advanced", new Dialogue().addNext(() -> {
+//									RanksInterfaces.noviceInterface(player);
+												group.getPrestigeManager().refreshPrestige();
+											}));
+											option.add("Veteran", new Dialogue().addNext(() -> {
+//									RanksInterfaces.noviceInterface(player);
+												group.getPrestigeManager().refreshPrestige();
+											}));
+											option.add("Completionist", new Dialogue().addNext(() -> {
+//									RanksInterfaces.noviceInterface(player);
+												group.getPrestigeManager().refreshPrestige();
+											}));
+										}));
+							});
+					}));
+
 //								option("Rename my team", new Dialogue()
 //										.addNPC(NPC, HeadE.CALM_TALK, "So you want to rename your team do you?")
 //										.addNext(()->{

@@ -4,6 +4,7 @@ import com.rs.game.content.dialogue.Conversation;
 import com.rs.game.content.dialogue.Dialogue;
 import com.rs.game.content.dialogue.statements.SimpleStatement;
 import com.rs.game.model.entity.player.Player;
+import com.rs.rsps.jessecustom.groupironman.GIM;
 
 public class GamemodeSelectionCustom extends Conversation {
 
@@ -30,8 +31,7 @@ public class GamemodeSelectionCustom extends Conversation {
 			}));
 			ops.add("Group Iron Man", new Dialogue().addOptions("Is a GIM account alright with you?", confirm -> {
 				confirm.add("Yes", () -> {
-					player.setIronMan(true);
-					player.setGIM(true);
+					GIM.setGIMMode(player, true);
 					player.setChosenAccountType(true);
 					player.getAppearance().generateAppearanceData();
 				});

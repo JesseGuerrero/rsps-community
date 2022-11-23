@@ -33,6 +33,7 @@ import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.entity.player.managers.InterfaceManager.Sub;
 import com.rs.lib.game.WorldTile;
+import com.rs.rsps.jessecustom.CustomScripts;
 
 public class MagicInstructor extends Conversation {
 
