@@ -47,6 +47,8 @@ public class GroupIronmanManager extends DBItemManager  {
 	}
 
 	public void saveSync(GroupIronMan group) {
+		if(group != null)
+			group.init();
 		getDocs().findOneAndReplace(eq("groupName", group.getGroupName()), Document.parse(JsonFileManager.toJson(group)), new FindOneAndReplaceOptions().upsert(true));
 	}
 

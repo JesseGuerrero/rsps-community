@@ -4,10 +4,9 @@ import com.rs.db.WorldDB;
 import com.rs.game.World;
 import com.rs.game.model.entity.player.Bank;
 import com.rs.game.model.entity.player.Player;
-import com.rs.lib.game.Item;
+import com.rs.lib.util.Utils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -69,6 +68,10 @@ public class GroupIronMan {
 
 	public String getGroupName() {
 		return groupName;
+	}
+
+	public String getGroupDisplayName() {
+		return Utils.formatPlayerNameForDisplay(getGroupName());
 	}
 
 	public int getSize() {
@@ -177,5 +180,65 @@ public class GroupIronMan {
 
 	public void updateDBGIM() {
 		WorldDB.getGIMS().saveSync(this);
+	}
+
+
+
+	public void broadcastFuncToAllPlayers(BroadCastFuncGIM function) {
+		List<String> usernames = getPlayers();
+		if(usernames.size() == 0)
+			return;
+		World.forceGetPlayerByDisplay(usernames.get(0), member -> {
+			if(usernames.size() == 1) {
+				List<Player> players = new ArrayList<>();
+				players.add(member);
+				function.setPlayers(players);
+				function.run();
+			} else if(usernames.size() >= 2) {
+				World.forceGetPlayerByDisplay(usernames.get(1), member2-> {
+					if(usernames.size() == 2) {
+						List<Player> players = new ArrayList<>();
+						players.add(member);
+						players.add(member2);
+						function.setPlayers(players);
+						function.run();
+					} else if(usernames.size() >= 3) {
+						World.forceGetPlayerByDisplay(usernames.get(2), member3->{
+							if(usernames.size() == 3) {
+								List<Player> players = new ArrayList<>();
+								players.add(member);
+								players.add(member2);
+								players.add(member3);
+								function.setPlayers(players);
+								function.run();
+							} else if(usernames.size() >= 4) {
+								World.forceGetPlayerByDisplay(usernames.get(3), member4-> {
+									if(usernames.size() == 4) {
+										List<Player> players = new ArrayList<>();
+										players.add(member);
+										players.add(member2);
+										players.add(member3);
+										players.add(member4);
+										function.setPlayers(players);
+										function.run();
+									} else if(usernames.size() == 5) {
+										World.forceGetPlayerByDisplay(usernames.get(4), member5->{
+											List<Player> players = new ArrayList<>();
+											players.add(member);
+											players.add(member2);
+											players.add(member3);
+											players.add(member4);
+											players.add(member5);
+											function.setPlayers(players);
+											function.run();
+										});
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+		});
 	}
 }

@@ -17,10 +17,7 @@
 package com.rs.db;
 
 import com.rs.Settings;
-import com.rs.db.collection.GEManager;
-import com.rs.db.collection.GroupIronmanManager;
-import com.rs.db.collection.HighscoresManager;
-import com.rs.db.collection.PlayerManager;
+import com.rs.db.collection.*;
 import com.rs.db.collection.logs.LogManager;
 import com.rs.lib.db.DBConnection;
 import com.rs.lib.util.Logger;
@@ -29,6 +26,8 @@ public class WorldDB extends DBConnection {
 
 	private static PlayerManager PLAYERS = new PlayerManager();
 	private static HighscoresManager HIGHSCORES = new HighscoresManager();
+
+	private static GIMHighscoresManager GIMHIGHSCORES = new GIMHighscoresManager();
 	private static GEManager GE = new GEManager();
 	private static LogManager LOGS = new LogManager();
 	private static GroupIronmanManager GIMS = new GroupIronmanManager();
@@ -38,6 +37,7 @@ public class WorldDB extends DBConnection {
 		Logger.info(WorldDB.class, "constructor()", "Connecting to MongoDB and initializing databases...");
 		addItemManager(PLAYERS);
 		addItemManager(HIGHSCORES);
+		addItemManager(GIMHIGHSCORES);
 		addItemManager(GE);
 		addItemManager(LOGS);
 		addItemManager(GIMS);
@@ -61,5 +61,9 @@ public class WorldDB extends DBConnection {
 
 	public static GroupIronmanManager getGIMS() {
 		return GIMS;
+	}
+
+	public static GIMHighscoresManager getGIMHighscores() {
+		return GIMHIGHSCORES;
 	}
 }

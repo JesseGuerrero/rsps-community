@@ -165,6 +165,7 @@ import com.rs.plugin.events.ItemEquipEvent;
 import com.rs.plugin.events.LoginEvent;
 import com.rs.rsps.jessecustom.CustomScripts;
 import com.rs.rsps.jessecustom.GamemodeSelectionCustom;
+import com.rs.rsps.jessecustom.groupironman.GIM;
 import com.rs.utils.MachineInformation;
 import com.rs.utils.Ticks;
 import com.rs.utils.record.Recorder;
@@ -1751,6 +1752,8 @@ public class Player extends Entity {
 			World.removePlayer(this);
 			World.updateEntityRegion(this);
 			WorldDB.getHighscores().save(this);
+			if(GIM.isGIM(this))
+				WorldDB.getGIMHighscores().save(this);
 			Logger.info(Player.class, "realFinish", "Finished Player: " + getUsername());
 		});
 		World.updateEntityRegion(this);

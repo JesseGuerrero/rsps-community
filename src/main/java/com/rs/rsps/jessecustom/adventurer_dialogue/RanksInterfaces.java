@@ -76,7 +76,7 @@ public class RanksInterfaces {
 			lines.add("15k loyalty points each");
 			lines.add("+1 GIM bank");
 			lines.add("25 % chance for dragon bones to drop as noted");
-			if(totalLevels.get() && questPoints.get() && killedEnoughDragons && doneEnoughTasks|| group.getPrestigeManager().getPrestige() >= 1) {
+			if(totalLevels.get() && questPoints.get() && killedEnoughDragons && doneEnoughTasks|| group.getPrestigeManager().getPrestige() >= 2) {
 				lines.add("");
 				lines.add("Congratulations, You pass this rank!");
 			}

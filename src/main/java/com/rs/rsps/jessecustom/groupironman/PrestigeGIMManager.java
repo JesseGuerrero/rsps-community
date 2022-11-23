@@ -46,6 +46,7 @@ public class PrestigeGIMManager {
 
 	public void setPrestige(int prestige) {
 		this.prestige = prestige;
+		group.updateDBGIM();
 	}
 
 
