@@ -22,6 +22,7 @@ import com.rs.game.content.dialogue.Options;
 import com.rs.game.content.skills.dungeoneering.DungeonConstants;
 import com.rs.game.content.skills.dungeoneering.DungeonPartyManager;
 import com.rs.game.model.entity.player.Player;
+import com.rs.rsps.jessecustom.CustomScripts;
 
 public class DungeonSize extends Conversation {
 	public DungeonSize(Player player) {
@@ -47,7 +48,7 @@ public class DungeonSize extends Conversation {
 							}
 						})
 				);
-				if(party != null && party.getTeam().size() >= 3)
+				if(party != null && party.getTeam().size() >= /*3*/CustomScripts.getLargeDungPartSizeRequirement())
 					option("Large.", new Dialogue()
 							.addNext(()->{
 								player.getDungManager().setSize(DungeonConstants.LARGE_DUNGEON);

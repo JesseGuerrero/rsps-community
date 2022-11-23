@@ -43,6 +43,7 @@ import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.Item;
 import com.rs.lib.game.WorldTile;
 import com.rs.lib.util.Utils;
+import com.rs.rsps.jessecustom.CustomScripts;
 
 public class DungeonNPC extends NPC {
 
@@ -128,7 +129,7 @@ public class DungeonNPC extends NPC {
 
 	@Override
 	public int getMaxHitpoints() {
-		return getCombatLevel() * (this instanceof DungeonBoss ? 25 : 8) + 1;
+		return getCombatLevel() * (this instanceof DungeonBoss ? 25/*CustomScripts.bossHPMultiplier() */: 8 /*CustomScripts.DungNPCMultiplier()*/) + 1;
 	}
 
 	@Override

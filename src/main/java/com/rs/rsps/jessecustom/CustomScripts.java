@@ -506,6 +506,18 @@ public class CustomScripts {
 		return xp;
 	}
 
+	public static int getLargeDungPartSizeRequirement() {
+		return 1;
+	}
+//
+//	public static int bossHPMultiplier() {
+//		return 13;
+//	}
+//
+//	public static int DungNPCMultiplier() {
+//		return 6;
+//	}
+
 //	public static LoginHandler onLoginUpdates = new LoginHandler() {
 //		@Override
 //		public void handle(LoginEvent e) {
@@ -653,12 +665,12 @@ public class CustomScripts {
 	}
 
 	public static boolean deathCofferIsSuccessful(Player player) {
-		if(player.isIronMan()) {
-			player.setNextWorldTile(Settings.getConfig().getPlayerRespawnTile());
-			player.lock(3);
-			player.startConversation(new Dialogue().addNPC(15661, HeadE.CALM, "Given you have earned everything yourself(iron) you get a free pass...").addPlayer(HeadE.HAPPY_TALKING, "Thanks!"));
-			return true;
-		}
+//		if(player.isIronMan()) {
+//			player.setNextWorldTile(Settings.getConfig().getPlayerRespawnTile());
+//			player.lock(3);
+//			player.startConversation(new Dialogue().addNPC(15661, HeadE.CALM, "Given you have earned everything yourself(iron) you get a free pass...").addPlayer(HeadE.HAPPY_TALKING, "Thanks!"));
+//			return true;
+//		}
 		if(player.getI("death coffer") < 10_000) {
 			player.sendMessage("You didn't have enough in your coffer");
 			return false;
