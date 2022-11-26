@@ -906,6 +906,15 @@ public final class World {
 		WorldDB.getPlayers().getByUsername(Utils.formatPlayerNameForProtocol(displayName), p -> result.accept(p));
 	}
 
+	public static void forceGetPlayerGroupByDisplay(List<String> usernames, Consumer<List<Player>> result) {
+		List<Player> players = new ArrayList<>();
+		for(String username : usernames) {
+			username = Utils.formatPlayerNameForProtocol(username);
+			players.add(WorldDB.getPlayers().getSyncUsername(username));
+		}
+		result.accept(players);
+	}
+
 	public static final EntityList<Player> getPlayers() {
 		return PLAYERS;
 	}

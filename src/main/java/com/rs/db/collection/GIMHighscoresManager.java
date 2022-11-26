@@ -21,12 +21,12 @@ import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Sorts;
 import com.rs.db.model.GIMHighscore;
 import com.rs.db.model.Highscore;
+import com.rs.game.World;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.db.DBItemManager;
 import com.rs.lib.file.JsonFileManager;
 import com.rs.lib.game.Rights;
 import com.rs.lib.util.Logger;
-import com.rs.rsps.jessecustom.groupironman.BroadCastFuncGIM;
 import com.rs.rsps.jessecustom.groupironman.GIM;
 import org.bson.Document;
 
@@ -64,24 +64,22 @@ public class GIMHighscoresManager extends DBItemManager {
 		try {
 			if(GIM.hasTeam(player)) {
 				GIM.openGIM(GIM.getGIMTeamName(player), group -> {
-					group.broadcastFuncToAllPlayers(new BroadCastFuncGIM() {
+					World.forceGetPlayerGroupByDisplay(group.getPlayers(), players -> {
 						int totalAverage = 0;
 						int totalXP = 0;
-						@Override
-						public void run() {
-							GIMHighscore highscore = new GIMHighscore();
-							highscore.setGroupName(group.getGroupName());
-							highscore.setGroupDisplayName(group.getGroupDisplayName());
-							for(Player member : getPlayers()) {
-								totalAverage += member.getSkills().getTotalLevel();
-								totalXP += member.getSkills().getTotalXp();
-							}
-							totalAverage = totalAverage/getPlayers().size();
-							highscore.setAverageTotalLevel(totalAverage);
-							highscore.setTotalXp(totalXP);
-							highscore.setPrestige(group.getPrestigeManager().getPrestige());
-							getDocs().findOneAndReplace(eq("groupName", GIM.getGIMTeamName(player)), Document.parse(JsonFileManager.toJson(highscore)), new FindOneAndReplaceOptions().upsert(true));
+						GIMHighscore highscore = new GIMHighscore();
+						highscore.setGroupName(group.getGroupName());
+						highscore.setGroupDisplayName(group.getGroupDisplayName());
+						for(Player member : players) {
+							System.out.println(member.getUsername());
+							totalAverage += member.getSkills().getTotalLevel();
+							totalXP += member.getSkills().getTotalXp();
 						}
+						totalAverage = totalAverage/players.size();
+						highscore.setAverageTotalLevel(totalAverage);
+						highscore.setTotalXp(totalXP);
+						highscore.setPrestige(group.getPrestigeManager().getPrestige());
+						getDocs().findOneAndReplace(eq("groupName", GIM.getGIMTeamName(player)), Document.parse(JsonFileManager.toJson(highscore)), new FindOneAndReplaceOptions().upsert(true));
 					});
 				});
 			}

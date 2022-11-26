@@ -18,7 +18,6 @@ package com.rs.db.model;
 
 import com.rs.game.World;
 import com.rs.game.model.entity.player.Player;
-import com.rs.rsps.jessecustom.groupironman.BroadCastFuncGIM;
 import com.rs.rsps.jessecustom.groupironman.GroupIronMan;
 
 import java.util.List;
