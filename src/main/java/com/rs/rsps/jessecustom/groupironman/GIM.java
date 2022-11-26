@@ -19,7 +19,7 @@ public class GIM {
 		p.setIronMan(true);
 		p.save("Group IronMan", isGIM);
 		if(!GIM.hasTeam(p)) {
-			p.sendMessage("<col=FF0000><shad=000000>You are XP locked until you are in a team...");
+//			p.sendMessage("<col=FF0000><shad=000000>You are XP locked until you are in a team...");
 			p.setXpLocked(true);
 		}
 	}
