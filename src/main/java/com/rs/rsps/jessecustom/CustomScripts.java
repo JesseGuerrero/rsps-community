@@ -261,6 +261,19 @@ public class CustomScripts {
 			});
 		});
 
+		Commands.add(Rights.PLAYER, "addadvancedcounts", "Completes all quests.", (p, args) -> {
+			p.incrementCount("Reaper assignments completed", 11);
+			p.incrementCount("Pest control games completed", 301);
+			p.incrementCount("Fight Caves clears", 2);
+			p.sendMessage("added counts");
+		});
+
+		Commands.add(Rights.PLAYER, "resetadvancedcounts", "Completes all quests.", (p, args) -> {
+			p.save("Reaper assignments completed", 0);
+			p.save("Pest control games completed", 0);
+			p.save("Fight Caves clears", 0);
+		});
+
 		Commands.add(Rights.PLAYER, "setprestige [prestige]", "Completes all quests.", (p, args) -> {
 			GIM.openGIM(GIM.getGIMTeamName(p), group -> {
 				group.getPrestigeManager().setPrestige(Integer.valueOf(args[0]));
@@ -478,7 +491,7 @@ public class CustomScripts {
 	/**
 	 * If we have a strength bonus you can't trade it on the GE, Shop, place in familiar or...
 	 *
-	 * @param item
+	 * @param
 	 * @return
 	 */
 //	public static boolean hasMetaBonusWhichPreventsExchange(Player player, Item item) {
@@ -635,21 +648,6 @@ public class CustomScripts {
 
 	public static int slayerPointsMultiplier(int amount) {
 		return amount*3;
-	}
-
-	public static void saveSlayerTaskNumber(Player p) {
-		if(p.getO("SlayerTasksCompleted") != null)
-			p.save("SlayerTasksCompleted", (p.getI("SlayerTasksCompleted") + 1));
-		if(p.getO("SlayerTasksCompleted") == null)
-			p.save("SlayerTasksCompleted", 0);
-	}
-
-	public static int getSlayerTasksCompleted(Player p) {
-		if(p.getO("SlayerTasksCompleted") != null)
-			return p.getI("SlayerTasksCompleted");
-		if (p.getO("SlayerTasksCompleted") == null)
-			return 0;
-		return 0;
 	}
 
 	public static void bindItemDirectly(ItemsContainer<Item> bindedItems, Item item) {

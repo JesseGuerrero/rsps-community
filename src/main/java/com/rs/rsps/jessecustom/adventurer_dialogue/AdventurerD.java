@@ -156,23 +156,23 @@ public class AdventurerD extends Conversation {
 										.addOptions("Which rank would you like to inquire?", option -> {
 											option.add("Novice", new Dialogue().addNext(() -> {
 												RanksInterfaces.noviceInterface(player);
-												group.getPrestigeManager().refreshPrestige();
+												group.getPrestigeManager().refreshPrestige(0);
 											}));
 											option.add("Intermediate", new Dialogue().addNext(() -> {
 												RanksInterfaces.intermediateInterface(player);
-												group.getPrestigeManager().refreshPrestige();
+												group.getPrestigeManager().refreshPrestige(1);
 											}));
 											option.add("Advanced", new Dialogue().addNext(() -> {
-//									RanksInterfaces.noviceInterface(player);
-												group.getPrestigeManager().refreshPrestige();
+												RanksInterfaces.advancedInterface(player);
+												group.getPrestigeManager().refreshPrestige(2);
 											}));
 											option.add("Veteran", new Dialogue().addNext(() -> {
 //									RanksInterfaces.noviceInterface(player);
-												group.getPrestigeManager().refreshPrestige();
+												group.getPrestigeManager().refreshPrestige(3);
 											}));
 											option.add("Completionist", new Dialogue().addNext(() -> {
 //									RanksInterfaces.noviceInterface(player);
-												group.getPrestigeManager().refreshPrestige();
+												group.getPrestigeManager().refreshPrestige(4);
 											}));
 										}));
 							});

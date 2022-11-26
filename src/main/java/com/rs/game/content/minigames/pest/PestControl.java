@@ -164,6 +164,7 @@ public class PestControl {
 			int pointsAmount = data.getReward();
 			player.simpleDialogue("Congratulations! You have successfully kept the lander safe and have been awarded: " + coinsAmount + " gold coins and " + pointsAmount + " commendation points.");
 			player.getInventory().addItem(new Item(995, coinsAmount));
+			player.incrementCount("Pest control games completed");
 			player.setPestPoints(player.getPestPoints() + pointsAmount);
 		}
 	}

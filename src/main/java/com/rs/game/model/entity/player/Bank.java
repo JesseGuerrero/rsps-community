@@ -760,7 +760,7 @@ public class Bank {
 									});
 								})
 						);
-					if(false)
+					if(group.getPrestigeManager().getPrestige() >= 3)
 						option("Bank 3", new Dialogue()
 								.addNext(()->{
 									if(group.isBank3Open()) {
