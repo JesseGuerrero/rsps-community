@@ -71,7 +71,6 @@ public class GIMHighscoresManager extends DBItemManager {
 						highscore.setGroupName(group.getGroupName());
 						highscore.setGroupDisplayName(group.getGroupDisplayName());
 						for(Player member : players) {
-							System.out.println(member.getUsername());
 							totalAverage += member.getSkills().getTotalLevel();
 							totalXP += member.getSkills().getTotalXp();
 						}

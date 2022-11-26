@@ -167,11 +167,11 @@ public class AdventurerD extends Conversation {
 												group.getPrestigeManager().refreshPrestige(2);
 											}));
 											option.add("Veteran", new Dialogue().addNext(() -> {
-//									RanksInterfaces.noviceInterface(player);
+												RanksInterfaces.veteranInterface(player);
 												group.getPrestigeManager().refreshPrestige(3);
 											}));
 											option.add("Completionist", new Dialogue().addNext(() -> {
-//									RanksInterfaces.noviceInterface(player);
+												RanksInterfaces.completionistInterface(player);
 												group.getPrestigeManager().refreshPrestige(4);
 											}));
 										}));

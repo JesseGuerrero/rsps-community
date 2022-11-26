@@ -18,6 +18,7 @@ import com.rs.rsps.jessecustom.bosses.godwars.bandos.ScaledGeneralGraardor;
 import com.rs.rsps.jessecustom.bosses.godwars.saradomin.ScaledCommanderZilyana;
 import com.rs.rsps.jessecustom.bosses.godwars.zamorak.ScaledKrilTstsaroth;
 import com.rs.rsps.jessecustom.bosses.kalphitequeen.KalphiteQueenScaling;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -145,7 +146,7 @@ public class PrestigeGIMManager {
 			deservesAdvanced.set(false);
 		if(numOfReaperKills.get() < group.getSize()*10)
 			deservesAdvanced.set(false);
-		if(numOfPCGames.get() < group.getSize()*300)
+		if(numOfPCGames.get() < group.getSize()*30)
 			deservesAdvanced.set(false);
 		if(!completedFightCaves.get())
 			deservesAdvanced.set(false);
@@ -153,13 +154,48 @@ public class PrestigeGIMManager {
 	}
 
 	private boolean deservesVeteran() {
-		boolean deservesVeteran = true;
-		return false;
+		AtomicBoolean deservesVeteran = new AtomicBoolean(true);
+		AtomicBoolean allPlayersHaveTotalLevels = new AtomicBoolean(true);
+		AtomicInteger numOfReaperKills = new AtomicInteger(0);
+		AtomicInteger numOfPCGames = new AtomicInteger(0);
+		AtomicInteger numOfFightKilnCleared = new AtomicInteger(0);
+		World.forceGetPlayerGroupByDisplay(group.getPlayers(), players -> {
+			for(Player player : players) {
+				if(player.getSkills().getTotalLevel() < 2496)
+					allPlayersHaveTotalLevels.set(false);
+				numOfReaperKills.set(numOfReaperKills.get() + player.getCounterValue("Reaper assignments completed"));
+				numOfPCGames.set(numOfPCGames.get() + player.getCounterValue("Pest control games completed"));
+				numOfFightKilnCleared.set(numOfFightKilnCleared.get() + player.getCounterValue("Fight Kiln clears"));
+			}
+		});
+		if(!allPlayersHaveTotalLevels.get())
+			deservesVeteran.set(false);
+		if(numOfReaperKills.get() < group.getSize()*25)
+			deservesVeteran.set(false);
+		if(numOfPCGames.get() < group.getSize()*100)
+			deservesVeteran.set(false);
+		if(numOfFightKilnCleared.get() < 1)
+			deservesVeteran.set(false);
+		return deservesVeteran.get();
 	}
 
 	private boolean deservesCompletionist() {
-		boolean deservesCompletionist = true;
-		return false;
+		AtomicBoolean deservesCompletionist = new AtomicBoolean(true);
+		AtomicBoolean allPlayersHaveTotalLevels = new AtomicBoolean(true);
+		AtomicInteger numOfReaperKills = new AtomicInteger(0);
+		World.forceGetPlayerGroupByDisplay(group.getPlayers(), players -> {
+			for(Player player : players) {
+				for(int skillId = 0; skillId < 25; skillId++)
+					if(!player.getSkills().is120(skillId))
+						allPlayersHaveTotalLevels.set(false);
+				numOfReaperKills.set(numOfReaperKills.get() + player.getCounterValue("Reaper assignments completed"));
+			}
+		});
+		if(!allPlayersHaveTotalLevels.get())
+			deservesCompletionist.set(false);
+		if(numOfReaperKills.get() < group.getSize()*100)
+			deservesCompletionist.set(false);
+		return deservesCompletionist.get();
 	}
 
 	private void promoteToNovice() {

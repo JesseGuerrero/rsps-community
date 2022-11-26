@@ -100,7 +100,6 @@ public class RanksInterfaces {
 				for(Player p : players) {
 					if(!p.getQuestManager().completedAllQuests())
 						allQuestsComplete.set(false);
-					System.out.println(p.getI("Reaper assignments completed"));
 					numOfReaperKills.set(numOfReaperKills.get() + p.getCounterValue("Reaper assignments completed"));
 					numOfPCGames.set(numOfPCGames.get() + p.getCounterValue("Pest control games completed"));
 					if(p.getCounterValue("Fight Caves clears") >= 1)
@@ -111,14 +110,14 @@ public class RanksInterfaces {
 			ArrayList<String> lines = new ArrayList<>();
 			lines.add((allQuestsComplete.get() ? "<str>" : "") + "All quests completed");
 			lines.add((numOfReaperKills.get() >= group.getSize()*10 ? "<str>" : "") + "Has done " + group.getPlayers().size()*10 + " reaper tasks");
-			lines.add((numOfPCGames.get() >= group.getSize()*300 ? "<str>" : "") + "Finished a total of " + group.getSize()*300 + " pest control games");
+			lines.add((numOfPCGames.get() >= group.getSize()*30 ? "<str>" : "") + "Finished a total of " + group.getSize()*30 + " pest control games");
 			lines.add((completedFightCaves.get() ? "<str>" : "") + "1 player completed fight caves");
 			lines.add("");
 			lines.add("");
 			lines.add("~~Rewards~~");
 			lines.add("30k loyalty points each");
 			lines.add("+1 GIM bank");
-			if(allQuestsComplete.get() && numOfReaperKills.get() < group.getSize()*10 &&  numOfPCGames.get() < group.getSize()*300 && completedFightCaves.get()
+			if(allQuestsComplete.get() && numOfReaperKills.get() < group.getSize()*10 &&  numOfPCGames.get() < group.getSize()*30 && completedFightCaves.get()
 					|| group.getPrestigeManager().getPrestige() >= PrestigeGIMManager.ADVANCED) {
 				lines.add("");
 				lines.add("Congratulations, You pass this rank!");
@@ -126,6 +125,89 @@ public class RanksInterfaces {
 			player.getInterfaceManager().sendInterface(275);
 			player.getPackets().sendRunScriptReverse(1207, lines.size());
 			player.getPackets().setIFText(275, 1, "Advanced Ranking");
+			for (int i = 10; i < 289; i++)
+				player.getPackets().setIFText(275, i, ((i - 10) >= lines.size() ? " " : lines.get(i - 10)));
+		});
+
+	}
+
+	public static void veteranInterface(Player player) {
+		GIM.openGIM(GIM.getGIMTeamName(player), group -> {
+			AtomicBoolean deservesVeteran = new AtomicBoolean(true);
+			AtomicBoolean allPlayersHaveTotalLevels = new AtomicBoolean(true);
+			AtomicInteger numOfReaperKills = new AtomicInteger(0);
+			AtomicInteger numOfPCGames = new AtomicInteger(0);
+			AtomicInteger numOfFightKilnCleared = new AtomicInteger(0);
+			World.forceGetPlayerGroupByDisplay(group.getPlayers(), players -> {
+				for(Player p : players) {
+					if(p.getSkills().getTotalLevel() < 2496)
+						allPlayersHaveTotalLevels.set(false);
+					numOfReaperKills.set(numOfReaperKills.get() + p.getCounterValue("Reaper assignments completed"));
+					numOfPCGames.set(numOfPCGames.get() + p.getCounterValue("Pest control games completed"));
+					numOfFightKilnCleared.set(numOfFightKilnCleared.get() + p.getCounterValue("Fight Kiln clears"));
+				}
+			});
+			if(!allPlayersHaveTotalLevels.get())
+				deservesVeteran.set(false);
+			if(numOfReaperKills.get() < group.getSize()*25)
+				deservesVeteran.set(false);
+			if(numOfPCGames.get() < group.getSize()*100)
+				deservesVeteran.set(false);
+			if(numOfFightKilnCleared.get() < 1)
+				deservesVeteran.set(false);
+			ArrayList<String> lines = new ArrayList<>();
+			lines.add((allPlayersHaveTotalLevels.get() ? "<str>" : "") + "All players have 2496 total levels");
+			lines.add((numOfReaperKills.get() >= group.getSize()*25 ? "<str>" : "") + "Has done " + group.getPlayers().size()*25 + " reaper tasks");
+			lines.add((numOfPCGames.get() >= group.getSize()*100 ? "<str>" : "") + "Finished a total of " + group.getSize()*100 + " pest control games");
+			lines.add((numOfFightKilnCleared.get() >= 1 ? "<str>" : "") + "1 player completed fight kiln");
+			lines.add("");
+			lines.add("");
+			lines.add("~~Rewards~~");
+			lines.add("50k loyalty points each");
+			if(deservesVeteran.get() || group.getPrestigeManager().getPrestige() >= PrestigeGIMManager.VETERAN) {
+				lines.add("");
+				lines.add("Congratulations, You pass this rank!");
+			}
+			player.getInterfaceManager().sendInterface(275);
+			player.getPackets().sendRunScriptReverse(1207, lines.size());
+			player.getPackets().setIFText(275, 1, "Veteran Ranking");
+			for (int i = 10; i < 289; i++)
+				player.getPackets().setIFText(275, i, ((i - 10) >= lines.size() ? " " : lines.get(i - 10)));
+		});
+
+	}
+
+	public static void completionistInterface(Player player) {
+		GIM.openGIM(GIM.getGIMTeamName(player), group -> {
+			AtomicBoolean deservesCompletionist = new AtomicBoolean(true);
+			AtomicBoolean allPlayersHaveTotalLevels = new AtomicBoolean(true);
+			AtomicInteger numOfReaperKills = new AtomicInteger(0);
+			World.forceGetPlayerGroupByDisplay(group.getPlayers(), players -> {
+				for(Player p : players) {
+					for(int skillId = 0; skillId < 25; skillId++)
+						if(!p.getSkills().is120(skillId))
+							allPlayersHaveTotalLevels.set(false);
+					numOfReaperKills.set(numOfReaperKills.get() + p.getCounterValue("Reaper assignments completed"));
+				}
+			});
+			if(!allPlayersHaveTotalLevels.get())
+				deservesCompletionist.set(false);
+			if(numOfReaperKills.get() < group.getSize()*100)
+				deservesCompletionist.set(false);
+			ArrayList<String> lines = new ArrayList<>();
+			lines.add((allPlayersHaveTotalLevels.get() ? "<str>" : "") + "All players have all 120s");
+			lines.add((numOfReaperKills.get() >= group.getSize()*100 ? "<str>" : "") + "Has done " + group.getPlayers().size()*100 + " reaper tasks");
+			lines.add("");
+			lines.add("");
+			lines.add("~~Rewards~~");
+			lines.add("120k loyalty points each");
+			if(deservesCompletionist.get() || group.getPrestigeManager().getPrestige() >= PrestigeGIMManager.COMPLETIONIST) {
+				lines.add("");
+				lines.add("Congratulations, You pass this rank!");
+			}
+			player.getInterfaceManager().sendInterface(275);
+			player.getPackets().sendRunScriptReverse(1207, lines.size());
+			player.getPackets().setIFText(275, 1, "Completionist Ranking");
 			for (int i = 10; i < 289; i++)
 				player.getPackets().setIFText(275, i, ((i - 10) >= lines.size() ? " " : lines.get(i - 10)));
 		});

@@ -262,9 +262,10 @@ public class CustomScripts {
 		});
 
 		Commands.add(Rights.PLAYER, "addadvancedcounts", "Completes all quests.", (p, args) -> {
-			p.incrementCount("Reaper assignments completed", 11);
+			p.incrementCount("Reaper assignments completed", 101);
 			p.incrementCount("Pest control games completed", 301);
 			p.incrementCount("Fight Caves clears", 2);
+			p.incrementCount("Fight Kiln clears", 2);
 			p.sendMessage("added counts");
 		});
 
