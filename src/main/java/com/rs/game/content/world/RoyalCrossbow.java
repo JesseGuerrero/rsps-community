@@ -72,8 +72,8 @@ public class RoyalCrossbow {
 				WorldTasks.delay(4, () -> e.getPlayer().resetReceivedHits());
 				e.getPlayer().sendMessage("You brandish the crossbow and it absorbs the dragon's extremely hot fire.");
 				e.getItem().setId(24338);
-				//e.getItem().deleteMetaData();
-				CustomScripts.restoreChargesWithoutLosingMeta(e.getItem(), ItemConstants.ItemDegrade.forId(e.getItem().getId()));
+				e.getItem().deleteMetaData();
+//				CustomScripts.restoreChargesWithoutLosingMeta(e.getItem(), ItemConstants.ItemDegrade.forId(e.getItem().getId()));
 				e.getPlayer().getEquipment().refresh(Equipment.WEAPON);
 				e.getPlayer().getInventory().refresh();
 				break;

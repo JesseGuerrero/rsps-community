@@ -69,8 +69,8 @@ public class KalphiteQueen extends NPC {
 					reset();
 					setLocation(getRespawnTile());
 					finish();
-					if(source instanceof Player p)
-						CustomScripts.increaseWeaponStats(p, this);
+//					if(source instanceof Player p)
+//						CustomScripts.increaseWeaponStats(p, this);
 					if (!isSpawned())
 						setRespawnTask(CustomScripts.KalphiteQueenRespawnTime());
 					transformIntoNPC(1158);

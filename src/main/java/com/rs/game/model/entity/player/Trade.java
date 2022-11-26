@@ -311,7 +311,7 @@ public class Trade {
 		if (item == null)
 			return;
 		player.sendMessage(ItemConfig.get(item.getId()).getExamine(item));
-		CustomScripts.sendExamine(player, item);
+//		CustomScripts.sendExamine(player, item);
 		if (player.hasRights(Rights.DEVELOPER))
 			player.sendMessage("Item: " + (item.getId() + ", "+item.getMetaData()));
 	}

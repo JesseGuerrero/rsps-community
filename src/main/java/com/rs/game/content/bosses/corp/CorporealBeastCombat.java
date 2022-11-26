@@ -45,12 +45,14 @@ public class CorporealBeastCombat extends CombatScript {
 	public int attack(final NPC npc, final Entity target) {
 		final NPCCombatDefinitions defs = npc.getCombatDefinitions();
 		if (Utils.getRandomInclusive(3) == 0 && npc.getHitpoints() < (npc.getMaxHitpoints()/2)) {
-			if(CustomScripts.isScalingCorp(npc))
-				;
-			else {
-				CorporealBeast beast = (CorporealBeast) npc;
-				beast.spawnDarkEnergyCore();
-			}
+//			if(CustomScripts.isScalingCorp(npc))
+//				;
+//			else {
+//				CorporealBeast beast = (CorporealBeast) npc;
+//				beast.spawnDarkEnergyCore();
+//			}
+			CorporealBeast beast = (CorporealBeast) npc;
+			beast.spawnDarkEnergyCore();
 		}
 		int size = npc.getSize();
 		final List<Entity> possibleTargets = npc.getPossibleTargets();

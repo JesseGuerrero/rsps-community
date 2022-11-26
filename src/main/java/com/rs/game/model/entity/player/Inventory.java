@@ -490,7 +490,7 @@ public final class Inventory {
 			return;
 		ItemDefinitions def = ItemDefinitions.getDefs(item.getId());
 		player.getPackets().sendInventoryMessage(0, slotId, ItemConfig.get(item.getId()).getExamine(item) + (ItemConstants.isTradeable(item) ? (" General store: " + Utils.formatTypicalInteger(item.getDefinitions().getSellPrice()) + " High Alchemy: " + Utils.formatTypicalInteger(def.getHighAlchPrice())) : ""));
-		CustomScripts.sendExamine(player, item);
+//		CustomScripts.sendExamine(player, item);
 		if (item.getMetaData("combatCharges") != null)
 			player.sendMessage("<col=FF0000>It looks like it will last another " + Utils.ticksToTime(item.getMetaDataI("combatCharges")));
 		else if (item.getMetaData("brawlerCharges") != null)

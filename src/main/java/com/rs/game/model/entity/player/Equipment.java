@@ -139,7 +139,7 @@ public final class Equipment {
 		if (item == null)
 			return;
 		player.sendMessage(ItemConfig.get(item.getId()).getExamine(item));
-		CustomScripts.sendExamine(player, item);
+//		CustomScripts.sendExamine(player, item);
 		if (item.getMetaData("combatCharges") != null)
 			player.sendMessage("<col=FF0000>It looks like it will last another " + Utils.ticksToTime(item.getMetaDataI("combatCharges")));
 		else if (item.getMetaData("brawlerCharges") != null)
@@ -910,8 +910,8 @@ public final class Equipment {
 			};
 		}
 		default -> {
-			return CustomScripts.addBonusToEquip(item, bonus);
-//				return value;
+//			return CustomScripts.addBonusToEquip(item, bonus);
+				return value;
 			}
 		}
 	}

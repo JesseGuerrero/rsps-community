@@ -99,7 +99,7 @@ public class GodwarsController extends Controller {
 			return false;
 		}
 		if (object.getId() == 26287 || object.getId() == 26286 || object.getId() == 26288 || object.getId() == 26289) {
-			CustomScripts.createGWDScalingDialogueFromAltar(player, object.getId());
+//			CustomScripts.createGWDScalingDialogueFromAltar(player, object.getId());
 			if (lastPrayerRecharge >= System.currentTimeMillis()) {
 				player.sendMessage("You must wait a total of 10 minutes before being able to recharge your prayer points.");
 				return false;

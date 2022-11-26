@@ -178,7 +178,8 @@ public class CorporealBeastScalingInstanceController extends Controller {
 		@Override
 		public void handle(ObjectClickEvent e) {
 			if(e.getPlayer().getX() <= 2918) {
-				CustomScripts.createCorpScalingDialogue(e.getPlayer());
+//				CustomScripts.createCorpScalingDialogue(e.getPlayer());
+				e.getPlayer().setNextWorldTile(new WorldTile(2921, e.getPlayer().getY(), 2));
 				return;
 			}
 			e.getPlayer().setNextWorldTile(new WorldTile(2917, e.getPlayer().getY(), 2));

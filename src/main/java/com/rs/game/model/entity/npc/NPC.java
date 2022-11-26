@@ -489,8 +489,8 @@ public class NPC extends Entity {
 			source.setFindTargetDelay(0);
 		}
 		setNextAnimation(null);
-		if(source instanceof Player p)
-			CustomScripts.increaseWeaponStats(p, this);
+//		if(source instanceof Player p)
+//			CustomScripts.increaseWeaponStats(p, this);
 		PluginManager.handle(new NPCDeathEvent(this, source));
 		WorldTasks.scheduleTimer(loop -> {
 			if (loop == 0) {

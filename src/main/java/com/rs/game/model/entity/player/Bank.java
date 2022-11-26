@@ -900,7 +900,7 @@ public class Bank {
 			return;
 		Item item = bankTabs[slot[0]][slot[1]];
 		player.sendMessage(ItemConfig.get(item.getId()).getExamine(item));
-		CustomScripts.sendExamine(player, item);
+//		CustomScripts.sendExamine(player, item);
 		if (item.getMetaData("combatCharges") != null)
 			player.sendMessage("<col=FF0000>It looks like it will last another " + Utils.ticksToTime(item.getMetaDataI("combatCharges")));
 	}

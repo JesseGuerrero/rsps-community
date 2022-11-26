@@ -103,22 +103,22 @@ public class ScalingItems {
 		};
 	}
 
-	public static NPCDropHandler addMetas = new NPCDropHandler(ScalingItems.npcListForScalingItems(), ScalingItems.getAllScalingItems()) {
-		@Override
-		public void handle(NPCDropEvent e) {
-			if(e.getNPC() instanceof KalphiteQueenScaling npc)
-				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
-			if(e.getNPC() instanceof ScaledGeneralGraardor npc)
-				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
-			if(e.getNPC() instanceof ScaledKrilTstsaroth npc)
-				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
-			if(e.getNPC() instanceof ScaledKreeArra npc)
-				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
-			if(e.getNPC() instanceof ScaledCommanderZilyana npc)
-				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
-			if(e.getNPC() instanceof ScalingCorporealBeast npc)
-				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
-		}
-	};
+//	public static NPCDropHandler addMetas = new NPCDropHandler(ScalingItems.npcListForScalingItems(), ScalingItems.getAllScalingItems()) {
+//		@Override
+//		public void handle(NPCDropEvent e) {
+//			if(e.getNPC() instanceof KalphiteQueenScaling npc)
+//				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
+//			if(e.getNPC() instanceof ScaledGeneralGraardor npc)
+//				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
+//			if(e.getNPC() instanceof ScaledKrilTstsaroth npc)
+//				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
+//			if(e.getNPC() instanceof ScaledKreeArra npc)
+//				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
+//			if(e.getNPC() instanceof ScaledCommanderZilyana npc)
+//				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
+//			if(e.getNPC() instanceof ScalingCorporealBeast npc)
+//				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
+//		}
+//	};
 
 }

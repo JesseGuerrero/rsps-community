@@ -47,7 +47,7 @@ public class NPCExamines {
 	}
 
 	public static final String getExamine(NPC npc, Player player) {
-		CustomScripts.getNPCCombatExamine(npc, player);
+//		CustomScripts.getNPCCombatExamine(npc, player);
 		if(Settings.getConfig().isDebug())
 			player.sendMessage(npc.getId() + ", X: " + npc.getX() + ", Y: " + npc.getY() + ", Plane: " + npc.getPlane() + ". Transforms with varbit "
 					+ npc.getDefinitions().varpBit + " and var " + npc.getDefinitions().varp);

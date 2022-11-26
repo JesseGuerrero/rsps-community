@@ -144,9 +144,9 @@ public class GE {
 				Item item = e.getPlayer().getInventory().getItem(e.getSlotId());
 				if (item == null)
 					return;
-				if(CustomScripts.hasMetaBonusWhichPreventsExchange(e.getPlayer(), item)) {
-					return;
-				}
+//				if(CustomScripts.hasMetaBonusWhichPreventsExchange(e.getPlayer(), item)) {
+//					return;
+//				}
 				if (item.getDefinitions().isNoted())
 					item = new Item(item.getDefinitions().getCertId(), item.getAmount());
 				selectItem(e.getPlayer(), item.getId(), item.getAmount());

@@ -304,7 +304,7 @@ public class DungeonController extends Controller {
 		if (npc instanceof DungeonBoss)
 			if (player.getHitpoints() <= 10)
 				killedBossWithLessThan10HP = true;
-		CustomScripts.updateMetasOnWeapons(player);
+//		CustomScripts.updateMetasOnWeapons(player);
 	}
 
 	@Override

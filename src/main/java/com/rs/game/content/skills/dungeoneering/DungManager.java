@@ -360,11 +360,11 @@ public class DungManager {
 
 	public void bind(Item item, int slot) {
 		ItemDefinitions defs = item.getDefinitions();
-		int bindId = -1;
-		if(CustomScripts.isBindedItem(item))
-			bindId = item.getId();
-		if(!CustomScripts.isBindedItem(item))
-			bindId = DungeonUtils.getBindedId(item);
+		int bindId = DungeonUtils.getBindedId(item);
+//		if(CustomScripts.isBindedItem(item))
+//			bindId = item.getId();
+//		if(!CustomScripts.isBindedItem(item))
+//			bindId = DungeonUtils.getBindedId(item);
 		if (bindId == -1)
 			return;
 		if (DungeonUtils.isBindAmmo(item)) {
@@ -388,11 +388,12 @@ public class DungManager {
 			}
 			item.setId(bindId);
 			player.getInventory().refresh(slot);
-//			bindedItems.add(new Item(item));
-			CustomScripts.bindItemDirectly(bindedItems, item);
+			bindedItems.add(new Item(item));
+//			CustomScripts.bindItemDirectly(bindedItems, item);
 		}
-		if(CustomScripts.silenceBoundNotice(true))
-			player.sendMessage("You bind the " + defs.getName() + " to you. Check in the smuggler to manage your bound items.");
+//		if(CustomScripts.silenceBoundNotice(true))
+//			player.sendMessage("You bind the " + defs.getName() + " to you. Check in the smuggler to manage your bound items.");
+		player.sendMessage("You bind the " + defs.getName() + " to you. Check in the smuggler to manage your bound items.");
 	}
 
 	public void unbind(Item item) {

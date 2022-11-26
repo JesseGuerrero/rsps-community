@@ -269,9 +269,9 @@ public final class Familiar extends NPC {
 			owner.sendMessage("You cannot store this item.");
 			return;
 		}
-		if (CustomScripts.hasMetaBonusWhichPreventsExchange(owner, item)) {
-			return;
-		}
+//		if (CustomScripts.hasMetaBonusWhichPreventsExchange(owner, item)) {
+//			return;
+//		}
 		Item[] itemsBefore = inv.getItemsCopy();
 		int maxAmount = owner.getInventory().getItems().getNumberOf(item);
 		if (amount < maxAmount)

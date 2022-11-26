@@ -261,8 +261,8 @@ public final class DungeonPartyManager {
 		int level = 0;
 		for (Player player : team)
 			level += player.getSkills().getCombatLevelWithSummoning();
-		return CustomScripts.getAverageCombatLevelDung(level, team.size());
-		//return (level / team.size();
+//		return CustomScripts.getAverageCombatLevelDung(level, team.size());
+		return (level / team.size());
 	}
 
 	public int getDefenceLevel() {

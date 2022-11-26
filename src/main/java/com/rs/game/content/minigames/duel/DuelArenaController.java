@@ -153,8 +153,8 @@ public class DuelArenaController extends Controller {
 			player.sendMessage("That item cannot be staked!");
 			return;
 		}
-		if(CustomScripts.hasMetaBonusWhichPreventsExchange(player, item))
-			return;
+//		if(CustomScripts.hasMetaBonusWhichPreventsExchange(player, item))
+//			return;
 		if (player.getLastDuelRules().getStake().getUsedSlots() > 8) {
 			player.sendMessage("There is enough items.");
 			return;

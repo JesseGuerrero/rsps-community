@@ -285,7 +285,7 @@ public class DungeonManager {
 	}
 
 	public int getBossLevel() {
-		return (int) (party.getAverageCombatLevel() * 1);
+		return (int) (party.getAverageCombatLevel() * 1.5);
 	}
 
 	public void openRoom(final Room room, final RoomReference reference, final VisibleRoom visibleRoom) {
@@ -689,7 +689,7 @@ public class DungeonManager {
 	}
 
 	public int getMaxCombatLevelMonster() {
-		return (int) (party.getAverageCombatLevel() * 1 * DungeonConstants.NPC_COMBAT_LEVEL_COMPLEXITY_MUL[party.getComplexity()-1]);
+		return (int) (party.getAverageCombatLevel() * 1.4 * DungeonConstants.NPC_COMBAT_LEVEL_COMPLEXITY_MUL[party.getComplexity()-1]);
 	}
 
 	public void spawnRandomNPCS(RoomReference reference) {
