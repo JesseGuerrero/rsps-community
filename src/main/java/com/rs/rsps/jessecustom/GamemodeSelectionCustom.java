@@ -13,7 +13,7 @@ public class GamemodeSelectionCustom extends Conversation {
 		
 		addNext("start", new SimpleStatement("Welcome to Darkan, we will start by setting up your gamemode options."));
 		addOptions("Which type of account would you like?", ops -> {
-			ops.add("CustomScape", new Dialogue().addOptions("Is a normal account alright with you?", confirm -> {
+			ops.add("CustomScape", new Dialogue().addOptions("Is a custom account alright with you?", confirm -> {
 				confirm.add("Yes.", () -> {
 					player.setIronMan(false);
 					CustomScape.setPlayerCustomScape(player);

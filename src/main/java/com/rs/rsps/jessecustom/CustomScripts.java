@@ -344,7 +344,7 @@ public class CustomScripts {
 						}));
 
 				option("Are there any rewards for this?", new Dialogue()
-						.addNPC(15661, HeadE.CALM, "Not yet, mortal. I am still thinking about possible reward options. But I will still keep tally of your points regardless."));
+						.addNext(()-> {reaperRewardsConversation(player);}));
 				if (player.getInventory().getAmountOf(995) >= 10_000)
 					option("I would like to add to my death coffer...", new Dialogue().addOptions("Choose an option:", new Options() {
 						@Override
