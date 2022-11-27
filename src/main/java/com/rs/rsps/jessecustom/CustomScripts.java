@@ -207,7 +207,7 @@ public class CustomScripts {
 
 
 	public static int getTokenReward(double totalXp) {
-		return (int) ((totalXp / 10.0) * Settings.getConfig().getXpRate());
+		return (int) ((totalXp / 10.0) * 10);
 	}
 
 	public static double increaseByXPRateForInterfaceDungeoneering(double xp) {

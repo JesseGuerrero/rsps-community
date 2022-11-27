@@ -39,6 +39,9 @@ import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ButtonClickEvent;
 import com.rs.plugin.events.XPGainEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
+import com.rs.rsps.jessecustom.CustomScape;
+import com.rs.rsps.jessecustom.CustomScripts;
+import com.rs.rsps.jessecustom.groupironman.GIM;
 
 @PluginEventHandler
 public final class Skills {
@@ -941,9 +944,15 @@ public final class Skills {
 		if (!player.getControllerManager().gainXP(skill, exp))
 			return 0.0;
 
-		if (Settings.getConfig().getXpRate() > 1)
-			exp *= Settings.getConfig().getXpRate();
-
+//		if (Settings.getConfig().getXpRate() > 1)
+//			exp *= Settings.getConfig().getXpRate();
+		if (Settings.getConfig().getXpRate() > 1 ) {
+			if(GIM.isGIM(player))
+				exp *= Settings.getConfig().getXpRate();
+			if(CustomScape.isPlayerCustomScape(player)) //Don't multiply xp rate past 99
+				if(getLevel(skill) < 99)
+					exp *= Settings.getConfig().getXpRate();
+		}
 		xp[skill] += exp;
 		int newLevel = getLevelForXp(skill);
 		double newXp = xp[skill];
@@ -1047,8 +1056,15 @@ public final class Skills {
 		if (player.isXpLocked())
 			return;
 
-		if (Settings.getConfig().getXpRate() > 1)
-			exp *= Settings.getConfig().getXpRate();
+//		if (Settings.getConfig().getXpRate() > 1 )
+//			exp *= Settings.getConfig().getXpRate();
+		if (Settings.getConfig().getXpRate() > 1 ) {
+			if(GIM.isGIM(player))
+				exp *= Settings.getConfig().getXpRate();
+			else if(CustomScape.isPlayerCustomScape(player)) //Don't multiply xp rate past 99
+				if(getLevel(skill) < 99)
+					exp *= Settings.getConfig().getXpRate();
+		}
 
 		double modifier = 1.0;
 
