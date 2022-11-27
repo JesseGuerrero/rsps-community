@@ -353,7 +353,7 @@ public class DungeonConstants {
 	 */
 	public static final int SMALL_DUNGEON = 0, MEDIUM_DUNGEON = 1, LARGE_DUNGEON = 2;
 
-	public static final double[] NPC_COMBAT_LEVEL_COMPLEXITY_MUL = { 0.70, 0.75, 0.80, 0.85, 0.95, 1.0 };
+	public static final double[] NPC_COMBAT_LEVEL_COMPLEXITY_MUL = { 0.35, 0.45, 0.60, 0.70, 0.90, 1.0 };
 
 	// 4x4, 4x8 and 4x8, 2x1(just boss room for test)
 	public static final int[][] DUNGEON_RATIO = { new int[]

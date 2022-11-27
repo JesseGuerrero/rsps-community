@@ -129,7 +129,7 @@ public class DungeonNPC extends NPC {
 
 	@Override
 	public int getMaxHitpoints() {
-		return getCombatLevel() * (this instanceof DungeonBoss ? 25/*CustomScripts.bossHPMultiplier() */: 8 /*CustomScripts.DungNPCMultiplier()*/) + 1;
+		return getCombatLevel() * (this instanceof DungeonBoss ? /*25*/CustomScripts.bossHPMultiplier(): /*8*/ CustomScripts.DungNPCMultiplier()) + 1;
 	}
 
 	@Override

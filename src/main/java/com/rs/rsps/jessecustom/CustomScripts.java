@@ -219,13 +219,13 @@ public class CustomScripts {
 		return 1;
 	}
 //
-//	public static int bossHPMultiplier() {
-//		return 13;
-//	}
-//
-//	public static int DungNPCMultiplier() {
-//		return 6;
-//	}
+	public static int bossHPMultiplier() {
+		return 13;
+	}
+
+	public static int DungNPCMultiplier() {
+		return 6;
+	}
 
 
 
