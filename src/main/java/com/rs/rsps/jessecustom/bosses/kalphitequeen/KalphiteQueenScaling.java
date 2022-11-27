@@ -25,6 +25,7 @@ import com.rs.lib.game.WorldTile;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.ObjectClickHandler;
+import com.rs.rsps.jessecustom.CustomScape;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -64,40 +65,4 @@ public class KalphiteQueenScaling extends KalphiteQueen {
 		}
 		this.setLevels(upgradedStats);
 	}
-
-	public static ObjectClickHandler handleKalphiteQueenLairEntrance = new ObjectClickHandler(true, new Object[] { 48803 }) {
-		@Override
-		public void handle(ObjectClickEvent e) {
-			Player player = e.getPlayer();
-			if(e.getPlayer().isKalphiteLairSetted()) {
-				if(e.getPlayer().getInventory().getAmountOf(995) >= 5_000) {
-					e.getPlayer().startConversation(new Dialogue()
-							.addOptions("Do you want to create a boss instance?", option -> {
-								option.add("Yes", ()->{
-									e.getPlayer().sendInputName("What instanced combat scale would you like? (1-10000)", scaleString -> {
-										try {
-											int scale = Integer.parseInt(scaleString);
-											if(scale < 0)
-												throw new NumberFormatException();
-											player.getInventory().removeItems(new Item(995, 5000));
-											player.getControllerManager().startController(new KalphiteQueenScalingInstanceController(scale));
-										} catch(NumberFormatException n) {
-											player.sendMessage("Improper scale formatting, try again.");
-											return;
-										}
-									});
-								});
-								option.add("No", () -> {e.getPlayer().setNextWorldTile(new WorldTile(3508, 9494, 0));});
-							})
-					);
-					return;
-				}
-				e.getPlayer().sendMessage("You need 5k coins for an instance");
-				e.getPlayer().setNextWorldTile(new WorldTile(3508, 9494, 0));
-			}
-		}
-	};
-
-/*else if (id == 48803 && player.isKalphiteLairSetted())
-				player.setNextWorldTile(new WorldTile(3508, 9494, 0));*/
 }
