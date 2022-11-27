@@ -38,11 +38,9 @@ public class PrestigeGIMManager {
 	public static LoginHandler onLoginUpdatePrestige = new LoginHandler() {
 		@Override
 		public void handle(LoginEvent e) {
-			if(GIM.hasTeam(e.getPlayer())) {
-				GIM.openGIM(GIM.getGIMTeamName(e.getPlayer()), group -> {
-					e.getPlayer().save("GroupPrestige", group.getPrestigeManager().getPrestige());
-				});
-			}
+			if(GIM.hasTeam(e.getPlayer()))
+				if(GIM.getGroupPrestige(e.getPlayer()) > GIM.getIndividualPrestige(e.getPlayer()))
+					GIM.setIndividualPrestige(e.getPlayer(), GIM.getGroupPrestige(e.getPlayer()));
 		}
 	};
 
@@ -51,6 +49,9 @@ public class PrestigeGIMManager {
 	}
 
 	public void refreshPrestige(int prestigeInQuestion) {
+		if(group.getSize() < 4) {
+			return;
+		}
 		switch(prestigeInQuestion) {
 			case NUBBY -> {
 				if(prestige == prestigeInQuestion && deservesNovice())
@@ -229,6 +230,7 @@ public class PrestigeGIMManager {
 			});
 		}
 		setPrestige(ADVANCED);
+		World.sendWorldMessage(group.getGroupDisplayName() + " has completed Advanced prestige!", false);
 	}
 
 	private void promoteToVeteran() {
@@ -240,6 +242,7 @@ public class PrestigeGIMManager {
 			});
 		}
 		setPrestige(VETERAN);
+		World.sendWorldMessage(group.getGroupDisplayName() + " has completed Veteran prestige!", false);
 	}
 
 	private void promoteToCompletionist() {
@@ -251,6 +254,7 @@ public class PrestigeGIMManager {
 			});
 		}
 		setPrestige(COMPLETIONIST);
+		World.sendWorldMessage(group.getGroupDisplayName() + " has completed Completionist prestige!", false);
 	}
 
 

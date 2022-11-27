@@ -1,6 +1,7 @@
 package com.rs.rsps.jessecustom.groupironman;
 
 import com.rs.db.WorldDB;
+import com.rs.game.World;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.WorldTile;
 import com.rs.plugin.annotations.PluginEventHandler;
@@ -38,8 +39,49 @@ public class GIM {
 		return p.getO("GIM Team") != null;
 	}
 
-	public static void openGIM(String group_name, Consumer<GroupIronMan> func) {
-		WorldDB.getGIMS().getByGroupName(group_name, func);
+	public static void openGIM(String groupName, Consumer<GroupIronMan> func) {
+		WorldDB.getGIMS().getByGroupName(groupName, func);
+	}
+
+	public static void removeGIM(String groupName) {
+			openGIM(groupName, group -> {
+				for(String username : group.getPlayers())
+					World.forceGetPlayerByDisplay(username, player -> {
+						player.delete("GIM Team");
+						player.setXpLocked(true);
+					});
+				WorldDB.getGIMS().removeSync(group);
+			});
+
+	}
+
+	public static GroupIronMan getGIMUnsyncReadOnly(String groupName) {
+			return WorldDB.getGIMS().getGroupSyncName(groupName);
+	}
+
+	public static GroupIronMan getGIMUnsyncReadOnly(Player player) {
+			return getGIMUnsyncReadOnly(getGIMTeamName(player));
+	}
+
+	public static boolean isGroupFounder(Player player) {
+			if(!hasTeam(player))
+				return false;
+			return getGIMUnsyncReadOnly(player).isGroupLeader(player);
+	}
+
+	public static int getGroupPrestige(Player player) {
+			return getGIMUnsyncReadOnly(player).getPrestigeManager().getPrestige();
+	}
+
+	public static int getIndividualPrestige(Player player) {
+			if(player.getO("GroupPrestige") == null) {
+				player.save("GroupPrestige", 0);
+			}
+			return player.getI("GroupPrestige");
+	}
+
+	public static void setIndividualPrestige(Player player, int prestige) {
+		player.save("GroupPrestige", prestige);
 	}
 
 	public static ObjectClickHandler openChest = new ObjectClickHandler(new Object[] { 170 }, new WorldTile[]{

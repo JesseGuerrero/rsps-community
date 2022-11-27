@@ -187,7 +187,8 @@ public class ReaperAssignments  {
 				talkAboutAssignment(e.getPlayer());
 				break;
 			case 4:
-				e.getPlayer().sendMessage("Rewards are not implemented at the moment, but you can still gain points. Feel free to post suggestions for rewards in Discord.");
+				CustomScripts.reaperRewardsConversation(e.getPlayer());
+//				e.getPlayer().sendMessage("Rewards are not implemented at the moment, but you can still gain points. Feel free to post suggestions for rewards in Discord.");
 				break;
 			case 5:
 				break;

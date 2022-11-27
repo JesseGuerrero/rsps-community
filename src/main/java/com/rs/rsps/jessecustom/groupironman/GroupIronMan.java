@@ -15,6 +15,8 @@ public class GroupIronMan {
 	private String groupName;//This is the key
 	private List<String> players = new ArrayList<>();
 
+	private String founder;
+
 	private PrestigeGIMManager prestigeManager = new PrestigeGIMManager();
 
 	private Map<String, Object> savingAttributes;
@@ -28,12 +30,20 @@ public class GroupIronMan {
 	public GroupIronMan(String groupName, Player founder) {
 		this.groupName = groupName;
 		this.players.add(0, founder.getUsername());
+		this.founder = founder.getUsername();
+		init();
 	}
 
 	public void init() {
 		if(this.prestigeManager == null)
 			this.prestigeManager = new PrestigeGIMManager();
 		this.prestigeManager.setGroup(this);
+		if(founder == null || !getPlayers().contains(founder))
+			founder = getPlayers().get(0);
+	}
+
+	public String getFounderUsername() {
+		return founder;
 	}
 
 	public List<String> getPlayers() {
@@ -82,12 +92,22 @@ public class GroupIronMan {
 		players.add(p.getUsername());
 	}
 
-	public void setGroupName(String groupName) {
+	/**
+	 *
+	 * @param newName
+	 * @return true if successful and false if unsuccessful
+	 */
+	public boolean setGroupName(final String newName) {
+		if(WorldDB.getGIMS().groupExists(newName))
+			return false;
+		WorldDB.getGIMS().removeSync(this);
 		for(String member : getPlayers())
 			World.forceGetPlayerByDisplay(member, player -> {
-				player.save("GIM Team", groupName);
+				player.save("GIM Team", newName);
 			});
-		this.groupName = groupName;
+		this.groupName = newName;
+		WorldDB.getGIMS().saveSync(this);
+		return true;
 	}
 
 	public void setBank2Open(boolean bank2Open) {
@@ -111,7 +131,7 @@ public class GroupIronMan {
 	}
 
 	public boolean isGroupLeader(Player p) {
-		return players.get(0).equalsIgnoreCase(p.getUsername());
+		return founder.equalsIgnoreCase(p.getUsername());
 	}
 
 	public void save(String key, Object value) {

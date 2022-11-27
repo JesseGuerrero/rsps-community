@@ -250,6 +250,31 @@ public class CustomScripts {
 //		return false;
 //	}
 
+	public static void reaperRewardsConversation(Player player) {
+		player.startConversation(new Dialogue()
+				.addOptions("Choose your rewards", reward -> {
+					reward.add("Coin accumulator(250 points)", new Dialogue()
+							.addNPC(15661, HeadE.CALM, "I have a coin accumulator which picks up coins?")
+							.addOptions("Would you like to have the coin accumulator?", confirm -> {
+								confirm.add("Nevermind", new Dialogue());
+								if(player.reaperPoints >= 250)
+									confirm.add("Yes, I would like that", new Dialogue().addNext(()->{
+										if(player.getInventory().hasFreeSlots()) {
+											player.reaperPoints -= 250;
+											player.getInventory().addItem(25351);
+											return;
+										}
+										player.sendMessage("Your inventory is full...");
+									}));
+								else
+									confirm.add("Yes, but I don't have enough reaper points", new Dialogue());
+							})
+
+					);
+				})
+		);
+	}
+
 	public static void customDebugCommands() {
 		Commands.add(Rights.PLAYER, "rights", "Completes all quests.", (p, args) -> {
 			p.sendMessage("Rights: " + p.getRights());
