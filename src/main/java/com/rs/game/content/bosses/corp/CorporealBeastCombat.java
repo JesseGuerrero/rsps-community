@@ -32,6 +32,7 @@ import com.rs.lib.game.Animation;
 import com.rs.lib.game.SpotAnim;
 import com.rs.lib.game.WorldTile;
 import com.rs.lib.util.Utils;
+import com.rs.rsps.jessecustom.CustomScape;
 import com.rs.rsps.jessecustom.CustomScripts;
 
 public class CorporealBeastCombat extends CombatScript {
@@ -45,14 +46,14 @@ public class CorporealBeastCombat extends CombatScript {
 	public int attack(final NPC npc, final Entity target) {
 		final NPCCombatDefinitions defs = npc.getCombatDefinitions();
 		if (Utils.getRandomInclusive(3) == 0 && npc.getHitpoints() < (npc.getMaxHitpoints()/2)) {
-//			if(CustomScripts.isScalingCorp(npc))
-//				;
-//			else {
-//				CorporealBeast beast = (CorporealBeast) npc;
-//				beast.spawnDarkEnergyCore();
-//			}
-			CorporealBeast beast = (CorporealBeast) npc;
-			beast.spawnDarkEnergyCore();
+			if(CustomScape.isScalingCorp(npc))
+				;
+			else {
+				CorporealBeast beast = (CorporealBeast) npc;
+				beast.spawnDarkEnergyCore();
+			}
+//			CorporealBeast beast = (CorporealBeast) npc;
+//			beast.spawnDarkEnergyCore();
 		}
 		int size = npc.getSize();
 		final List<Entity> possibleTargets = npc.getPossibleTargets();

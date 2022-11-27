@@ -37,6 +37,7 @@ import com.rs.lib.game.Rights;
 import com.rs.lib.game.WorldTile;
 import com.rs.lib.net.ClientPacket;
 import com.rs.lib.util.Utils;
+import com.rs.rsps.jessecustom.CustomScape;
 import com.rs.rsps.jessecustom.CustomScripts;
 
 public class DuelArenaController extends Controller {
@@ -153,8 +154,8 @@ public class DuelArenaController extends Controller {
 			player.sendMessage("That item cannot be staked!");
 			return;
 		}
-//		if(CustomScripts.hasMetaBonusWhichPreventsExchange(player, item))
-//			return;
+		if(CustomScape.hasMetaBonusWhichPreventsExchange(player, item))
+			return;
 		if (player.getLastDuelRules().getStake().getUsedSlots() > 8) {
 			player.sendMessage("There is enough items.");
 			return;

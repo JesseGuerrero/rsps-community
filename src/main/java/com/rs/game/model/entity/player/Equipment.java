@@ -40,6 +40,7 @@ import com.rs.plugin.events.ButtonClickEvent;
 import com.rs.plugin.events.ItemClickEvent;
 import com.rs.plugin.events.ItemEquipEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
+import com.rs.rsps.jessecustom.CustomScape;
 import com.rs.rsps.jessecustom.CustomScripts;
 import com.rs.utils.ItemConfig;
 
@@ -139,7 +140,7 @@ public final class Equipment {
 		if (item == null)
 			return;
 		player.sendMessage(ItemConfig.get(item.getId()).getExamine(item));
-//		CustomScripts.sendExamine(player, item);
+		CustomScape.sendExamine(player, item);
 		if (item.getMetaData("combatCharges") != null)
 			player.sendMessage("<col=FF0000>It looks like it will last another " + Utils.ticksToTime(item.getMetaDataI("combatCharges")));
 		else if (item.getMetaData("brawlerCharges") != null)
@@ -910,8 +911,8 @@ public final class Equipment {
 			};
 		}
 		default -> {
-//			return CustomScripts.addBonusToEquip(item, bonus);
-				return value;
+			return CustomScape.addBonusToEquip(player, item, bonus);
+//				return value;
 			}
 		}
 	}

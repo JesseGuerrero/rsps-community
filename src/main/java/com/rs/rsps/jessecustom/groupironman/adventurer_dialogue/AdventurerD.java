@@ -1,21 +1,16 @@
-package com.rs.rsps.jessecustom.adventurer_dialogue;
+package com.rs.rsps.jessecustom.groupironman.adventurer_dialogue;
 
-import com.rs.db.WorldDB;
-import com.rs.game.World;
 import com.rs.game.content.dialogue.Conversation;
-import com.rs.game.content.dialogue.Dialogue;
 import com.rs.game.content.dialogue.HeadE;
-import com.rs.game.content.dialogue.Options;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.NPCClickEvent;
 import com.rs.plugin.handlers.NPCClickHandler;
 import com.rs.rsps.jessecustom.groupironman.GIM;
-import com.rs.rsps.jessecustom.groupironman.GroupIronMan;
 import com.rs.rsps.jessecustom.groupironman.PrestigeGIMManager;
 
-import static com.rs.rsps.jessecustom.adventurer_dialogue.AdventurerDIntroduction.*;
+import static com.rs.rsps.jessecustom.groupironman.adventurer_dialogue.AdventurerDIntroduction.*;
 
 @PluginEventHandler
 public class AdventurerD extends Conversation {

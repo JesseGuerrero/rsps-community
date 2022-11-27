@@ -29,6 +29,7 @@ import com.rs.plugin.events.ItemClickEvent;
 import com.rs.plugin.events.ItemOnItemEvent;
 import com.rs.plugin.handlers.ItemClickHandler;
 import com.rs.plugin.handlers.ItemOnItemHandler;
+import com.rs.rsps.jessecustom.CustomScape;
 import com.rs.rsps.jessecustom.CustomScripts;
 
 @PluginEventHandler
@@ -123,8 +124,8 @@ public class PolyporeStaff {
 				e.getPlayer().setNextSpotAnim(new SpotAnim(2032));
 				if (newCharges == 3000) {
 					stick.setId(22494);
-					stick.deleteMetaData();
-//					CustomScripts.restorePolyporeStaff(stick, newCharges);
+//					stick.deleteMetaData();
+					CustomScape.restorePolyporeStaff(stick, newCharges);
 					e.getPlayer().getInventory().refresh(stick.getSlot());
 				} else
 					stick.addMetaData("polyporeCasts", newCharges);
@@ -166,9 +167,9 @@ public class PolyporeStaff {
 		} else if (staff.getId() == 22496) {
 			int charges = staff.getMetaDataI("polyporeCasts");
 			if (charges <= 1) {
-//				if(CustomScripts.polyporeDontLoseMeta())
-//					staff.deleteMetaData();
-				staff.deleteMetaData();
+				if(CustomScape.polyporeLoseMeta(player))
+					staff.deleteMetaData();
+//				staff.deleteMetaData();
 				staff.setId(22498);
 				player.getEquipment().refresh(Equipment.WEAPON);
 				player.getAppearance().generateAppearanceData();

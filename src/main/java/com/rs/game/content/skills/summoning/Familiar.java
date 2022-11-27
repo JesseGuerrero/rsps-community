@@ -46,6 +46,7 @@ import com.rs.plugin.events.ButtonClickEvent;
 import com.rs.plugin.events.NPCClickEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
 import com.rs.plugin.handlers.NPCClickHandler;
+import com.rs.rsps.jessecustom.CustomScape;
 import com.rs.rsps.jessecustom.CustomScripts;
 
 @PluginEventHandler
@@ -269,9 +270,9 @@ public final class Familiar extends NPC {
 			owner.sendMessage("You cannot store this item.");
 			return;
 		}
-//		if (CustomScripts.hasMetaBonusWhichPreventsExchange(owner, item)) {
-//			return;
-//		}
+		if (CustomScape.hasMetaBonusWhichPreventsExchange(owner, item)) {
+			return;
+		}
 		Item[] itemsBefore = inv.getItemsCopy();
 		int maxAmount = owner.getInventory().getItems().getNumberOf(item);
 		if (amount < maxAmount)

@@ -5,13 +5,10 @@ import com.rs.game.World;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.WorldTile;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.plugin.events.NPCClickEvent;
 import com.rs.plugin.events.ObjectClickEvent;
-import com.rs.plugin.handlers.NPCClickHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
-import com.rs.rsps.jessecustom.adventurer_dialogue.AdventurerD;
+import com.rs.rsps.jessecustom.groupironman.adventurer_dialogue.AdventurerD;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 @PluginEventHandler
@@ -98,7 +95,7 @@ public class GIM {
 				}
 				e.getPlayer().getBank().openGIMBank();
 			} else
-				e.getPlayer().startConversation(new AdventurerD(e.getPlayer()));
+				e.getPlayer().sendMessage("Only GIM have access to this chest.");
 		}
 	};
 }

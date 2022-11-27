@@ -46,6 +46,7 @@ import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
 import com.rs.plugin.handlers.ItemClickHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
+import com.rs.rsps.jessecustom.CustomScape;
 import com.rs.rsps.jessecustom.CustomScripts;
 
 @PluginEventHandler
@@ -361,10 +362,10 @@ public class DungManager {
 	public void bind(Item item, int slot) {
 		ItemDefinitions defs = item.getDefinitions();
 		int bindId = DungeonUtils.getBindedId(item);
-//		if(CustomScripts.isBindedItem(item))
-//			bindId = item.getId();
-//		if(!CustomScripts.isBindedItem(item))
-//			bindId = DungeonUtils.getBindedId(item);
+		if(CustomScape.isBindedItem(item)) //For rebinding when updating metas
+			bindId = item.getId();
+		if(!CustomScape.isBindedItem(item)) //Should not affect GIM
+			bindId = DungeonUtils.getBindedId(item);
 		if (bindId == -1)
 			return;
 		if (DungeonUtils.isBindAmmo(item)) {
@@ -388,12 +389,11 @@ public class DungManager {
 			}
 			item.setId(bindId);
 			player.getInventory().refresh(slot);
-			bindedItems.add(new Item(item));
-//			CustomScripts.bindItemDirectly(bindedItems, item);
+//			bindedItems.add(new Item(item));
+			CustomScape.bindItemDirectly(bindedItems, item);
 		}
-//		if(CustomScripts.silenceBoundNotice(true))
-//			player.sendMessage("You bind the " + defs.getName() + " to you. Check in the smuggler to manage your bound items.");
-		player.sendMessage("You bind the " + defs.getName() + " to you. Check in the smuggler to manage your bound items.");
+		if(CustomScape.silenceBoundNotice(true))
+			player.sendMessage("You bind the " + defs.getName() + " to you. Check in the smuggler to manage your bound items.");
 	}
 
 	public void unbind(Item item) {

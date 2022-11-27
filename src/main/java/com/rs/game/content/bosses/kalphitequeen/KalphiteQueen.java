@@ -27,6 +27,7 @@ import com.rs.lib.game.SpotAnim;
 import com.rs.lib.game.WorldTile;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.handlers.NPCInstanceHandler;
+import com.rs.rsps.jessecustom.CustomScape;
 import com.rs.rsps.jessecustom.CustomScripts;
 
 @PluginEventHandler
@@ -69,10 +70,10 @@ public class KalphiteQueen extends NPC {
 					reset();
 					setLocation(getRespawnTile());
 					finish();
-//					if(source instanceof Player p)
-//						CustomScripts.increaseWeaponStats(p, this);
+					if(source instanceof Player p)
+						CustomScape.increaseWeaponStats(p, this);
 					if (!isSpawned())
-						setRespawnTask(CustomScripts.KalphiteQueenRespawnTime());
+						setRespawnTask(CustomScape.KalphiteQueenRespawnTime());
 					transformIntoNPC(1158);
 				}
 				return false;

@@ -20,7 +20,6 @@ import com.rs.game.content.quests.Quest;
 import com.rs.game.content.skills.agility.Agility;
 import com.rs.game.content.world.AgilityShortcuts;
 import com.rs.game.content.world.doors.Doors;
-import com.rs.game.content.world.npcs.Banker;
 import com.rs.game.ge.GE;
 import com.rs.game.model.entity.ForceMovement;
 import com.rs.game.model.entity.pathing.Direction;
@@ -35,7 +34,7 @@ import com.rs.plugin.events.NPCClickEvent;
 import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.NPCClickHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
-import com.rs.rsps.jessecustom.BankerCustom;
+import com.rs.rsps.jessecustom.groupironman.BankerCustom;
 import com.rs.utils.shop.ShopsHandler;
 
 @PluginEventHandler

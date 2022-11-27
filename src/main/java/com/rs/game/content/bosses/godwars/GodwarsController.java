@@ -36,6 +36,7 @@ import com.rs.lib.game.WorldTile;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.ObjectClickHandler;
+import com.rs.rsps.jessecustom.CustomScape;
 import com.rs.rsps.jessecustom.CustomScripts;
 
 @PluginEventHandler
@@ -99,7 +100,7 @@ public class GodwarsController extends Controller {
 			return false;
 		}
 		if (object.getId() == 26287 || object.getId() == 26286 || object.getId() == 26288 || object.getId() == 26289) {
-//			CustomScripts.createGWDScalingDialogueFromAltar(player, object.getId());
+			CustomScape.createGWDScalingDialogueFromAltar(player, object.getId());
 			if (lastPrayerRecharge >= System.currentTimeMillis()) {
 				player.sendMessage("You must wait a total of 10 minutes before being able to recharge your prayer points.");
 				return false;

@@ -17,7 +17,6 @@
 package com.rs.game.content.skills.dungeoneering;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.lang.SuppressWarnings;
 
@@ -77,10 +76,8 @@ import com.rs.game.model.entity.Hit.HitLook;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.pathing.Direction;
 import com.rs.game.model.entity.player.Controller;
-import com.rs.game.model.entity.player.Equipment;
 import com.rs.game.model.entity.player.Inventory;
 import com.rs.game.model.entity.player.Player;
-import com.rs.game.model.item.ItemsContainer;
 import com.rs.game.model.object.GameObject;
 import com.rs.game.tasks.WorldTask;
 import com.rs.game.tasks.WorldTasks;
@@ -92,7 +89,7 @@ import com.rs.lib.game.SpotAnim;
 import com.rs.lib.game.WorldTile;
 import com.rs.lib.net.ClientPacket;
 import com.rs.lib.util.Utils;
-import com.rs.rsps.jessecustom.CustomScripts;
+import com.rs.rsps.jessecustom.CustomScape;
 import com.rs.utils.WorldUtil;
 import com.rs.utils.music.Genre;
 import com.rs.utils.music.Music;
@@ -304,7 +301,7 @@ public class DungeonController extends Controller {
 		if (npc instanceof DungeonBoss)
 			if (player.getHitpoints() <= 10)
 				killedBossWithLessThan10HP = true;
-//		CustomScripts.updateMetasOnWeapons(player);
+		CustomScape.updateMetasOnWeaponsDung(player);
 	}
 
 	@Override

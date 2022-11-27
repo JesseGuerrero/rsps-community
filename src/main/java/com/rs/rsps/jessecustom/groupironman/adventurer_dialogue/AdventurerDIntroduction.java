@@ -1,4 +1,4 @@
-package com.rs.rsps.jessecustom.adventurer_dialogue;
+package com.rs.rsps.jessecustom.groupironman.adventurer_dialogue;
 
 import com.rs.db.WorldDB;
 import com.rs.game.World;

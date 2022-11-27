@@ -32,6 +32,7 @@ import com.rs.plugin.events.ButtonClickEvent;
 import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
+import com.rs.rsps.jessecustom.CustomScape;
 import com.rs.rsps.jessecustom.CustomScripts;
 import com.rs.rsps.jessecustom.bosses.godwars.armadyl.ScaledKreeArra;
 import com.rs.utils.music.Genre;
@@ -174,12 +175,11 @@ public class CorporealBeastScalingInstanceController extends Controller {
 		instance.destroy(()->{if(!teled) player.setNextWorldTile(locationOnExit);});
 	}
 
-	public static ObjectClickHandler handleIcePrison = new ObjectClickHandler(new Object[] { 37929 }) {
+	public static ObjectClickHandler handleCororealEntrance = new ObjectClickHandler(new Object[] { 37929 }) {
 		@Override
 		public void handle(ObjectClickEvent e) {
 			if(e.getPlayer().getX() <= 2918) {
-//				CustomScripts.createCorpScalingDialogue(e.getPlayer());
-				e.getPlayer().setNextWorldTile(new WorldTile(2921, e.getPlayer().getY(), 2));
+				CustomScape.createCorpScalingDialogue(e.getPlayer());
 				return;
 			}
 			e.getPlayer().setNextWorldTile(new WorldTile(2917, e.getPlayer().getY(), 2));

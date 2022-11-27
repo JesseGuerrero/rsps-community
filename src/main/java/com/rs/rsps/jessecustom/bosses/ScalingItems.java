@@ -3,6 +3,7 @@ package com.rs.rsps.jessecustom.bosses;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.NPCDropEvent;
 import com.rs.plugin.handlers.NPCDropHandler;
+import com.rs.rsps.jessecustom.CustomScape;
 import com.rs.rsps.jessecustom.CustomScripts;
 import com.rs.rsps.jessecustom.bosses.corp.ScalingCorporealBeast;
 import com.rs.rsps.jessecustom.bosses.godwars.ScaledGodWarMinion;
@@ -103,22 +104,22 @@ public class ScalingItems {
 		};
 	}
 
-//	public static NPCDropHandler addMetas = new NPCDropHandler(ScalingItems.npcListForScalingItems(), ScalingItems.getAllScalingItems()) {
-//		@Override
-//		public void handle(NPCDropEvent e) {
-//			if(e.getNPC() instanceof KalphiteQueenScaling npc)
-//				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
-//			if(e.getNPC() instanceof ScaledGeneralGraardor npc)
-//				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
-//			if(e.getNPC() instanceof ScaledKrilTstsaroth npc)
-//				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
-//			if(e.getNPC() instanceof ScaledKreeArra npc)
-//				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
-//			if(e.getNPC() instanceof ScaledCommanderZilyana npc)
-//				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
-//			if(e.getNPC() instanceof ScalingCorporealBeast npc)
-//				CustomScripts.scaleEquipmentBonus(e.getItem(), npc.combatScale);
-//		}
-//	};
+	public static NPCDropHandler addMetas = new NPCDropHandler(ScalingItems.npcListForScalingItems(), ScalingItems.getAllScalingItems()) {
+		@Override
+		public void handle(NPCDropEvent e) {
+			if(e.getNPC() instanceof KalphiteQueenScaling npc)
+				CustomScape.scaleEquipmentBonus(e.getItem(), npc.combatScale);
+			if(e.getNPC() instanceof ScaledGeneralGraardor npc)
+				CustomScape.scaleEquipmentBonus(e.getItem(), npc.combatScale);
+			if(e.getNPC() instanceof ScaledKrilTstsaroth npc)
+				CustomScape.scaleEquipmentBonus(e.getItem(), npc.combatScale);
+			if(e.getNPC() instanceof ScaledKreeArra npc)
+				CustomScape.scaleEquipmentBonus(e.getItem(), npc.combatScale);
+			if(e.getNPC() instanceof ScaledCommanderZilyana npc)
+				CustomScape.scaleEquipmentBonus(e.getItem(), npc.combatScale);
+			if(e.getNPC() instanceof ScalingCorporealBeast npc)
+				CustomScape.scaleEquipmentBonus(e.getItem(), npc.combatScale);
+		}
+	};
 
 }

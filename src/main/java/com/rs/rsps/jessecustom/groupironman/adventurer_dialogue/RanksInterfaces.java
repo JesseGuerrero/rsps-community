@@ -1,8 +1,7 @@
-package com.rs.rsps.jessecustom.adventurer_dialogue;
+package com.rs.rsps.jessecustom.groupironman.adventurer_dialogue;
 
 import com.rs.game.World;
 import com.rs.game.model.entity.player.Player;
-import com.rs.rsps.jessecustom.CustomScripts;
 import com.rs.rsps.jessecustom.groupironman.GIM;
 import com.rs.rsps.jessecustom.groupironman.PrestigeGIMManager;
 

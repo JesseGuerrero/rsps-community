@@ -31,6 +31,7 @@ import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.annotations.ServerStartupEvent;
 import com.rs.plugin.annotations.ServerStartupEvent.Priority;
+import com.rs.rsps.jessecustom.CustomScape;
 import com.rs.rsps.jessecustom.CustomScripts;
 
 @PluginEventHandler
@@ -47,7 +48,7 @@ public class NPCExamines {
 	}
 
 	public static final String getExamine(NPC npc, Player player) {
-//		CustomScripts.getNPCCombatExamine(npc, player);
+		CustomScape.getNPCCombatExamine(npc, player);
 		if(Settings.getConfig().isDebug())
 			player.sendMessage(npc.getId() + ", X: " + npc.getX() + ", Y: " + npc.getY() + ", Plane: " + npc.getPlane() + ". Transforms with varbit "
 					+ npc.getDefinitions().varpBit + " and var " + npc.getDefinitions().varp);

@@ -54,6 +54,7 @@ import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ItemClickEvent;
 import com.rs.plugin.handlers.ItemClickHandler;
+import com.rs.rsps.jessecustom.CustomScape;
 import com.rs.rsps.jessecustom.CustomScripts;
 import com.rs.utils.Ticks;
 
@@ -1611,7 +1612,7 @@ public class PlayerCombat extends PlayerAction {
 			if (prob <= Math.random() && !veracsProc)
 				return 0;
 		}
-		int hit = Utils.random(minHit, /*CustomScripts.increaseHitByWeaponBonus(player, maxHit)*/ maxHit);
+		int hit = Utils.random(minHit, CustomScape.increaseHitByWeaponBonus(player, maxHit)/* maxHit*/);
 		if (veracsProc)
 			hit += 1.0;
 		if (target instanceof NPC n)

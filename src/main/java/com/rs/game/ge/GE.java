@@ -40,6 +40,7 @@ import com.rs.plugin.events.NPCClickEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
 import com.rs.plugin.handlers.NPCClickHandler;
 import com.rs.plugin.handlers.NPCInteractionDistanceHandler;
+import com.rs.rsps.jessecustom.CustomScape;
 import com.rs.rsps.jessecustom.CustomScripts;
 import com.rs.utils.ItemConfig;
 
@@ -144,9 +145,9 @@ public class GE {
 				Item item = e.getPlayer().getInventory().getItem(e.getSlotId());
 				if (item == null)
 					return;
-//				if(CustomScripts.hasMetaBonusWhichPreventsExchange(e.getPlayer(), item)) {
-//					return;
-//				}
+				if(CustomScape.hasMetaBonusWhichPreventsExchange(e.getPlayer(), item)) {
+					return;
+				}
 				if (item.getDefinitions().isNoted())
 					item = new Item(item.getDefinitions().getCertId(), item.getAmount());
 				selectItem(e.getPlayer(), item.getId(), item.getAmount());

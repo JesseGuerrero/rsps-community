@@ -30,7 +30,7 @@ import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.NPCClickHandler;
 import com.rs.plugin.handlers.NPCInteractionDistanceHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
-import com.rs.rsps.jessecustom.BankerCustom;
+import com.rs.rsps.jessecustom.groupironman.BankerCustom;
 
 @PluginEventHandler
 public class Banker extends Conversation {
