@@ -299,9 +299,9 @@ public class CustomScripts {
 				addNPC(NPC, HeadE.CALM_TALK, "You want it so bad, you know what I will give it for 50k Dungeoneering Token...");
 				addOptions("Pay 50k tokens for charming imp?", options -> {
 					options.add("No thank you...", new Dialogue());
-					if(p.getDungManager().getTokens() < 5)
+					if(p.getDungManager().getTokens() < 50_000)
 						options.add("I don't have enough tokens!", new Dialogue());
-					if(p.getDungManager().getTokens() >= 5) {
+					if(p.getDungManager().getTokens() >= 50_000) {
 						if(!p.getInventory().hasFreeSlots())
 							options.add("I don't have enough space!", new Dialogue());
 						if(p.getInventory().hasFreeSlots())
@@ -310,7 +310,7 @@ public class CustomScripts {
 								.addNPC(NPC, HeadE.CALM_TALK, "Sounds good...")
 								.addSimple("He gives you the charming imp", ()->{
 									p.getInventory().addItem(25350, 1);
-									p.getDungManager().removeTokens(5);
+									p.getDungManager().removeTokens(50_000);
 								}));
 					}
 				});
