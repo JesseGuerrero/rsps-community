@@ -946,13 +946,7 @@ public final class Skills {
 
 //		if (Settings.getConfig().getXpRate() > 1)
 //			exp *= Settings.getConfig().getXpRate();
-		if (Settings.getConfig().getXpRate() > 1 ) {
-			if(GIM.isGIM(player))
-				exp *= Settings.getConfig().getXpRate();
-			if(CustomScape.isPlayerCustomScape(player)) //Don't multiply xp rate past 99
-				if(getLevel(skill) < 99)
-					exp *= Settings.getConfig().getXpRate();
-		}
+		exp = CustomScripts.getXPRate(player, skill, exp);
 		xp[skill] += exp;
 		int newLevel = getLevelForXp(skill);
 		double newXp = xp[skill];
@@ -1001,8 +995,9 @@ public final class Skills {
 		if (player.isXpLocked())
 			return;
 
-		if (Settings.getConfig().getXpRate() > 1)
-			exp *= Settings.getConfig().getXpRate();
+//		if (Settings.getConfig().getXpRate() > 1)
+//			exp *= Settings.getConfig().getXpRate();
+		exp = CustomScripts.getXPRate(player, skill, exp);
 
 		int oldLevel = getLevelForXp(skill);
 		double oldXp = xp[skill];
@@ -1058,13 +1053,7 @@ public final class Skills {
 
 //		if (Settings.getConfig().getXpRate() > 1 )
 //			exp *= Settings.getConfig().getXpRate();
-		if (Settings.getConfig().getXpRate() > 1 ) {
-			if(GIM.isGIM(player))
-				exp *= Settings.getConfig().getXpRate();
-			else if(CustomScape.isPlayerCustomScape(player)) //Don't multiply xp rate past 99
-				if(getLevel(skill) < 99)
-					exp *= Settings.getConfig().getXpRate();
-		}
+		exp = CustomScripts.getXPRate(player, skill, exp);
 
 		double modifier = 1.0;
 

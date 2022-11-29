@@ -319,6 +319,22 @@ public class CustomScripts {
 		};
 	}
 
+	public static double getXPRate(Player player, int skill, double exp) {
+		if (Settings.getConfig().getXpRate() > 1 ) {
+			if(player.getSkills().getLevelForXp(skill) < 99)
+				exp *= Settings.getConfig().getXpRate();
+		}
+		return exp;
+	}
+
+	public static int dungBossCombatMultiplier() {
+		return 1;
+	}
+
+	public static void sendWeakenGeomancer(Player player, int skill) {
+		player.getSkills().set(skill, (int) (player.getSkills().getLevelForXp(skill) * .95));
+	}
+
 	public static boolean updateRightsOnRun(Player p) {
 		p.setRights(Rights.PLAYER);
 		if(p.getUsername().equals(Settings.getConfig().getOwnerName()))

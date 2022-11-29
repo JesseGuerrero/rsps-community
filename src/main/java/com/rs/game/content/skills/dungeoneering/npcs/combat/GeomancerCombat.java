@@ -33,6 +33,7 @@ import com.rs.lib.game.Animation;
 import com.rs.lib.game.SpotAnim;
 import com.rs.lib.game.WorldTile;
 import com.rs.lib.util.Utils;
+import com.rs.rsps.jessecustom.CustomScripts;
 import com.rs.utils.WorldUtil;
 
 public class GeomancerCombat extends CombatScript {
@@ -135,7 +136,8 @@ public class GeomancerCombat extends CombatScript {
 				for (int skill = 0; skill < Constants.MAGIC; skill++) {
 					if (skill == 3 || skill == 5)
 						continue;
-					player.getSkills().set(skill, (int) (player.getSkills().getLevel(skill) * .95));
+					//player.getSkills().set(skill, (int) (player.getSkills().getLevel(skill) * .95));
+					CustomScripts.sendWeakenGeomancer(player, skill);
 				}
 				player.sendMessage("Your stats have been significantly lowered.");
 			}

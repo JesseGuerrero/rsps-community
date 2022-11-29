@@ -285,7 +285,7 @@ public class DungeonManager {
 	}
 
 	public int getBossLevel() {
-		return (int) (party.getAverageCombatLevel() * 1.5);
+		return (int) (party.getAverageCombatLevel() * /*1.5*/ CustomScripts.dungBossCombatMultiplier());
 	}
 
 	public void openRoom(final Room room, final RoomReference reference, final VisibleRoom visibleRoom) {
