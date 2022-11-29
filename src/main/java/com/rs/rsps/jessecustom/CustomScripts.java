@@ -229,17 +229,17 @@ public class CustomScripts {
 
 
 
-//	public static LoginHandler onLoginUpdateGIMQuests = new LoginHandler() {
-//		@Override
-//		public void handle(LoginEvent e) {
-//			if(GIM.isGIM(e.getPlayer()) && (boolean)e.getPlayer().get("resetQuestsGIM") == false) {
-//				e.getPlayer().save("resetQuestsGIM", true);
-//				for (Quest quest : Quest.values())
-//					if (quest.isImplemented())
-//						e.getPlayer().getQuestManager().resetQuest(quest);
-//			}
-//		}
-//	};
+	public static LoginHandler onLoginUpdateGIMQuests = new LoginHandler() {
+		@Override
+		public void handle(LoginEvent e) {
+			if(GIM.isGIM(e.getPlayer()) && (boolean)e.getPlayer().get("resetQuestsGIM") == false) {
+				e.getPlayer().save("resetQuestsGIM", true);
+				for (Quest quest : Quest.values())
+					if (quest.isImplemented())
+						e.getPlayer().getQuestManager().resetQuest(quest);
+			}
+		}
+	};
 
 
 	public static boolean completeTreasureTrail(Player player, int level, Item item) {
