@@ -691,7 +691,7 @@ public class Bank {
 			player.startConversation(new Dialogue().addOptions("Choose an option:", new Options() {
 				@Override
 				public void create() {
-					if(group.getPrestigeManager().getPrestige() >= 1)
+					if(group.getPrestigeManager().getPrestige() >= 0)
 						option("Bank 1", new Dialogue()
 								.addNext(()->{
 									if(group.isBank1Open()) {
@@ -726,7 +726,7 @@ public class Bank {
 									});
 								})
 						);
-					if(group.getPrestigeManager().getPrestige() >= 2)
+					if(group.getPrestigeManager().getPrestige() >= 1)
 						option("Bank 2", new Dialogue()
 								.addNext(()->{
 									if(group.isBank2Open()) {
@@ -761,7 +761,7 @@ public class Bank {
 									});
 								})
 						);
-					if(group.getPrestigeManager().getPrestige() >= 3)
+					if(group.getPrestigeManager().getPrestige() >= 2)
 						option("Bank 3", new Dialogue()
 								.addNext(()->{
 									if(group.isBank3Open()) {
