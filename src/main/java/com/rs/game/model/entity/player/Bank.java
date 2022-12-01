@@ -643,7 +643,7 @@ public class Bank {
 		if(player.getTempAttribs().getO("Bank Name") != null)
 			player.getPackets().setIFText(762, 47, player.getTempAttribs().getO("Bank Name"));
 		if(player.getTempAttribs().getO("Bank Name") == null)
-			player.getPackets().setIFText(762, 47, "Bank of " + Settings.getConfig().getServerName());
+			player.getPackets().setIFText(762, 47, "Personal Bank");
 		unlockButtons();
 		sendItems();
 		refreshItems();
@@ -667,7 +667,7 @@ public class Bank {
 		player.getInterfaceManager().sendInterface(762);
 		player.getInterfaceManager().sendInventoryInterface(763);
 		player.getPackets().sendRunScript(2319);
-		player.getPackets().setIFText(762, 47, "Bank of " + Settings.getConfig().getServerName());
+		player.getPackets().setIFText(762, 47, "Personal Bank");
 		unlockButtons();
 		sendItems();
 		refreshItems();
@@ -685,9 +685,6 @@ public class Bank {
 		if (!checkPin())
 			return;
 		WorldDB.getGIMS().getByGroupName(player.getO("GIM Team"), group -> {
-			if(group.getPrestigeManager().getPrestige() == 0) {
-				player.sendMessage("You need a prestige level of novice to access GIM bank...");
-			}
 			player.startConversation(new Dialogue().addOptions("Choose an option:", new Options() {
 				@Override
 				public void create() {
