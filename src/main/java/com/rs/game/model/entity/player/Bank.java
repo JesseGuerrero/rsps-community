@@ -856,7 +856,7 @@ public class Bank {
 			item = new Item(item.getId(), quantity, item.getMetaData());
 		boolean noted = false;
 		ItemDefinitions defs = item.getDefinitions();
-		if (withdrawNotes)
+		if (/*withdrawNotes*/player.getTempAttribs().getB("withdraw_noted_items"))
 			if (!defs.isNoted() && defs.getCertId() != -1 && item.getMetaData() == null) {
 				item.setId(defs.getCertId());
 				noted = true;
@@ -1196,7 +1196,8 @@ public class Bank {
 	}
 
 	public void switchWithdrawNotes() {
-		withdrawNotes = !withdrawNotes;
+		player.getTempAttribs().setB("withdraw_noted_items", !player.getTempAttribs().getB("withdraw_noted_items"));
+//		withdrawNotes = !withdrawNotes;
 	}
 
 	public void switchInsertItems() {
@@ -1209,7 +1210,8 @@ public class Bank {
 	}
 
 	public boolean getWithdrawNotes() {
-		return withdrawNotes;
+		return player.getTempAttribs().getB("withdraw_noted_items");
+//		return withdrawNotes;
 	}
 
 	public int getCurrentTab() {
