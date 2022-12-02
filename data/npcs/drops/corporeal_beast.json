@@ -61,8 +61,8 @@
       ]
     },
     {
-      "chance": 0.0,
-      "outOf": 0.0,
+      "chance": 1.0,
+      "outOf": 512.0,
       "dropOne": true,
       "drops": [
          { "id": 13746, "min": 1, "max": 1 },
