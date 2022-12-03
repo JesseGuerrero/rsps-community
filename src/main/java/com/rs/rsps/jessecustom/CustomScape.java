@@ -2,11 +2,15 @@ package com.rs.rsps.jessecustom;
 
 import com.rs.Settings;
 import com.rs.cache.loaders.Bonus;
+import com.rs.game.World;
 import com.rs.game.content.ItemConstants;
 import com.rs.game.content.dialogue.Dialogue;
 import com.rs.game.content.quests.Quest;
 import com.rs.game.content.quests.handlers.shieldofarrav.ShieldOfArrav;
+import com.rs.game.content.skills.dungeoneering.npcs.DungeonNPC;
+import com.rs.game.model.entity.Entity;
 import com.rs.game.model.entity.npc.NPC;
+import com.rs.game.model.entity.npc.combat.NPCCombatDefinitions;
 import com.rs.game.model.entity.player.Equipment;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.item.ItemsContainer;
@@ -27,6 +31,7 @@ import com.rs.rsps.jessecustom.bosses.godwars.zamorak.KrilTstsarothScalingInstan
 import com.rs.rsps.jessecustom.bosses.kalphitequeen.KalphiteQueenScalingInstanceController;
 import com.rs.rsps.jessecustom.groupironman.GIM;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -105,25 +110,25 @@ public class CustomScape {
 			return value;
 		switch(bonus) {
 			case STAB_DEF, SLASH_DEF, CRUSH_DEF, RANGE_DEF-> {
-				return (value + (item.getMetaData("DefenseBonus") == null ? 0 : (int)item.getMetaDataD("DefenseBonus", 0)));
+				return (value + (item.getMetaData("DefenseBonus") == null ? 0 : (int)Math.ceil(item.getMetaDataD("DefenseBonus", 0))));
 			}
 			case MELEE_STR -> {
-				return (value + (item.getMetaData("StrengthBonus") == null ? 0 : (int)item.getMetaDataD("StrengthBonus", 0)));
+				return (value + (item.getMetaData("StrengthBonus") == null ? 0 : (int)Math.ceil(item.getMetaDataD("StrengthBonus", 0))));
 			}
 			case RANGE_STR -> {
-				return (value + (item.getMetaData("RangeStrengthBonus") == null ? 0 : (int)item.getMetaDataD("RangeStrengthBonus", 0)));
+				return (value + (item.getMetaData("RangeStrengthBonus") == null ? 0 : (int)Math.ceil(item.getMetaDataD("RangeStrengthBonus", 0))));
 			}
 			case CRUSH_ATT, SLASH_ATT, STAB_ATT -> {
-				return (value + (item.getMetaData("AttackBonus") == null ? 0 : (int)item.getMetaDataD("AttackBonus", 0)));
+				return (value + (item.getMetaData("AttackBonus") == null ? 0 : (int)Math.ceil(item.getMetaDataD("AttackBonus", 0))));
 			}
 			case RANGE_ATT -> {
-				return (value + (item.getMetaData("RangeAttackBonus") == null ? 0 : (int)item.getMetaDataD("RangeAttackBonus", 0)));
+				return (value + (item.getMetaData("RangeAttackBonus") == null ? 0 : (int)Math.ceil(item.getMetaDataD("RangeAttackBonus", 0))));
 			}
 			case MAGIC_ATT -> {
-				return (value + (item.getMetaData("MagicAttackBonus") == null ? 0 : (int)item.getMetaDataD("MagicAttackBonus", 0)));
+				return (value + (item.getMetaData("MagicAttackBonus") == null ? 0 : (int)Math.ceil(item.getMetaDataD("MagicAttackBonus", 0))));
 			}
 			case MAGIC_DEF -> {
-				return (value + (item.getMetaData("MagicDefenseBonus") == null ? 0 : (int)item.getMetaDataD("MagicDefenseBonus", 0)));
+				return (value + (item.getMetaData("MagicDefenseBonus") == null ? 0 : (int)Math.ceil(item.getMetaDataD("MagicDefenseBonus", 0))));
 			}
 			default -> {
 				return value;
@@ -145,33 +150,22 @@ public class CustomScape {
 		public void handle(ObjectClickEvent e) {
 			Player player = e.getPlayer();
 			if(e.getPlayer().isKalphiteLairSetted()) {
-				if(!CustomScape.isPlayerCustomScape(e.getPlayer())) {
-					e.getPlayer().setNextWorldTile(new WorldTile(3508, 9494, 0));
-					return;
-				}
-				if(e.getPlayer().getInventory().getAmountOf(995) >= 5_000) {
-					e.getPlayer().startConversation(new Dialogue()
-							.addOptions("Do you want to create a boss instance?", option -> {
-								option.add("Yes", ()->{
-									e.getPlayer().sendInputName("What instanced combat scale would you like? (1-10000)", scaleString -> {
-										try {
-											int scale = Integer.parseInt(scaleString);
-											if(scale < 0)
-												throw new NumberFormatException();
-											player.getInventory().removeItems(new Item(995, 5000));
-											player.getControllerManager().startController(new KalphiteQueenScalingInstanceController(scale));
-										} catch(NumberFormatException n) {
-											player.sendMessage("Improper scale formatting, try again.");
-											return;
-										}
-									});
-								});
-								option.add("No", () -> {e.getPlayer().setNextWorldTile(new WorldTile(3508, 9494, 0));});
-							})
-					);
-					return;
-				}
-				e.getPlayer().sendMessage("You need 5k coins for an instance");
+//				if(!CustomScape.isPlayerCustomScape(e.getPlayer())) {
+//					e.getPlayer().setNextWorldTile(new WorldTile(3508, 9494, 0));
+//					return;
+//				}
+//				if(e.getPlayer().getInventory().getAmountOf(995) >= 5_000) {
+//					e.getPlayer().startConversation(new Dialogue()
+//							.addOptions("Do you want to create a boss instance?", option -> {
+//								option.add("Yes", ()->{
+//									player.getControllerManager().startController(new KalphiteQueenScalingInstanceController());
+//								});
+//								option.add("No", () -> {e.getPlayer().setNextWorldTile(new WorldTile(3508, 9494, 0));});
+//							})
+//					);
+//					return;
+//				}
+//				e.getPlayer().sendMessage("You need 5k coins for an instance");
 				e.getPlayer().setNextWorldTile(new WorldTile(3508, 9494, 0));
 			}
 		}
@@ -231,35 +225,35 @@ public class CustomScape {
 
 		if(item.getMetaData("WeaponName") != null)
 			weaponName = nameColor + (String) item.getMetaDataO("WeaponName");
-		if (item.getMetaData("HitBonus") != null) {
+		if (item.getMetaData("HitBonus") != null && item.getMetaDataD("HitBonus") > 0) {
 			hitBonus = " " + String.format("%.3f", item.getMetaDataD("HitBonus")) + " hit-bonus ";
 			hasStats = true;
 		}
-		if (item.getMetaData("StrengthBonus") != null) {
+		if (item.getMetaData("StrengthBonus") != null && item.getMetaDataD("StrengthBonus") > 0) {
 			strengthBonus = " " + String.format("%.1f", item.getMetaDataD("StrengthBonus")) + " strength ";
 			hasStats = true;
 		}
-		if (item.getMetaData("AttackBonus") != null) {
+		if (item.getMetaData("AttackBonus") != null && item.getMetaDataD("AttackBonus") > 0) {
 			attackBonus = " " + String.format("%.1f", item.getMetaDataD("AttackBonus")) + " attack ";
 			hasStats = true;
 		}
-		if (item.getMetaData("RangeStrengthBonus") != null) {
+		if (item.getMetaData("RangeStrengthBonus") != null && item.getMetaDataD("RangeStrengthBonus") > 0) {
 			strengthBonus = " " + String.format("%.1f", item.getMetaDataD("RangeStrengthBonus")) + " strength ";
 			hasStats = true;
 		}
-		if (item.getMetaData("RangeAttackBonus") != null) {
+		if (item.getMetaData("RangeAttackBonus") != null && item.getMetaDataD("RangeAttackBonus") > 0) {
 			attackBonus = " " + String.format("%.1f", item.getMetaDataD("RangeAttackBonus")) + " attack ";
 			hasStats = true;
 		}
-		if (item.getMetaData("DefenseBonus") != null) {
+		if (item.getMetaData("DefenseBonus") != null && item.getMetaDataD("DefenseBonus") > 0) {
 			defenseBonus = " " + String.format("%.1f", item.getMetaDataD("DefenseBonus")) + " defense ";
 			hasStats = true;
 		}
-		if (item.getMetaData("MagicAttackBonus") != null) {
+		if (item.getMetaData("MagicAttackBonus") != null && item.getMetaDataD("MagicAttackBonus") > 0) {
 			magicAttackBonus = " " + String.format("%.1f", item.getMetaDataD("MagicAttackBonus")) + " mage attack ";
 			hasStats = true;
 		}
-		if (item.getMetaData("MagicDefenseBonus") != null) {
+		if (item.getMetaData("MagicDefenseBonus") != null && item.getMetaDataD("MagicDefenseBonus") > 0) {
 			magicDefenseBonus = " " + String.format("%.1f", item.getMetaDataD("MagicDefenseBonus")) + " mage defense ";
 			hasStats = true;
 		}
@@ -304,25 +298,15 @@ public class CustomScape {
 			player.startConversation(new Dialogue()
 					.addOptions("Start a boss instance?", option -> {
 						option.add("Yes", () -> {
-							player.sendInputName("What instanced combat scale would you like? (1-10000)", scaleString -> {
-								try {
-									int scale = Integer.parseInt(scaleString);
-									if (scale < 0)
-										throw new NumberFormatException();
-									player.getInventory().removeItems(new Item(995, 5000));
-									if (altarID == 26289)
-										player.getControllerManager().startController(new GeneralGraardorScalingInstanceController(scale));
-									if(altarID == 26286)
-										player.getControllerManager().startController(new KrilTstsarothScalingInstanceController(scale));
-									if(altarID == 26288)
-										player.getControllerManager().startController(new KreeArraScalingInstanceController(scale));
-									if(altarID == 26287)
-										player.getControllerManager().startController(new CommanderZilyanaScalingInstanceController(scale));
-								} catch (NumberFormatException n) {
-									player.sendMessage("Improper scale formatting, try again.");
-									return;
-								}
-							});
+							player.getInventory().removeItems(new Item(995, 5000));
+							if (altarID == 26289)
+								player.getControllerManager().startController(new GeneralGraardorScalingInstanceController());
+							if(altarID == 26286)
+								player.getControllerManager().startController(new KrilTstsarothScalingInstanceController());
+							if(altarID == 26288)
+								player.getControllerManager().startController(new KreeArraScalingInstanceController());
+							if(altarID == 26287)
+								player.getControllerManager().startController(new CommanderZilyanaScalingInstanceController());
 						});
 						option.add("No", new Dialogue());
 					}));
@@ -339,18 +323,8 @@ public class CustomScape {
 			player.startConversation(new Dialogue()
 					.addOptions("Start a boss instance?", option -> {
 						option.add("Yes", () -> {
-							player.sendInputName("What instanced combat scale would you like? (1-10000)", scaleString -> {
-								try {
-									int scale = Integer.parseInt(scaleString);
-									if (scale < 0)
-										throw new NumberFormatException();
-									player.getInventory().removeItems(new Item(995, 5000));
-									player.getControllerManager().startController(new CorporealBeastScalingInstanceController(scale));
-								} catch (NumberFormatException n) {
-									player.sendMessage("Improper scale formatting, try again.");
-									return;
-								}
-							});
+							player.getInventory().removeItems(new Item(995, 5000));
+							player.getControllerManager().startController(new CorporealBeastScalingInstanceController());
 						});
 						option.add("No", ()->{player.setNextWorldTile(new WorldTile(2921, player.getY(), 2));});
 					}));
@@ -437,6 +411,63 @@ public class CustomScape {
 			if(item.getName().equalsIgnoreCase((String)itemName))
 				if(item.getMetaData("MagicAttackBonus") == null)
 					item.setMetaDataO("MagicAttackBonus", getAverage(item, "magicattack") * (scale - 1));
+	}
+
+
+	public static void customScale(Entity attacker, NPC npc) {
+		if(npc.getTempAttribs().getO("AttackingCustomScapePlayer") != null)
+			return;
+		if(npc instanceof DungeonNPC)
+			return;
+		if(attacker instanceof Player player && isPlayerCustomScape(player)) {
+			npc.getTempAttribs().setO("AttackingCustomScapePlayer", player);
+			int scale = player.getI("CustomScapeScale", 0);
+			double combatScale = 1 + (scale/10.0);
+			npc.setCombatLevel((int)Math.ceil(npc.getCombatLevel()*combatScale));
+			if(Settings.getConfig().isDebug())
+				player.sendMessage("Set npc scale " + combatScale);
+			npc.getTempAttribs().setI("CustomScapeScale", scale);
+			Map<NPCCombatDefinitions.Skill, Integer> levels = NPCCombatDefinitions.getDefs(npc.getId()).getLevels();
+			Map<NPCCombatDefinitions.Skill, Integer> upgradedStats = new HashMap<>();
+			for(NPCCombatDefinitions.Skill combatSkill : levels.keySet())
+				upgradedStats.put(combatSkill, (int) Math.ceil(levels.get(combatSkill) * combatScale));
+			npc.setLevels(upgradedStats);
+			npc.setHitpoints(npc.getMaxHitpoints());
+		}
+		if(npc.getTempAttribs().getO("AttackingCustomScapePlayer") == null) {
+			if(attacker instanceof Player player)
+				if(Settings.getConfig().isDebug())
+					player.sendMessage("reset2");
+			resetNPCScale(npc);
+		}
+	}
+
+	public static void resetNPCTickRestore(NPC npc, long lastAttackedByTarget) {
+		if(npc.getTempAttribs() != null && npc.getTempAttribs().getI("CustomScapeScale") >= 1)
+			if(System.currentTimeMillis() - lastAttackedByTarget > 1000*60*1) { //1 minute
+				if(Settings.getConfig().isDebug()) {
+					Player attacker = World.getPlayerByDisplay("Abc20");
+					attacker.sendMessage("reset3 " + npc.getName());
+				}
+				CustomScape.resetNPCScale(npc);
+			}
+	}
+
+	public static void resetNPCScale(NPC npc) {
+		npc.getTempAttribs().removeI("CustomScapeScale");
+		npc.setCombatLevel(npc.getDefinitions().combatLevel);
+		npc.setLevels(NPCCombatDefinitions.getDefs(npc.getId()).getLevels());
+		if(npc.getHitpoints() > npc.getMaxHitpoints())
+			npc.setHitpoints(npc.getMaxHitpoints());
+	}
+
+	public static int scaleHP(NPC npc) {
+		if(npc.getTempAttribs() == null)
+			return npc.getCombatDefinitions().getHitpoints();
+		double combatScale = npc.getTempAttribs().getD("CustomScapeScale", 1);
+		if(combatScale > 1)
+			return (int)Math.ceil(NPCCombatDefinitions.getDefs(npc.getId()).getHitpoints()* combatScale);
+		return npc.getCombatDefinitions().getHitpoints();
 	}
 
 	private static double getAverage(Item item, String type) {

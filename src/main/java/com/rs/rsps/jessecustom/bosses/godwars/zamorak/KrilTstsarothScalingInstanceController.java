@@ -38,13 +38,12 @@ public class KrilTstsarothScalingInstanceController extends Controller {
 
 
 	private RegionBuilder.DynamicRegionReference instance;
-	private double scale = 1;
 	final WorldTile locationOnExit = new WorldTile(2915, 3747, 0);
 	WorldTile spawn;
+	List<NPC> npcs = new ArrayList<>();
 
-	public KrilTstsarothScalingInstanceController(double scale) {
+	public KrilTstsarothScalingInstanceController() {
 		super();
-		this.scale = scale;
 	}
 
 	@Override
@@ -54,8 +53,11 @@ public class KrilTstsarothScalingInstanceController extends Controller {
 		instance.copyMapAllPlanes(364, 664, () -> {
 			spawn = instance.getLocalTile(24, 11);
 			spawn.setLocation(spawn.getX(), spawn.getY(), 2);
-			List<NPC> npcs = new ArrayList<>();
-			npcs.add(new ScaledKrilTstsaroth(6203, new WorldTile(spawn.getX() - 4, spawn.getY() - 1, 2), false, scale));
+			ScaledKrilTstsaroth boss = new ScaledKrilTstsaroth(6203, new WorldTile(spawn.getX() - 4, spawn.getY() - 1, 2), false);
+			npcs.add(boss);
+			npcs.add(boss.minions[0]);
+			npcs.add(boss.minions[1]);
+			npcs.add(boss.minions[2]);
 			for(NPC npc : npcs) {
 				npc.setRespawnTask(75);
 				npc.setForceMultiArea(true);
@@ -116,8 +118,10 @@ public class KrilTstsarothScalingInstanceController extends Controller {
 	@Override
 	public boolean processObjectClick2(GameObject object) {
 		if (object.getId() == 26286) {
+			teled = true;
 			Magic.sendNormalTeleportNoType(player, locationOnExit);
 			forceClose();
+			return false;
 		}
 		return true;
 	}
@@ -147,7 +151,14 @@ public class KrilTstsarothScalingInstanceController extends Controller {
 
 	private void removeInstance() {
 		player.setForceMultiArea(false);
-		instance.destroy(()->{if(!teled) player.setNextWorldTile(locationOnExit);});
+		instance.destroy(()->{
+			if(!teled)
+				player.setNextWorldTile(locationOnExit);
+			for(NPC npc : npcs) {
+				npc.finishAfterTicks(90);
+				player.sendMessage("finished " + npc.getName());
+			}
+		});
 	}
 
 }

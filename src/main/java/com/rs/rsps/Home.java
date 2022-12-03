@@ -1,14 +1,18 @@
 package com.rs.rsps;
 
 import com.rs.cache.loaders.ObjectType;
+import com.rs.db.WorldDB;
 import com.rs.game.World;
 import com.rs.game.content.dialogue.Dialogue;
+import com.rs.game.content.dialogue.HeadE;
 import com.rs.game.content.dialogue.Options;
 import com.rs.game.content.world.areas.wilderness.WildernessController;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.pathing.Direction;
+import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.object.GameObject;
 import com.rs.lib.Constants;
+import com.rs.lib.game.Item;
 import com.rs.lib.game.WorldObject;
 import com.rs.lib.game.WorldTile;
 import com.rs.lib.util.Utils;
@@ -20,6 +24,8 @@ import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.LoginHandler;
 import com.rs.plugin.handlers.NPCClickHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
+import com.rs.rsps.jessecustom.CustomScape;
+import com.rs.rsps.jessecustom.bosses.kalphitequeen.KalphiteQueenScalingInstanceController;
 import com.rs.rsps.teleports.BossTeleport;
 import com.rs.rsps.teleports.SlayerTeleport;
 import com.rs.rsps.teleports.Teleport;
@@ -34,8 +40,8 @@ public class Home {
 		/* Task master */
 		//spawnNPC(14858, new WorldTile(3090, 3494, 0), "Cadet Cassandra", Direction.WEST, false);
 
-		/* Prestige master */
-//		spawnNPC(2253, new WorldTile(3167, 3491, 0), "Wise Old Man", Direction.EAST, false);
+		/* Scale master */
+		spawnNPC(2253, new WorldTile(3167, 3491, 0), "Wise Old Man", Direction.EAST, false);
 
 		/* Slayer Masters */
 //		spawnNPC(8480, new WorldTile(3091, 3487, 0), Direction.SOUTH, false);
@@ -170,7 +176,7 @@ public class Home {
 		}
 	};
 
-		public static NPCClickHandler slayerTeleHandler = new NPCClickHandler(new Object[] { 15147 }) {
+	public static NPCClickHandler slayerTeleHandler = new NPCClickHandler(new Object[] { 15147 }) {
 		@Override
 		public void handle(NPCClickEvent e) {
 			if (e.getPlayer().getSlayer().getTask() == null) {
@@ -190,6 +196,34 @@ public class Home {
 					option("Nowhere.");
 				}
 			}));
+		}
+	};
+
+	public static NPCClickHandler scaleNPCHandler = new NPCClickHandler(new Object[] { 2253 }) {
+		@Override
+		public void handle(NPCClickEvent e) {
+			if(CustomScape.isPlayerCustomScape(e.getPlayer())) {
+				int NPC = 2253;
+				e.getPlayer().startConversation(new Dialogue()
+						.addNPC(NPC, HeadE.CALM_TALK, "Would you like to scale the world?")
+						.addNext(() -> {
+							e.getPlayer().sendInputName("What scale would you like?", scaleString -> {
+								try {
+									int scale = Integer.parseInt(scaleString);
+									if(scale < 0)
+										throw new NumberFormatException();
+									e.getPlayer().save("CustomScapeScale", scale);
+									e.getPlayer().sendMessage("The world is now scaled by " + scaleString + "0%");
+								} catch(NumberFormatException n) {
+									e.getPlayer().sendMessage("Improper scale formatting, try again.");
+								}
+
+							});
+						})
+				);
+				return;
+			}
+			e.getPlayer().sendMessage("You must be a custom scaper to use scaling...");
 		}
 	};
 

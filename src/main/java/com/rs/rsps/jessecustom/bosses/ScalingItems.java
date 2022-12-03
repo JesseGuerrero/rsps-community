@@ -1,17 +1,14 @@
 package com.rs.rsps.jessecustom.bosses;
 
+import com.rs.Settings;
+import com.rs.cache.loaders.ItemDefinitions;
+import com.rs.game.content.skills.dungeoneering.npcs.DungeonNPC;
+import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.NPCDropEvent;
 import com.rs.plugin.handlers.NPCDropHandler;
 import com.rs.rsps.jessecustom.CustomScape;
 import com.rs.rsps.jessecustom.CustomScripts;
-import com.rs.rsps.jessecustom.bosses.corp.ScalingCorporealBeast;
-import com.rs.rsps.jessecustom.bosses.godwars.ScaledGodWarMinion;
-import com.rs.rsps.jessecustom.bosses.godwars.armadyl.ScaledKreeArra;
-import com.rs.rsps.jessecustom.bosses.godwars.bandos.ScaledGeneralGraardor;
-import com.rs.rsps.jessecustom.bosses.godwars.saradomin.ScaledCommanderZilyana;
-import com.rs.rsps.jessecustom.bosses.godwars.zamorak.ScaledKrilTstsaroth;
-import com.rs.rsps.jessecustom.bosses.kalphitequeen.KalphiteQueenScaling;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,15 +28,32 @@ public class ScalingItems {
 		return allScalingItems.stream().distinct().toArray();
 	}
 
+	public static List<Object> getItemsByName(String name) {
+		List<Object> items = new ArrayList<>();
+		for (int i = 0; i < Utils.getItemDefinitionsSize(); i++) {
+			boolean contains = true;
+			if (!ItemDefinitions.getDefs(i).getName().toLowerCase().contains(name.toLowerCase())
+					|| ItemDefinitions.getDefs(i).isLended() || ItemDefinitions.getDefs(i).isNoted()) {
+				continue;
+			}
+			if (contains)
+				items.add(ItemDefinitions.getDefs(i).getName());
+		}
+		return items;
+	}
+
 	public static Object[] getMeleeAttackScalingItems() {
-		return new Object[]{
-				"Dragon 2h sword", "Adamant longsword", "Rune 2h sword", "Rune warhammer",
-				"Rune hatchet", "Rune battleaxe", "Amulet of power", "Adamant spear",
-				"Rune spear", "Dragon spear", "Rune longsword", "Bandos hilt",
-				"Rune scimitar", "Rune battleaxe", "Dragon dagger(p++)", "Zamorak hilt",
-				"Zamorakian spear", "Armadyl hilt", "Saradomin hilt", "Saradomin's whisper",
-				"Regen bracelet"
-		};
+		List<Object> items = new ArrayList<>();
+		items.addAll(getItemsByName("sword"));
+		items.addAll(getItemsByName("spear"));
+		items.addAll(getItemsByName("hilt"));
+		items.addAll(getItemsByName("dagger"));
+		items.addAll(getItemsByName("warhammer"));
+		items.addAll(getItemsByName("scimitar"));
+		items.addAll(getItemsByName("hatchet"));
+		items.addAll(getItemsByName("regen bracelet"));
+		items.addAll(getItemsByName("Saradomin's whisper"));
+		return items.stream().distinct().toArray();
 	}
 
 	public static Object[] getMeleeStrengthScalingItems() {
@@ -51,74 +65,107 @@ public class ScalingItems {
 	}
 
 	public static Object[] getRangeAttackScalingItems() {
-		return new Object[]{
-				"Amulet of power", "Black d'hide body", "Armadyl helmet",
-				"Armadyl chestplate", "Armadyl chainskirt", "Armadyl boots",
-				"Armadyl buckler", "Armadyl gloves", "Rune crossbow", "Armadyl crossbow",
-				"Saradomin's murmer", "Regen bracelet"
-		};
+
+		List<Object> items = new ArrayList<>();
+		items.addAll(getItemsByName("Amulet of power"));
+		items.addAll(getItemsByName("bow"));
+		items.addAll(getItemsByName("armadyl"));
+		items.addAll(getItemsByName("royal"));
+		items.addAll(getItemsByName("hide"));
+		items.addAll(getItemsByName("Regen bracelet"));
+		items.addAll(getItemsByName("Saradomin's murmer"));
+		return items.stream().distinct().toArray();
 	}
 
 	public static Object[] getRangeStrengthScalingItems() {
-		return new Object[]{
-				"Amulet of power"
-		};
+		List<Object> items = new ArrayList<>();
+		items.addAll(getItemsByName("Amulet of power"));
+		items.addAll(getItemsByName("armadyl"));
+		return items.stream().distinct().toArray();
 	}
 
 	public static Object[] getDefensiveScalingItems() {
-		return new Object[]{
-				"Dragon chainbody", "Amulet of power", "Rune platebody", "Dragon med helm",
-				"Rune sq shield", "Rune kiteshield", "Shield left half", "Bandos chestplate",
-				"Bandos tassets", "Bandos boots", "Bandos warshield", "Bandos helmet",
-				"Bandos gloves", "Rune platelegs", "Black d'hide body", "Armadyl helmet",
-				"Armadyl chestplate", "Armadyl chainskirt", "Armadyl boots",
-				"Armadyl buckler", "Armadyl gloves", "Rune plateskirt", "Regen bracelet",
-				"Spirit shield", "Arcane sigil", "Divine sigil", "Elysian sigil", "Spectral sigil"
-		};
+		List<Object> items = new ArrayList<>();
+		items.addAll(getItemsByName("Amulet of power"));
+		items.addAll(getItemsByName("body"));
+		items.addAll(getItemsByName("plate"));
+		items.addAll(getItemsByName("bandos"));
+		items.addAll(getItemsByName("subjugation"));
+		items.addAll(getItemsByName("armadyl"));
+		items.addAll(getItemsByName("sigil"));
+		items.addAll(getItemsByName("helmet"));
+		items.addAll(getItemsByName("helm"));
+		items.addAll(getItemsByName("shield"));
+		items.addAll(getItemsByName("boots"));
+		items.addAll(getItemsByName("glove"));
+		items.addAll(getItemsByName("chap"));
+		items.addAll(getItemsByName("coif"));
+		items.addAll(getItemsByName("Regen bracelet"));
+		return items.stream().distinct().toArray();
 	}
 	public static Object[] getMagicDefenseScalingItems() {
-		return new Object[]{
-				"Amulet of power","Hood of subjugation", "Garb of subjugation",
-				"Gown of subjugation", "Ward of subjugation", "Boots of subjugation",
-				"Gloves of subjugation", "Regen bracelet"
-		};
+		List<Object> items = new ArrayList<>();
+		items.addAll(getItemsByName("Amulet of power"));
+		items.addAll(getItemsByName("body"));
+		items.addAll(getItemsByName("plate"));
+		items.addAll(getItemsByName("bandos"));
+		items.addAll(getItemsByName("subjugation"));
+		items.addAll(getItemsByName("armadyl"));
+		items.addAll(getItemsByName("sigil"));
+		items.addAll(getItemsByName("helmet"));
+		items.addAll(getItemsByName("helm"));
+		items.addAll(getItemsByName("shield"));
+		items.addAll(getItemsByName("boots"));
+		items.addAll(getItemsByName("glove"));
+		items.addAll(getItemsByName("chap"));
+		items.addAll(getItemsByName("coif"));
+		items.addAll(getItemsByName("Regen bracelet"));
+		return items.stream().distinct().toArray();
 	}
 	public static Object[] getMagicAttackScalingItems() {
-		return new Object[]{
-				"Lava battlestaff", "Amulet of power", "Steam battlestaff",
-				"Hood of subjugation", "Garb of subjugation", "Gown of subjugation",
-				"Ward of subjugation", "Boots of subjugation", "Gloves of subjugation",
-				"Saradomin's hiss", "Mystic fire staff", "Mystic water staff",
-				"Mystic air staff", "Mystic earth staff", "Regen bracelet"
-		};
+		List<Object> items = new ArrayList<>();
+		items.addAll(getItemsByName("Amulet of power"));
+		items.addAll(getItemsByName("subjugation"));
+		items.addAll(getItemsByName("armadyl"));
+		items.addAll(getItemsByName("sigil"));
+		items.addAll(getItemsByName("mystic"));
+		items.addAll(getItemsByName("staff"));
+		items.addAll(getItemsByName("shield"));
+		items.addAll(getItemsByName("boots"));
+		items.addAll(getItemsByName("glove"));
+		items.addAll(getItemsByName("wand"));
+		items.addAll(getItemsByName("wizard"));
+		items.addAll(getItemsByName("Regen bracelet"));
+		return items.stream().distinct().toArray();
 	}
 
-	public static Object[] npcListForScalingItems() {
-		return new Object[] {
-				1158, 1160, //Kalphite Queen
-				6260,  //Bandos
-				6203, //Zammy
-				6222, //Arma
-				6247, //Zilyana
-				8133 //Corp
-		};
-	}
-
-	public static NPCDropHandler addMetas = new NPCDropHandler(ScalingItems.npcListForScalingItems(), ScalingItems.getAllScalingItems()) {
+	public static NPCDropHandler addMetas = new NPCDropHandler(null, ScalingItems.getAllScalingItems()) {
 		@Override
 		public void handle(NPCDropEvent e) {
-			if(e.getNPC() instanceof KalphiteQueenScaling npc)
-				CustomScape.scaleEquipmentBonus(e.getItem(), npc.combatScale);
-			if(e.getNPC() instanceof ScaledGeneralGraardor npc)
-				CustomScape.scaleEquipmentBonus(e.getItem(), npc.combatScale);
-			if(e.getNPC() instanceof ScaledKrilTstsaroth npc)
-				CustomScape.scaleEquipmentBonus(e.getItem(), npc.combatScale);
-			if(e.getNPC() instanceof ScaledKreeArra npc)
-				CustomScape.scaleEquipmentBonus(e.getItem(), npc.combatScale);
-			if(e.getNPC() instanceof ScaledCommanderZilyana npc)
-				CustomScape.scaleEquipmentBonus(e.getItem(), npc.combatScale);
-			if(e.getNPC() instanceof ScalingCorporealBeast npc)
-				CustomScape.scaleEquipmentBonus(e.getItem(), npc.combatScale);
+			if(e.getNPC().getTempAttribs() == null)
+				return;
+			if(e.getNPC() instanceof DungeonNPC)
+				return;
+			if(!CustomScape.isPlayerCustomScape(e.getPlayer()))
+				return;
+			int playerScale = e.getPlayer().getI("CustomScapeScale", 0);
+			double playerCombatScale = 1 + (playerScale/10.0);
+			double npcScale = e.getNPC().getTempAttribs().getI("CustomScapeScale");
+			double npcCombatScale = 1 + (npcScale/10.0);
+			double scale = 1;
+			if(npcCombatScale >= playerCombatScale) {
+				scale = playerCombatScale;
+				if(Settings.getConfig().isDebug())
+					e.getPlayer().sendMessage("This one");
+			}
+			if(npcCombatScale < playerCombatScale) {
+				scale = npcCombatScale;
+				if(Settings.getConfig().isDebug())
+					e.getPlayer().sendMessage("This two " + e.getNPC().getTempAttribs().getD("CustomScapeScale"));
+			}
+			if(Settings.getConfig().isDebug())
+				e.getPlayer().sendMessage("scale " + scale);
+			CustomScape.scaleEquipmentBonus(e.getItem(), scale);
 		}
 	};
 

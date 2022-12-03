@@ -30,39 +30,21 @@ import com.rs.rsps.jessecustom.CustomScape;
 import java.util.HashMap;
 import java.util.Map;
 
-@PluginEventHandler
-public class KalphiteQueenScaling extends KalphiteQueen {
-	public double combatScale = 1;
-
-	public KalphiteQueenScaling(int id, WorldTile tile, boolean spawned, double scale) {
-		super(id, tile, spawned);
-		this.combatScale = 1 + (scale/10.0);
-	}
-
-	@Override
-	public int getMaxHitpoints() {
-		return (int)Math.ceil(NPCCombatDefinitions.getDefs(super.getId()).getHitpoints()* combatScale);
-	}
-
-	@Override
-	public void spawn() {
-		super.spawn();
-		Map<NPCCombatDefinitions.Skill, Integer> levels = NPCCombatDefinitions.getDefs(super.getId()).getLevels();
-		Map<NPCCombatDefinitions.Skill, Integer> upgradedStats = new HashMap<>();
-		for(NPCCombatDefinitions.Skill combatSkill : levels.keySet())
-			upgradedStats.put(combatSkill, (int) Math.ceil(levels.get(combatSkill) * combatScale));
-		this.setLevels(upgradedStats);
-		this.setCombatLevel((int)Math.ceil(NPCCombatDefinitions.getDefs(super.getId()).getCombatLevel()* combatScale));
-	}
-
-	@Override
-	public void reset() {
-		super.reset();
-		Map<NPCCombatDefinitions.Skill, Integer> levels = NPCCombatDefinitions.getDefs(super.getId()).getLevels();
-		Map<NPCCombatDefinitions.Skill, Integer> upgradedStats = new HashMap<>();
-		for(NPCCombatDefinitions.Skill combatSkill : levels.keySet()) {
-			upgradedStats.put(combatSkill, (int) Math.ceil(levels.get(combatSkill) * combatScale));
-		}
-		this.setLevels(upgradedStats);
-	}
-}
+//@PluginEventHandler
+//public class KalphiteQueenScaling extends KalphiteQueen {
+//
+//	public KalphiteQueenScaling(int id, WorldTile tile, boolean spawned) {
+//		super(id, tile, spawned);
+//	}
+//
+//
+//	@Override
+//	public void spawn() {
+//		super.spawn();
+//	}
+//
+//	@Override
+//	public void reset() {
+//		super.reset();
+//	}
+//}

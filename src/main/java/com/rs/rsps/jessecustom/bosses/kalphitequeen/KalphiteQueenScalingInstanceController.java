@@ -17,6 +17,7 @@
 package com.rs.rsps.jessecustom.bosses.kalphitequeen;
 
 import com.rs.Settings;
+import com.rs.game.content.bosses.kalphitequeen.KalphiteQueen;
 import com.rs.game.content.death.DeathOfficeController;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.player.Controller;
@@ -38,14 +39,14 @@ import java.util.List;
 @PluginEventHandler
 public final class KalphiteQueenScalingInstanceController extends Controller {
 	private DynamicRegionReference instance;
-	private double scale = 1;
 	final WorldTile locationOnExit = new WorldTile(3509, 9499, 2);
 	WorldTile spawn;
+	boolean teled=false;
+	List<NPC> npcs = new ArrayList<>();
 
 	//Multicombat
-	public KalphiteQueenScalingInstanceController(double scale) {
+	public KalphiteQueenScalingInstanceController() {
 		super();
-		this.scale = scale;
 	}
 
 	@Override
@@ -54,13 +55,12 @@ public final class KalphiteQueenScalingInstanceController extends Controller {
 		instance = new DynamicRegionReference(8, 8);
 		instance.copyMapAllPlanes(433, 1183, () -> {
 			spawn = instance.getLocalTile(44, 29);
-			List<NPC> npcs = new ArrayList<>();
-			npcs.add(new NPCScaling(1157, instance.getLocalTile(34, 35), false, scale));
-			npcs.add(new NPCScaling(1157, instance.getLocalTile(19, 46), false, scale));
-			npcs.add(new NPCScaling(1157, instance.getLocalTile(17, 31), false, scale));
-			npcs.add(new KalphiteQueenScaling(1158, instance.getLocalTile(16, 25), false, scale));
+			npcs.add(new NPC(1157, instance.getLocalTile(34, 35), false));
+			npcs.add(new NPC(1157, instance.getLocalTile(19, 46), false));
+			npcs.add(new NPC(1157, instance.getLocalTile(17, 31), false));
+			npcs.add(new KalphiteQueen(1158, instance.getLocalTile(16, 25), false));
 			for(NPC npc : npcs) {
-				npc.setRespawnTask();
+				npc.setRespawnTask(75);
 				npc.setForceMultiArea(true);
 			}
 			player.fadeScreen(() -> {
@@ -88,6 +88,7 @@ public final class KalphiteQueenScalingInstanceController extends Controller {
 
 	@Override
 	public void magicTeleported(int type) {
+		teled = true;
 		forceClose();
 	}
 
@@ -104,6 +105,7 @@ public final class KalphiteQueenScalingInstanceController extends Controller {
 	@Override
 	public boolean sendDeath() {
 		player.lock(7);
+		teled = true;
 		player.stopAll();
 		WorldTasks.schedule(new WorldTask() {
 			int loop;
@@ -150,7 +152,14 @@ public final class KalphiteQueenScalingInstanceController extends Controller {
 
 	private void removeInstance() {
 		player.setForceMultiArea(false);
-		instance.destroy(()->{player.setNextWorldTile(locationOnExit);});
+		instance.destroy(()->{
+			if(!teled)
+				player.setNextWorldTile(locationOnExit);
+			for(NPC npc : npcs) {
+				npc.finishAfterTicks(90);
+				player.sendMessage("finished " + npc.getName());
+			}
+		});
 	}
 
 

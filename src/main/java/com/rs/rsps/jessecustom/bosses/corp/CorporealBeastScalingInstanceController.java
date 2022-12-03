@@ -18,6 +18,7 @@ package com.rs.rsps.jessecustom.bosses.corp;
 
 import com.rs.Settings;
 import com.rs.game.World;
+import com.rs.game.content.bosses.corp.CorporealBeast;
 import com.rs.game.content.combat.PlayerCombat;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.player.Controller;
@@ -44,13 +45,12 @@ import java.util.List;
 @PluginEventHandler
 public class CorporealBeastScalingInstanceController extends Controller {
 	private RegionBuilder.DynamicRegionReference instance;
-	private double scale = 1;
 	final WorldTile locationOnExit = new WorldTile(2970, 4384, 2);
 	WorldTile spawn;
+	List<NPC> npcs = new ArrayList<>();
 
-	public CorporealBeastScalingInstanceController(double scale) {
+	public CorporealBeastScalingInstanceController() {
 		super();
-		this.scale = scale;
 	}
 
 	@Override
@@ -60,8 +60,7 @@ public class CorporealBeastScalingInstanceController extends Controller {
 		instance.copyMapAllPlanes(364, 545, () -> {
 			spawn = instance.getLocalTile(58, 24);
 			spawn.setLocation(spawn.getX(), spawn.getY(), 2);
-			List<NPC> npcs = new ArrayList<>();
-			npcs.add(new ScalingCorporealBeast(8133, new WorldTile(spawn.getX() + 10, spawn.getY(), 2), false, scale));
+			npcs.add(new CorporealBeast(8133, new WorldTile(spawn.getX() + 10, spawn.getY(), 2), false));
 			for(NPC npc : npcs) {
 				npc.setRespawnTask(75);
 				npc.setForceMultiArea(true);
@@ -172,14 +171,26 @@ public class CorporealBeastScalingInstanceController extends Controller {
 
 	private void removeInstance() {
 		player.setForceMultiArea(false);
-		instance.destroy(()->{if(!teled) player.setNextWorldTile(locationOnExit);});
+		instance.destroy(()->{
+			if(!teled)
+				player.setNextWorldTile(locationOnExit);
+			for(NPC npc : npcs) {//TODO: Make NPCS Dissapear completely.
+				npc.finishAfterTicks(90);
+				player.sendMessage("finished " + npc.getName());
+			}
+
+		});
 	}
 
 	public static ObjectClickHandler handleCororealEntrance = new ObjectClickHandler(new Object[] { 37929 }) {
 		@Override
 		public void handle(ObjectClickEvent e) {
+//			if(e.getPlayer().getX() <= 2918) {
+//				CustomScape.createCorpScalingDialogue(e.getPlayer());
+//				return;
+//			}
 			if(e.getPlayer().getX() <= 2918) {
-				CustomScape.createCorpScalingDialogue(e.getPlayer());
+				e.getPlayer().setNextWorldTile(new WorldTile(2921, e.getPlayer().getY(), 2));
 				return;
 			}
 			e.getPlayer().setNextWorldTile(new WorldTile(2917, e.getPlayer().getY(), 2));

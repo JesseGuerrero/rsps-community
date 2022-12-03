@@ -9,16 +9,6 @@ import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.LoginEvent;
 import com.rs.plugin.events.NPCDropEvent;
 import com.rs.plugin.handlers.LoginHandler;
-import com.rs.plugin.handlers.NPCDropHandler;
-import com.rs.rsps.jessecustom.CustomScripts;
-import com.rs.rsps.jessecustom.bosses.ScalingItems;
-import com.rs.rsps.jessecustom.bosses.corp.ScalingCorporealBeast;
-import com.rs.rsps.jessecustom.bosses.godwars.armadyl.ScaledKreeArra;
-import com.rs.rsps.jessecustom.bosses.godwars.bandos.ScaledGeneralGraardor;
-import com.rs.rsps.jessecustom.bosses.godwars.saradomin.ScaledCommanderZilyana;
-import com.rs.rsps.jessecustom.bosses.godwars.zamorak.ScaledKrilTstsaroth;
-import com.rs.rsps.jessecustom.bosses.kalphitequeen.KalphiteQueenScaling;
-import org.checkerframework.checker.units.qual.A;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;

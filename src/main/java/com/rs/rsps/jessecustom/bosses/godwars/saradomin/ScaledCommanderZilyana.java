@@ -30,38 +30,25 @@ import java.util.Map;
 
 @PluginEventHandler
 public class ScaledCommanderZilyana extends NPC {
-	public double combatScale = 1;
-	private ScaledGodWarMinion[] minions = new ScaledGodWarMinion[3];
+	public GodWarMinion[] minions = new GodWarMinion[3];
 
-	public ScaledCommanderZilyana(int id, WorldTile tile, boolean spawned, double scale) {
+	public ScaledCommanderZilyana(int id, WorldTile tile, boolean spawned) {
 		super(id, tile, spawned);
 		setIntelligentRouteFinder(true);
 		setForceFollowClose(true);
 		setIgnoreDocile(true);
-		minions[0] = new ScaledGodWarMinion(6248, tile.transform(0, -4), spawned);
-		minions[1] = new ScaledGodWarMinion(6250, tile.transform(0, 4), spawned);
-		minions[2] = new ScaledGodWarMinion(6252, tile.transform(4, -4), spawned);
-		for(ScaledGodWarMinion minion : minions) {
+		minions[0] = new GodWarMinion(6248, tile.transform(0, -4), spawned);
+		minions[1] = new GodWarMinion(6250, tile.transform(0, 4), spawned);
+		minions[2] = new GodWarMinion(6252, tile.transform(4, -4), spawned);
+		for(GodWarMinion minion : minions) {
 			minion.setRespawnTask(75);
 			minion.setForceMultiArea(true);
 		}
-		this.combatScale = 1 + (scale/10.0);
-		this.setCombatLevel((int)Math.ceil(getCombatLevel()* combatScale));
-	}
-
-	@Override
-	public int getMaxHitpoints() {
-		return (int)Math.ceil(NPCCombatDefinitions.getDefs(super.getId()).getHitpoints()* combatScale);
 	}
 
 	@Override
 	public void spawn() {
 		super.spawn();
-		Map<NPCCombatDefinitions.Skill, Integer> levels = NPCCombatDefinitions.getDefs(super.getId()).getLevels();
-		Map<NPCCombatDefinitions.Skill, Integer> upgradedStats = new HashMap<>();
-		for(NPCCombatDefinitions.Skill combatSkill : levels.keySet())
-			upgradedStats.put(combatSkill, (int) Math.ceil(levels.get(combatSkill) * combatScale));
-		this.setLevels(upgradedStats);
 		respawnMinions();
 	}
 

@@ -68,7 +68,6 @@ import com.rs.plugin.PluginManager;
 import com.rs.plugin.events.NPCDeathEvent;
 import com.rs.plugin.events.NPCDropEvent;
 import com.rs.rsps.jessecustom.CustomScape;
-import com.rs.rsps.jessecustom.CustomScripts;
 import com.rs.tools.old.CharmDrop;
 import com.rs.utils.DropSets;
 import com.rs.utils.EffigyDrop;
@@ -247,7 +246,8 @@ public class NPC extends Entity {
 
 	@Override
 	public int getMaxHitpoints() {
-		return getCombatDefinitions().getHitpoints();
+		return CustomScape.scaleHP(this);
+//		return getCombatDefinitions().getHitpoints();
 	}
 
 	public int getId() {
@@ -275,8 +275,11 @@ public class NPC extends Entity {
 		if (isDead() || locked || World.getPlayersInRegionRange(getRegionId()).isEmpty())
 			return;
 		//Restore combat stats
-		if (getTickCounter() % 100 == 0)
+		if (getTickCounter() % 100 == 0) {
+			if(getTarget() == null)
+				CustomScape.resetNPCTickRestore(this, lastAttackedByTarget);
 			restoreTick();
+		}
 		if (!combat.process() && routeEvent == null) {
 			if (!isForceWalking() && !cantInteract && !checkAggressivity() && !hasEffect(Effect.FREEZE)) {
 				if (!hasWalkSteps() && shouldRandomWalk()) {
@@ -439,6 +442,7 @@ public class NPC extends Entity {
 		loadMapRegions();
 		checkMultiArea();
 		onRespawn();
+		CustomScape.resetNPCScale(this);
 	}
 
 	public void onRespawn() {
@@ -874,6 +878,7 @@ public class NPC extends Entity {
 	@Override
 	public void setAttackedBy(Entity target) {
 		super.setAttackedBy(target);
+		CustomScape.customScale(target, this);
 		if (target == combat.getTarget() && !(combat.getTarget() instanceof Familiar))
 			lastAttackedByTarget = System.currentTimeMillis();
 	}

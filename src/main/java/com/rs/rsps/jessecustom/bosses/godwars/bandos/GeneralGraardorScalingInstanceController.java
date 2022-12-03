@@ -37,7 +37,6 @@ import com.rs.lib.game.Item;
 import com.rs.lib.game.WorldTile;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.rsps.jessecustom.bosses.NPCScaling;
-import com.rs.rsps.jessecustom.bosses.kalphitequeen.KalphiteQueenScaling;
 import com.rs.utils.music.Genre;
 import com.rs.utils.music.Music;
 
@@ -50,13 +49,12 @@ public class GeneralGraardorScalingInstanceController extends Controller {
 
 
 	private RegionBuilder.DynamicRegionReference instance;
-	private double scale = 1;
 	final WorldTile locationOnExit = new WorldTile(2915, 3747, 0);
 	WorldTile spawn;
+	List<NPC> npcs = new ArrayList<>();
 
-	public GeneralGraardorScalingInstanceController(double scale) {
+	public GeneralGraardorScalingInstanceController() {
 		super();
-		this.scale = scale;
 	}
 
 	@Override
@@ -66,8 +64,11 @@ public class GeneralGraardorScalingInstanceController extends Controller {
 		instance.copyMapAllPlanes(357, 668, () -> {
 			spawn = instance.getLocalTile(15, 25);
 			spawn.setLocation(spawn.getX(), spawn.getY(), 2);
-			List<NPC> npcs = new ArrayList<>();
-			npcs.add(new ScaledGeneralGraardor(6260, new WorldTile(spawn.getX() + 1, spawn.getY() - 5, 2), false, scale));
+			ScaledGeneralGraardor boss = new ScaledGeneralGraardor(6260, new WorldTile(spawn.getX() + 1, spawn.getY() - 5, 2), false);
+			npcs.add(boss);
+			npcs.add(boss.minions[0]);
+			npcs.add(boss.minions[1]);
+			npcs.add(boss.minions[2]);
 			for(NPC npc : npcs) {
 				npc.setRespawnTask(75);
 				npc.setForceMultiArea(true);
@@ -128,8 +129,11 @@ public class GeneralGraardorScalingInstanceController extends Controller {
 	@Override
 	public boolean processObjectClick2(GameObject object) {
 		if (object.getId() == 26289) {
+			player.sendMessage("got here");
 			Magic.sendNormalTeleportNoType(player, locationOnExit);
+			teled = true;
 			forceClose();
+			return false;
 		}
 		return true;
 	}
@@ -159,7 +163,14 @@ public class GeneralGraardorScalingInstanceController extends Controller {
 
 	private void removeInstance() {
 		player.setForceMultiArea(false);
-		instance.destroy(()->{if(!teled) player.setNextWorldTile(locationOnExit);});
+		instance.destroy(()->{
+			if(!teled)
+				player.setNextWorldTile(locationOnExit);
+			for(NPC npc : npcs) {
+				npc.finishAfterTicks(90);
+				player.sendMessage("finished " + npc.getName());
+			}
+		});
 	}
 
 }

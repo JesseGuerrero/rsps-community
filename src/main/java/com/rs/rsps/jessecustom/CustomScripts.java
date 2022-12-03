@@ -138,27 +138,27 @@ public class CustomScripts {
 		});
 
 		Commands.add(Rights.PLAYER, "kq [scale]", "Start qbd", (p, args) -> {
-			p.getControllerManager().startController(new KalphiteQueenScalingInstanceController(Double.parseDouble(args[0])));
+			p.getControllerManager().startController(new KalphiteQueenScalingInstanceController());
 		});
 
 		Commands.add(Rights.PLAYER, "bando [scale]", "Start qbd", (p, args) -> {
-			p.getControllerManager().startController(new GeneralGraardorScalingInstanceController(Double.parseDouble(args[0])));
+			p.getControllerManager().startController(new GeneralGraardorScalingInstanceController());
 		});
 
 		Commands.add(Rights.PLAYER, "corp [scale]", "Start qbd", (p, args) -> {
-			p.getControllerManager().startController(new CorporealBeastScalingInstanceController(Double.parseDouble(args[0])));
+			p.getControllerManager().startController(new CorporealBeastScalingInstanceController());
 		});
 
 		Commands.add(Rights.PLAYER, "zammy [scale]", "Start qbd", (p, args) -> {
-			p.getControllerManager().startController(new KrilTstsarothScalingInstanceController(Double.parseDouble(args[0])));
+			p.getControllerManager().startController(new KrilTstsarothScalingInstanceController());
 		});
 
 		Commands.add(Rights.PLAYER, "arma [scale]", "Start qbd", (p, args) -> {
-			p.getControllerManager().startController(new KreeArraScalingInstanceController(Double.parseDouble(args[0])));
+			p.getControllerManager().startController(new KreeArraScalingInstanceController());
 		});
 
 		Commands.add(Rights.PLAYER, "sara [scale]", "Start qbd", (p, args) -> {
-			p.getControllerManager().startController(new CommanderZilyanaScalingInstanceController(Double.parseDouble(args[0])));
+			p.getControllerManager().startController(new CommanderZilyanaScalingInstanceController());
 		});
 
 		Commands.add(Rights.PLAYER, "ipeek [itemId]", "Spawns an item with specified id and scaling.", (p, args) -> {

@@ -38,13 +38,12 @@ public class CommanderZilyanaScalingInstanceController extends Controller {
 
 
 	private RegionBuilder.DynamicRegionReference instance;
-	private double scale = 1;
 	final WorldTile locationOnExit = new WorldTile(2915, 3747, 0);
 	WorldTile spawn;
+	List<NPC> npcs = new ArrayList<>();
 
-	public CommanderZilyanaScalingInstanceController(double scale) {
+	public CommanderZilyanaScalingInstanceController() {
 		super();
-		this.scale = scale;
 	}
 
 	@Override
@@ -54,8 +53,11 @@ public class CommanderZilyanaScalingInstanceController extends Controller {
 		instance.copyMapAllPlanes(361, 656, () -> {
 			spawn = instance.getLocalTile(7, 17);
 			spawn.setLocation(spawn.getX(), spawn.getY(), 0);
-			List<NPC> npcs = new ArrayList<>();
-			npcs.add(new ScaledCommanderZilyana(6247, new WorldTile(spawn.getX() + 2, spawn.getY() + 1, 0), false, scale));
+			ScaledCommanderZilyana boss = new ScaledCommanderZilyana(6247, new WorldTile(spawn.getX() + 2, spawn.getY() + 1, 0), false);
+			npcs.add(boss);
+			npcs.add(boss.minions[0]);
+			npcs.add(boss.minions[1]);
+			npcs.add(boss.minions[2]);
 			for(NPC npc : npcs) {
 				npc.setRespawnTask(75);
 				npc.setForceMultiArea(true);
@@ -116,8 +118,10 @@ public class CommanderZilyanaScalingInstanceController extends Controller {
 	@Override
 	public boolean processObjectClick2(GameObject object) {
 		if (object.getId() == 26287) {
+			teled = true;
 			Magic.sendNormalTeleportNoType(player, locationOnExit);
 			forceClose();
+			return false;
 		}
 		return true;
 	}
@@ -147,7 +151,14 @@ public class CommanderZilyanaScalingInstanceController extends Controller {
 
 	private void removeInstance() {
 		player.setForceMultiArea(false);
-		instance.destroy(()->{if(!teled) player.setNextWorldTile(locationOnExit);});
+		instance.destroy(()->{
+			if(!teled)
+				player.setNextWorldTile(locationOnExit);
+			for(NPC npc : npcs) {
+				npc.finishAfterTicks(90);
+				player.sendMessage("finished " + npc.getName());
+			}
+		});
 	}
 
 }
