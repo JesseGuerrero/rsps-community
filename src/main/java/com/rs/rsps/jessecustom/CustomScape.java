@@ -54,7 +54,9 @@ public class CustomScape {
 		public static LoginHandler onLoginUpdates = new LoginHandler() {
 		@Override
 		public void handle(LoginEvent e) {
-			if(!GIM.isGIM(e.getPlayer()))
+//			if(GIM.isGIM(e.getPlayer()))
+//				return;
+			if(!GIM.isGIM(e.getPlayer()) && !isPlayerCustomScape(e.getPlayer()))
 				setPlayerCustomScape(e.getPlayer());
 			if(isPlayerCustomScape(e.getPlayer()))
 				if(!ShieldOfArrav.hasGang(e.getPlayer()))

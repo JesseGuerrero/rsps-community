@@ -321,11 +321,15 @@ public class CustomScripts {
 
 	public static double getXPRate(Player player, int skill, double exp) {
 		if (Settings.getConfig().getXpRate() > 1 ) {
-			if(GIM.isGIM(player))
-				exp *= Settings.getConfig().getXpRate();
 			if(CustomScape.isPlayerCustomScape(player)) //Don't multiply xp rate past 99
-				if(player.getSkills().getLevelForXp(skill) < 99)
+				if(player.getSkills().getLevelForXp(skill) < 99) {
 					exp *= Settings.getConfig().getXpRate();
+					return exp;
+				}
+			if(GIM.isGIM(player)) {
+				exp *= Settings.getConfig().getXpRate();
+				return exp;
+			}
 		}
 		return exp;
 	}

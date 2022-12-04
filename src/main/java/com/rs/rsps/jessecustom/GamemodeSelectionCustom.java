@@ -36,7 +36,16 @@ public class GamemodeSelectionCustom extends Conversation {
 					player.setChosenAccountType(true);
 					player.getAppearance().generateAppearanceData();
 				});
-//				confirm.add("No, let me choose again.", new Dialogue().addGotoStage("start", this));
+				confirm.add("No, let me choose again.", new Dialogue().addGotoStage("start", this));
+			}));
+			ops.add("CustomScape Group Iron Man", new Dialogue().addOptions("Is a GIM account alright with you?", confirm -> {
+				confirm.add("Yes", () -> {
+					GIM.setGIMMode(player, true);
+					CustomScape.setPlayerCustomScape(player);
+					player.setChosenAccountType(true);
+					player.getAppearance().generateAppearanceData();
+				});
+				confirm.add("No, let me choose again.", new Dialogue().addGotoStage("start", this));
 			}));
 		});
 
