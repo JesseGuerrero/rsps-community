@@ -464,7 +464,8 @@ public class CustomScape {
 	public static int scaleHP(NPC npc) {
 		if(npc.getTempAttribs() == null)
 			return npc.getCombatDefinitions().getHitpoints();
-		double combatScale = npc.getTempAttribs().getD("CustomScapeScale", 1);
+		int scale = npc.getTempAttribs().getI("CustomScapeScale", 1);
+		double combatScale = 1 + (scale/10.0);
 		if(combatScale > 1)
 			return (int)Math.ceil(NPCCombatDefinitions.getDefs(npc.getId()).getHitpoints()* combatScale);
 		return npc.getCombatDefinitions().getHitpoints();
