@@ -48,8 +48,7 @@ import com.rs.plugin.events.NPCInteractionDistanceEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
 import com.rs.plugin.handlers.InterfaceOnNPCHandler;
 import com.rs.plugin.handlers.InterfaceOnPlayerHandler;
-import com.rs.rsps.jessecustom.CustomScape;
-import com.rs.rsps.jessecustom.CustomScripts;
+import com.rs.rsps.jessecustom.customscape.CustomScape;
 import com.rs.utils.ItemConfig;
 
 @PluginEventHandler

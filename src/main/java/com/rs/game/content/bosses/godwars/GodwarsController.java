@@ -36,8 +36,6 @@ import com.rs.lib.game.WorldTile;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.ObjectClickHandler;
-import com.rs.rsps.jessecustom.CustomScape;
-import com.rs.rsps.jessecustom.CustomScripts;
 
 @PluginEventHandler
 public class GodwarsController extends Controller {

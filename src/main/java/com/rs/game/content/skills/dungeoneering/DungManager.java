@@ -46,8 +46,7 @@ import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
 import com.rs.plugin.handlers.ItemClickHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
-import com.rs.rsps.jessecustom.CustomScape;
-import com.rs.rsps.jessecustom.CustomScripts;
+import com.rs.rsps.jessecustom.customscape.CustomScape;
 
 @PluginEventHandler
 public class DungManager {

@@ -49,16 +49,16 @@ public class DropCleaners {
 		}
 	};
 
-	public static NPCDropHandler goldAccumulator = new NPCDropHandler(null, new Object[] { 995 }) {
-		@Override
-		public void handle(NPCDropEvent e) {
-			if (e.getPlayer().getInventory().containsItem(25351, 1) && e.getPlayer().getInventory().hasRoomFor(e.getItem())) {
-				e.getPlayer().getInventory().addItem(new Item(e.getItem()));
-				e.deleteItem();
-				return;
-			}
-		}
-	};
+//	public static NPCDropHandler goldAccumulator = new NPCDropHandler(null, new Object[] { 995 }) {
+//		@Override
+//		public void handle(NPCDropEvent e) {
+//			if (e.getPlayer().getInventory().containsItem(25351, 1) && e.getPlayer().getInventory().hasRoomFor(e.getItem())) {
+//				e.getPlayer().getInventory().addItem(new Item(e.getItem()));
+//				e.deleteItem();
+//				return;
+//			}
+//		}
+//	};
 
 	public static boolean herbicide(Player player, Item item) {
 		if (!player.getInventory().containsItem(19675, 1))

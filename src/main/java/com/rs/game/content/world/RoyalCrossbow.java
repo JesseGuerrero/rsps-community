@@ -31,8 +31,7 @@ import com.rs.plugin.events.ItemClickEvent;
 import com.rs.plugin.events.NPCClickEvent;
 import com.rs.plugin.handlers.ItemClickHandler;
 import com.rs.plugin.handlers.NPCClickHandler;
-import com.rs.rsps.jessecustom.CustomScape;
-import com.rs.rsps.jessecustom.CustomScripts;
+import com.rs.rsps.jessecustom.customscape.CustomScape;
 
 @PluginEventHandler
 public class RoyalCrossbow {

@@ -46,8 +46,7 @@ import com.rs.plugin.events.ButtonClickEvent;
 import com.rs.plugin.events.NPCClickEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
 import com.rs.plugin.handlers.NPCClickHandler;
-import com.rs.rsps.jessecustom.CustomScape;
-import com.rs.rsps.jessecustom.CustomScripts;
+import com.rs.rsps.jessecustom.customscape.CustomScape;
 
 @PluginEventHandler
 public final class Familiar extends NPC {

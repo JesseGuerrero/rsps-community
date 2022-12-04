@@ -35,8 +35,7 @@ import com.rs.lib.net.packets.decoders.GroundItemOp;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.PluginManager;
 import com.rs.plugin.events.PickupItemEvent;
-import com.rs.rsps.jessecustom.CustomScape;
-import com.rs.rsps.jessecustom.CustomScripts;
+import com.rs.rsps.jessecustom.customscape.CustomScape;
 import com.rs.utils.ItemConfig;
 
 public class GroundItemOpHandler implements PacketHandler<Player, GroundItemOp> {

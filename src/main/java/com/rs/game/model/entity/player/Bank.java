@@ -43,9 +43,7 @@ import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ButtonClickEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
-import com.rs.rsps.jessecustom.CustomScape;
-import com.rs.rsps.jessecustom.CustomScripts;
-import com.rs.rsps.jessecustom.groupironman.GIM;
+import com.rs.rsps.jessecustom.customscape.CustomScape;
 import com.rs.utils.ItemConfig;
 
 @PluginEventHandler

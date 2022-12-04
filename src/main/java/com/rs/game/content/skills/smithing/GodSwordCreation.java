@@ -21,7 +21,7 @@ import com.rs.lib.Constants;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ItemClickEvent;
 import com.rs.plugin.handlers.ItemClickHandler;
-import com.rs.rsps.jessecustom.CustomScape;
+import com.rs.rsps.jessecustom.customscape.CustomScape;
 import com.rs.rsps.jessecustom.CustomScripts;
 
 /**

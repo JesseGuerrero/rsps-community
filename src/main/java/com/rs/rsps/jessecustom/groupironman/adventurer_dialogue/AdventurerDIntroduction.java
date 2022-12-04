@@ -9,7 +9,7 @@ import com.rs.game.content.dialogue.Options;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.rsps.jessecustom.CustomScape;
+import com.rs.rsps.jessecustom.customscape.CustomScape;
 import com.rs.rsps.jessecustom.groupironman.GIM;
 import com.rs.rsps.jessecustom.groupironman.GroupIronMan;
 

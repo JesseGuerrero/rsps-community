@@ -5,7 +5,7 @@ import com.rs.game.World;
 import com.rs.game.model.entity.player.Bank;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.util.Utils;
-import com.rs.rsps.jessecustom.CustomScape;
+import com.rs.rsps.jessecustom.customscape.CustomScape;
 
 import java.util.ArrayList;
 import java.util.List;

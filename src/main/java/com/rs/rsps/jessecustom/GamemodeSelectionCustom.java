@@ -4,6 +4,7 @@ import com.rs.game.content.dialogue.Conversation;
 import com.rs.game.content.dialogue.Dialogue;
 import com.rs.game.content.dialogue.statements.SimpleStatement;
 import com.rs.game.model.entity.player.Player;
+import com.rs.rsps.jessecustom.customscape.CustomScape;
 import com.rs.rsps.jessecustom.groupironman.GIM;
 
 public class GamemodeSelectionCustom extends Conversation {

@@ -17,9 +17,7 @@
 package com.rs.rsps.jessecustom.bosses.corp;
 
 import com.rs.Settings;
-import com.rs.game.World;
 import com.rs.game.content.bosses.corp.CorporealBeast;
-import com.rs.game.content.combat.PlayerCombat;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.player.Controller;
 import com.rs.game.model.object.GameObject;
@@ -29,13 +27,9 @@ import com.rs.game.tasks.WorldTasks;
 import com.rs.lib.game.Animation;
 import com.rs.lib.game.WorldTile;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.plugin.events.ButtonClickEvent;
 import com.rs.plugin.events.ObjectClickEvent;
-import com.rs.plugin.handlers.ButtonClickHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
-import com.rs.rsps.jessecustom.CustomScape;
 import com.rs.rsps.jessecustom.CustomScripts;
-import com.rs.rsps.jessecustom.bosses.godwars.armadyl.ScaledKreeArra;
 import com.rs.utils.music.Genre;
 import com.rs.utils.music.Music;
 

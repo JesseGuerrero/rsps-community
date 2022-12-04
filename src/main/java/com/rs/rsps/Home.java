@@ -1,21 +1,16 @@
 package com.rs.rsps;
 
 import com.rs.cache.loaders.ObjectType;
-import com.rs.db.WorldDB;
 import com.rs.game.World;
 import com.rs.game.content.dialogue.Dialogue;
-import com.rs.game.content.dialogue.HeadE;
 import com.rs.game.content.dialogue.Options;
 import com.rs.game.content.world.areas.wilderness.WildernessController;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.pathing.Direction;
-import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.object.GameObject;
 import com.rs.lib.Constants;
-import com.rs.lib.game.Item;
 import com.rs.lib.game.WorldObject;
 import com.rs.lib.game.WorldTile;
-import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.annotations.ServerStartupEvent;
 import com.rs.plugin.events.LoginEvent;
@@ -24,12 +19,10 @@ import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.LoginHandler;
 import com.rs.plugin.handlers.NPCClickHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
-import com.rs.rsps.jessecustom.CustomScape;
-import com.rs.rsps.jessecustom.bosses.kalphitequeen.KalphiteQueenScalingInstanceController;
+import com.rs.rsps.jessecustom.customscape.CustomScape;
 import com.rs.rsps.teleports.BossTeleport;
 import com.rs.rsps.teleports.SlayerTeleport;
 import com.rs.rsps.teleports.Teleport;
-import com.rs.utils.shop.ShopsHandler;
 import com.rs.game.content.combat.CombatDefinitions.Spellbook;
 
 @PluginEventHandler

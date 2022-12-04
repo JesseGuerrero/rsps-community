@@ -1,4 +1,4 @@
-package com.rs.rsps.jessecustom.bosses;
+package com.rs.rsps.jessecustom.customscape;
 
 import com.rs.Settings;
 import com.rs.cache.loaders.ItemDefinitions;
@@ -7,8 +7,6 @@ import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.NPCDropEvent;
 import com.rs.plugin.handlers.NPCDropHandler;
-import com.rs.rsps.jessecustom.CustomScape;
-import com.rs.rsps.jessecustom.CustomScripts;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,13 +29,14 @@ public class ScalingItems {
 	public static List<Object> getItemsByName(String name) {
 		List<Object> items = new ArrayList<>();
 		for (int i = 0; i < Utils.getItemDefinitionsSize(); i++) {
-			boolean contains = true;
 			if (!ItemDefinitions.getDefs(i).getName().toLowerCase().contains(name.toLowerCase())
 					|| ItemDefinitions.getDefs(i).isLended() || ItemDefinitions.getDefs(i).isNoted()) {
 				continue;
 			}
-			if (contains)
-				items.add(ItemDefinitions.getDefs(i).getName());
+			if(ItemDefinitions.getDefs(i).isStackable()) {
+				continue;
+			}
+			items.add(i);
 		}
 		return items;
 	}

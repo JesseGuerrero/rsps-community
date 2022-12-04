@@ -19,7 +19,6 @@ package com.rs.game.model.entity.player;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.rs.Settings;
 import com.rs.game.World;
 import com.rs.game.content.Effect;
 import com.rs.game.content.Skillcapes;
@@ -39,9 +38,7 @@ import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ButtonClickEvent;
 import com.rs.plugin.events.XPGainEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
-import com.rs.rsps.jessecustom.CustomScape;
 import com.rs.rsps.jessecustom.CustomScripts;
-import com.rs.rsps.jessecustom.groupironman.GIM;
 
 @PluginEventHandler
 public final class Skills {

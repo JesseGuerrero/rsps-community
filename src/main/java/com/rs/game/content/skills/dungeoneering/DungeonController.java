@@ -89,7 +89,7 @@ import com.rs.lib.game.SpotAnim;
 import com.rs.lib.game.WorldTile;
 import com.rs.lib.net.ClientPacket;
 import com.rs.lib.util.Utils;
-import com.rs.rsps.jessecustom.CustomScape;
+import com.rs.rsps.jessecustom.customscape.CustomScape;
 import com.rs.utils.WorldUtil;
 import com.rs.utils.music.Genre;
 import com.rs.utils.music.Music;

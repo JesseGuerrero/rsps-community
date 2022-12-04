@@ -1,4 +1,4 @@
-package com.rs.rsps.jessecustom;
+package com.rs.rsps.jessecustom.customscape;
 
 import com.rs.Settings;
 import com.rs.cache.loaders.Bonus;
@@ -21,24 +21,20 @@ import com.rs.plugin.events.LoginEvent;
 import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.LoginHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
-import com.rs.rsps.jessecustom.bosses.ScalingItems;
 import com.rs.rsps.jessecustom.bosses.corp.CorporealBeastScalingInstanceController;
 import com.rs.rsps.jessecustom.bosses.corp.ScalingCorporealBeast;
 import com.rs.rsps.jessecustom.bosses.godwars.armadyl.KreeArraScalingInstanceController;
 import com.rs.rsps.jessecustom.bosses.godwars.bandos.GeneralGraardorScalingInstanceController;
 import com.rs.rsps.jessecustom.bosses.godwars.saradomin.CommanderZilyanaScalingInstanceController;
 import com.rs.rsps.jessecustom.bosses.godwars.zamorak.KrilTstsarothScalingInstanceController;
-import com.rs.rsps.jessecustom.bosses.kalphitequeen.KalphiteQueenScalingInstanceController;
 import com.rs.rsps.jessecustom.groupironman.GIM;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @PluginEventHandler
 public class CustomScape {
 	public static String[] metasString = new String[] {
-			"DefenseBonus", "StrengthBonus", "RangeStrengthBonus", "AttackBonus", "RangeAttackBonus", "MagicAttackBonus", "MagicDefenseBonus"
+			"DefenseBonus", "StrengthBonus", "RangeStrengthBonus", "AttackBonus", "RangeAttackBonus", "MagicAttackBonus", "MagicDefenseBonus", "HitBonus", "WeaponName"
 	};
 
 	public static void setPlayerCustomScape(Player player) {
@@ -566,16 +562,21 @@ public class CustomScape {
 	}
 	//StrengthBonus
 	public static boolean isTradeable(Item item) {
-		if (item.getMetaData() == null)
+		if (item.getMetaData() == null) {
 			return true;
+		}
 		if(item.getMetaData().size() >= 1) {
 			Map<String, Object> metas = item.getMetaData();//Any that is not these is false
-			Set<String> keys = metas.keySet();
+			List<String> keys = new ArrayList<>();
+			for(String key : metas.keySet())
+				keys.add(key);
 			for(String metaString : metasString)
-				if(keys.contains(metaString))
-					keys.remove(metasString);
-			if(keys.size() == 0)
+				if(keys.contains(metaString)) {
+					keys.remove(metaString);
+				}
+			if(keys.size() == 0) {
 				return true;
+			}
 		}
 		return false;
 	}
