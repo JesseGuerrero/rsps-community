@@ -5,6 +5,7 @@ import com.rs.game.World;
 import com.rs.game.model.entity.player.Bank;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.util.Utils;
+import com.rs.rsps.jessecustom.CustomScape;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,16 @@ public class GroupIronMan {
 	private List<String> players = new ArrayList<>();
 
 	private String founder;
+
+	public boolean isCustomScape() {
+		return customScape;
+	}
+
+	public void setCustomScape(boolean customScape) {
+		this.customScape = customScape;
+	}
+
+	private boolean customScape = false;
 
 	private PrestigeGIMManager prestigeManager = new PrestigeGIMManager();
 
@@ -31,6 +42,7 @@ public class GroupIronMan {
 		this.groupName = groupName;
 		this.players.add(0, founder.getUsername());
 		this.founder = founder.getUsername();
+		this.customScape = CustomScape.isPlayerCustomScape(founder);
 		init();
 	}
 

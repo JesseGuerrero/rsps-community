@@ -9,6 +9,7 @@ import com.rs.game.content.dialogue.Options;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
+import com.rs.rsps.jessecustom.CustomScape;
 import com.rs.rsps.jessecustom.groupironman.GIM;
 import com.rs.rsps.jessecustom.groupironman.GroupIronMan;
 
@@ -179,6 +180,11 @@ public class AdventurerDIntroduction extends Conversation {
 										&& player.getTempAttribs().getB("GIM Join Request_" +member.getUsername())
 										&& member.getTempAttribs().getB("GIM Group Request_"+player.getO("GIM Team"))) {
 									WorldDB.getGIMS().getByGroupName(player.getO("GIM Team"), group -> {
+										if(group.isCustomScape() != CustomScape.isPlayerCustomScape(member)) {
+											member.sendMessage("The prospective member must" + (group.isCustomScape() ? " " : " not ") + "be a custom scaper...");
+											player.sendMessage("The prospective member must" + (group.isCustomScape() ? " " : " not ") + "be a custom scaper...");
+											return;
+										}
 										group.addPlayer(member);
 										player.sendMessage(member.getDisplayName() + " has been added to the group...");
 										member.save("GIM Team", group.getGroupName());
