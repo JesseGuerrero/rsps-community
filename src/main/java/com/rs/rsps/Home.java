@@ -213,7 +213,7 @@ public class Home {
 									if(scale < 0)
 										throw new NumberFormatException();
 									e.getPlayer().save("CustomScapeScale", scale);
-									e.getPlayer().sendMessage("The world is now scaled by " + scaleString + "0%");
+									e.getPlayer().sendMessage("The world is now scaled by " + (scale*10 + 100) + "%");
 								} catch(NumberFormatException n) {
 									e.getPlayer().sendMessage("Improper scale formatting, try again.");
 								}
