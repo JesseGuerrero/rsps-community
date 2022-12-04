@@ -385,32 +385,53 @@ public class CustomScape {
 	public static void scaleEquipmentBonus(Item item, double scale) {
 		for(Object itemName : ScalingItems.getDefensiveScalingItems())
 			if(item.getName().equalsIgnoreCase((String)itemName))
-				if(item.getMetaData("DefenseBonus") == null)
-					item.setMetaDataO("DefenseBonus", getAverage(item, "defense") * (scale - 1));
+				if(item.getMetaData("DefenseBonus") == null) {
+					double average = getAverage(item, "defense") * (scale - 1);
+					if(average > 0)
+						item.setMetaDataO("DefenseBonus", average);
+				}
 		for(Object itemName : ScalingItems.getMeleeAttackScalingItems())
 			if(item.getName().equalsIgnoreCase((String)itemName))
-				if(item.getMetaData("AttackBonus") == null)
-					item.setMetaDataO("AttackBonus", getAverage(item, "attack") * (scale - 1));
+				if(item.getMetaData("AttackBonus") == null) {
+					double average = getAverage(item, "attack") * (scale - 1);
+					if(average > 0)
+						item.setMetaDataO("AttackBonus", average);
+				}
 		for(Object itemName : ScalingItems.getMeleeStrengthScalingItems())
 			if(item.getName().equalsIgnoreCase((String)itemName))
-				if(item.getMetaData("StrengthBonus") == null)
-					item.setMetaDataO("StrengthBonus", getAverage(item, "strength") * (scale - 1));
+				if(item.getMetaData("StrengthBonus") == null) {
+					double average = getAverage(item, "strength") * (scale - 1);
+					if(average > 0)
+						item.setMetaDataO("StrengthBonus", average);
+				}
 		for(Object itemName : ScalingItems.getRangeAttackScalingItems())
 			if(item.getName().equalsIgnoreCase((String)itemName))
-				if(item.getMetaData("RangeAttackBonus") == null)
-					item.setMetaDataO("RangeAttackBonus", getAverage(item, "rangeattack") * (scale - 1));
+				if(item.getMetaData("RangeAttackBonus") == null) {
+					double average = getAverage(item, "rangeattack") * (scale - 1);
+					if(average > 0)
+						item.setMetaDataO("RangeAttackBonus", average);
+				}
 		for(Object itemName : ScalingItems.getRangeStrengthScalingItems())
 			if(item.getName().equalsIgnoreCase((String)itemName))
-				if(item.getMetaData("RangeStrengthBonus") == null)
-					item.setMetaDataO("RangeStrengthBonus", getAverage(item, "rangestrength") * (scale - 1));
+				if(item.getMetaData("RangeStrengthBonus") == null) {
+					double average = getAverage(item, "rangestrength") * (scale - 1);
+					if(average > 0)
+						item.setMetaDataO("RangeStrengthBonus", average);
+				}
 		for(Object itemName : ScalingItems.getMagicDefenseScalingItems())
 			if(item.getName().equalsIgnoreCase((String)itemName))
-				if(item.getMetaData("MagicDefenseBonus") == null)
-					item.setMetaDataO("MagicDefenseBonus", getAverage(item, "magicdefense") * (scale - 1));
+				if(item.getMetaData("MagicDefenseBonus") == null) {
+					double average = getAverage(item, "magicdefense") * (scale - 1);
+					if(average > 0)
+						item.setMetaDataO("MagicDefenseBonus", average);
+				}
 		for(Object itemName : ScalingItems.getMagicAttackScalingItems())
 			if(item.getName().equalsIgnoreCase((String)itemName))
-				if(item.getMetaData("MagicAttackBonus") == null)
-					item.setMetaDataO("MagicAttackBonus", getAverage(item, "magicattack") * (scale - 1));
+				if(item.getMetaData("MagicAttackBonus") == null) {
+					double average = getAverage(item, "magicattack") * (scale - 1);
+					if(average > 0)
+						item.setMetaDataO("MagicAttackBonus", average);
+				}
 	}
 
 
