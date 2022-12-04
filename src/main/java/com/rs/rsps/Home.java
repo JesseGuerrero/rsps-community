@@ -205,21 +205,28 @@ public class Home {
 			if(CustomScape.isPlayerCustomScape(e.getPlayer())) {
 				int NPC = 2253;
 				e.getPlayer().startConversation(new Dialogue()
-						.addNPC(NPC, HeadE.CALM_TALK, "Would you like to scale the world?")
-						.addNext(() -> {
-							e.getPlayer().sendInputName("What scale would you like?", scaleString -> {
-								try {
-									int scale = Integer.parseInt(scaleString);
-									if(scale < 0)
-										throw new NumberFormatException();
-									e.getPlayer().save("CustomScapeScale", scale);
-									e.getPlayer().sendMessage("The world is now scaled by " + (scale*10 + 100) + "%");
-								} catch(NumberFormatException n) {
-									e.getPlayer().sendMessage("Improper scale formatting, try again.");
-								}
+						.addOptions("Would you like to scale the world?", option -> {
+							option.add("Yes", new Dialogue().addNext(() -> {
+								e.getPlayer().sendInputName("What scale would you like?", scaleString -> {
+									try {
+										int scale = Integer.parseInt(scaleString);
+										if(scale < 0)
+											throw new NumberFormatException();
+										if(scale == 0) {
+											e.getPlayer().delete("CustomScapeScale");
+											return;
+										}
+										e.getPlayer().save("CustomScapeScale", scale);
+										e.getPlayer().sendMessage("The world is now scaled by " + (scale*10 + 100) + "%");
+									} catch(NumberFormatException n) {
+										e.getPlayer().sendMessage("Improper scale formatting, try again.");
+									}
 
-							});
+								});
+							}));
+							option.add("No", new Dialogue().addNext(()->{e.getPlayer().delete("CustomScapeScale"); e.getPlayer().sendMessage("No longer scaled...");}));
 						})
+
 				);
 				return;
 			}
