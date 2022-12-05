@@ -14,19 +14,19 @@ import java.util.List;
 
 @PluginEventHandler
 public class ScalingItems {
-	public static Object[] getAllScalingItems() {
+	public static Object[] getAllScalingItemsByID() {
 		List<Object> allScalingItems = new ArrayList<>();
-		allScalingItems.addAll(Arrays.asList(getMeleeStrengthScalingItems()));
-		allScalingItems.addAll(Arrays.asList(getMeleeAttackScalingItems()));
-		allScalingItems.addAll(Arrays.asList(getRangeStrengthScalingItems()));
-		allScalingItems.addAll(Arrays.asList(getRangeAttackScalingItems()));
-		allScalingItems.addAll(Arrays.asList(getDefensiveScalingItems()));
-		allScalingItems.addAll(Arrays.asList(getMagicDefenseScalingItems()));
-		allScalingItems.addAll(Arrays.asList(getMagicAttackScalingItems()));
+		allScalingItems.addAll(Arrays.asList(getMeleeStrengthScalingItemsByID()));
+		allScalingItems.addAll(Arrays.asList(getMeleeAttackScalingItemsByID()));
+		allScalingItems.addAll(Arrays.asList(getRangeStrengthScalingItemsByID()));
+		allScalingItems.addAll(Arrays.asList(getRangeAttackScalingItemsByID()));
+		allScalingItems.addAll(Arrays.asList(getDefensiveScalingItemsByID()));
+		allScalingItems.addAll(Arrays.asList(getMagicDefenseScalingItemsByID()));
+		allScalingItems.addAll(Arrays.asList(getMagicAttackScalingItemsByID()));
 		return allScalingItems.stream().distinct().toArray();
 	}
 
-	public static List<Object> getItemsByName(String name) {
+	public static List<Object> getItemsByID(String name) {
 		List<Object> items = new ArrayList<>();
 		for (int i = 0; i < Utils.getItemDefinitionsSize(); i++) {
 			if (!ItemDefinitions.getDefs(i).getName().toLowerCase().contains(name.toLowerCase())
@@ -37,6 +37,121 @@ public class ScalingItems {
 				continue;
 			}
 			items.add(i);
+		}
+		return items;
+	}
+
+	public static Object[] getMeleeAttackScalingItemsByID() {
+		List<Object> items = new ArrayList<>();
+		items.addAll(getItemsByID("sword"));
+		items.addAll(getItemsByID("abyssal whip"));
+		items.addAll(getItemsByID("spear"));
+		items.addAll(getItemsByID("hilt"));
+		items.addAll(getItemsByID("dagger"));
+		items.addAll(getItemsByID("warhammer"));
+		items.addAll(getItemsByID("scimitar"));
+		items.addAll(getItemsByID("hatchet"));
+		items.addAll(getItemsByID("regen bracelet"));
+		items.addAll(getItemsByID("Saradomin's whisper"));
+		return items.stream().distinct().toArray();
+	}
+
+	public static Object[] getMeleeStrengthScalingItemsByID() {
+		List<Object> items = new ArrayList<>();
+		items.addAll(getItemsByID("amulet of power"));
+		items.addAll(getItemsByID("bandos"));
+		items.addAll(getItemsByID("Saradomin's whisper"));
+		items.addAll(getItemsByID("Regen bracelet"));
+		return items.stream().distinct().toArray();
+	}
+
+	public static Object[] getRangeAttackScalingItemsByID() {
+
+		List<Object> items = new ArrayList<>();
+		items.addAll(getItemsByID("Amulet of power"));
+		items.addAll(getItemsByID("bow"));
+		items.addAll(getItemsByID("armadyl"));
+		items.addAll(getItemsByID("royal"));
+		items.addAll(getItemsByID("hide"));
+		items.addAll(getItemsByID("Regen bracelet"));
+		items.addAll(getItemsByID("Saradomin's murmer"));
+		return items.stream().distinct().toArray();
+	}
+
+	public static Object[] getRangeStrengthScalingItemsByID() {
+		List<Object> items = new ArrayList<>();
+		items.addAll(getItemsByID("Amulet of power"));
+		items.addAll(getItemsByID("armadyl"));
+		return items.stream().distinct().toArray();
+	}
+
+	public static Object[] getDefensiveScalingItemsByID() {
+		List<Object> items = new ArrayList<>();
+		items.addAll(getItemsByID("Amulet of power"));
+		items.addAll(getItemsByID("body"));
+		items.addAll(getItemsByID("plate"));
+		items.addAll(getItemsByID("bandos"));
+		items.addAll(getItemsByID("subjugation"));
+		items.addAll(getItemsByID("armadyl"));
+		items.addAll(getItemsByID("sigil"));
+		items.addAll(getItemsByID("helmet"));
+		items.addAll(getItemsByID("helm"));
+		items.addAll(getItemsByID("shield"));
+		items.addAll(getItemsByID("boots"));
+		items.addAll(getItemsByID("glove"));
+		items.addAll(getItemsByID("chap"));
+		items.addAll(getItemsByID("coif"));
+		items.addAll(getItemsByID("Regen bracelet"));
+		return items.stream().distinct().toArray();
+	}
+	public static Object[] getMagicDefenseScalingItemsByID() {
+		List<Object> items = new ArrayList<>();
+		items.addAll(getItemsByID("Amulet of power"));
+		items.addAll(getItemsByID("body"));
+		items.addAll(getItemsByID("plate"));
+		items.addAll(getItemsByID("bandos"));
+		items.addAll(getItemsByID("subjugation"));
+		items.addAll(getItemsByID("armadyl"));
+		items.addAll(getItemsByID("sigil"));
+		items.addAll(getItemsByID("helmet"));
+		items.addAll(getItemsByID("helm"));
+		items.addAll(getItemsByID("shield"));
+		items.addAll(getItemsByID("boots"));
+		items.addAll(getItemsByID("glove"));
+		items.addAll(getItemsByID("chap"));
+		items.addAll(getItemsByID("coif"));
+		items.addAll(getItemsByID("Regen bracelet"));
+		return items.stream().distinct().toArray();
+	}
+	public static Object[] getMagicAttackScalingItemsByID() {
+		List<Object> items = new ArrayList<>();
+		items.addAll(getItemsByID("Amulet of power"));
+		items.addAll(getItemsByID("subjugation"));
+		items.addAll(getItemsByID("armadyl"));
+		items.addAll(getItemsByID("sigil"));
+		items.addAll(getItemsByID("mystic"));
+		items.addAll(getItemsByID("staff"));
+		items.addAll(getItemsByID("shield"));
+		items.addAll(getItemsByID("boots"));
+		items.addAll(getItemsByID("glove"));
+		items.addAll(getItemsByID("wand"));
+		items.addAll(getItemsByID("wizard"));
+		items.addAll(getItemsByID("Regen bracelet"));
+		return items.stream().distinct().toArray();
+	}
+	
+	
+	public static List<Object> getItemsByName(String name) {
+		List<Object> items = new ArrayList<>();
+		for (int i = 0; i < Utils.getItemDefinitionsSize(); i++) {
+			if (!ItemDefinitions.getDefs(i).getName().toLowerCase().contains(name.toLowerCase())
+					|| ItemDefinitions.getDefs(i).isLended() || ItemDefinitions.getDefs(i).isNoted()) {
+				continue;
+			}
+			if(ItemDefinitions.getDefs(i).isStackable()) {
+				continue;
+			}
+			items.add(ItemDefinitions.getDefs(i).getName());
 		}
 		return items;
 	}
@@ -57,11 +172,12 @@ public class ScalingItems {
 	}
 
 	public static Object[] getMeleeStrengthScalingItems() {
-		return new Object[]{
-				"Amulet of power", "Bandos chestplate", "Bandos tassets", "Bandos boots",
-				"Bandos warshield", "Bandos helmet", "Bandos gloves", "Saradomin's whisper",
-				"Regen bracelet"
-		};
+		List<Object> items = new ArrayList<>();
+		items.addAll(getItemsByName("amulet of power"));
+		items.addAll(getItemsByName("bandos"));
+		items.addAll(getItemsByName("Saradomin's whisper"));
+		items.addAll(getItemsByName("Regen bracelet"));
+		return items.stream().distinct().toArray();
 	}
 
 	public static Object[] getRangeAttackScalingItems() {
@@ -138,8 +254,10 @@ public class ScalingItems {
 		items.addAll(getItemsByName("Regen bracelet"));
 		return items.stream().distinct().toArray();
 	}
+	
 
-	public static NPCDropHandler addMetas = new NPCDropHandler(null, ScalingItems.getAllScalingItems()) {
+
+	public static NPCDropHandler addMetas = new NPCDropHandler(null, ScalingItems.getAllScalingItemsByID()) {
 		@Override
 		public void handle(NPCDropEvent e) {
 			if(e.getNPC().getTempAttribs() == null)
