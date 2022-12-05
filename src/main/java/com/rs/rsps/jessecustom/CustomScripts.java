@@ -334,7 +334,6 @@ public class CustomScripts {
 	}
 
 	public static boolean updateRightsOnRun(Player p) {
-		p.setRights(Rights.PLAYER);
 		if(p.getUsername().equals(Settings.getConfig().getOwnerName()))
 			p.setRights(Rights.OWNER);
 		return false;
