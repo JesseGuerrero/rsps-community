@@ -44,6 +44,7 @@ public class ScalingItems {
 	public static Object[] getMeleeAttackScalingItemsByID() {
 		List<Object> items = new ArrayList<>();
 		items.addAll(getItemsByID("sword"));
+		items.addAll(getItemsByID("battleaxe"));
 		items.addAll(getItemsByID("abyssal whip"));
 		items.addAll(getItemsByID("spear"));
 		items.addAll(getItemsByID("hilt"));
