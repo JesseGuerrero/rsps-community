@@ -20,10 +20,10 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.rs.cache.loaders.Bonus;
 import com.rs.game.World;
-import com.rs.game.content.quests.Quest;
 import com.rs.game.content.skills.prayer.Leech;
 import com.rs.game.content.skills.prayer.Prayer;
 import com.rs.game.content.skills.prayer.Sap;
+import com.rs.game.engine.quest.Quest;
 import com.rs.game.model.entity.Entity;
 import com.rs.game.model.entity.interactions.PlayerCombatInteraction;
 import com.rs.game.model.entity.npc.NPC;
@@ -34,7 +34,6 @@ import com.rs.lib.game.Animation;
 import com.rs.lib.game.SpotAnim;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.plugin.events.ButtonClickEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
 
 @PluginEventHandler
@@ -55,15 +54,12 @@ public class PrayerManager {
 	private CopyOnWriteArraySet<Prayer> quickPrays = new CopyOnWriteArraySet<>();
 	private CopyOnWriteArraySet<Prayer> quickCurses = new CopyOnWriteArraySet<>();
 
-	public static ButtonClickHandler handlePrayerInterface = new ButtonClickHandler(271) {
-		@Override
-		public void handle(ButtonClickEvent e) {
-			if (e.getComponentId() == 8 || e.getComponentId() == 42)
-				e.getPlayer().getPrayer().switchPrayer(e.getSlotId());
-			else if (e.getComponentId() == 43 && e.getPlayer().getPrayer().settingQuickPrayers)
-				e.getPlayer().getPrayer().switchSettingQuickPrayer();
-		}
-	};
+	public static ButtonClickHandler handlePrayerInterface = new ButtonClickHandler(271, e -> {
+		if (e.getComponentId() == 8 || e.getComponentId() == 42)
+			e.getPlayer().getPrayer().switchPrayer(e.getSlotId());
+		else if (e.getComponentId() == 43 && e.getPlayer().getPrayer().settingQuickPrayers)
+			e.getPlayer().getPrayer().switchSettingQuickPrayer();
+	});
 
 	public void switchPrayer(int prayerId) {
 		Prayer prayer = Prayer.forSlot(prayerId, curses);

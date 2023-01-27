@@ -41,12 +41,7 @@ public class Shade extends NPC {
 		attack = 0;
 	}
 
-	public static NPCInstanceHandler toFunc = new NPCInstanceHandler(1240, 1241, 1243, 1244, 1245, 1246, 1247, 1248, 1249, 1250) {
-		@Override
-		public NPC getNPC(int npcId, WorldTile tile) {
-			return new Shade(npcId, tile);
-		}
-	};
+	public static NPCInstanceHandler toFunc = new NPCInstanceHandler(new Object[] { 1240, 1241, 1243, 1244, 1245, 1246, 1247, 1248, 1249, 1250 }, (npcId, tile) -> new Shade(npcId, tile));
 
 	@Override
 	public void onRespawn() {
@@ -74,7 +69,7 @@ public class Shade extends NPC {
 					resetWalkSteps();
 					if (attack-- <= 0) {
 						attack = 5;
-						faceTile(new WorldTile(3506, 3316, 0));
+						faceTile(WorldTile.of(3506, 3316, 0));
 						setNextAnimation(new Animation(1284));
 						TempleWall wall = ShadesOfMortton.getRandomWall();
 						if (wall != null)
@@ -84,7 +79,7 @@ public class Shade extends NPC {
 				return;
 			}
 			if (Utils.random(10) == 0)
-				calcFollow(new WorldTile(new WorldTile(3506, 3316, 0), 4), false);
+				calcFollow(WorldTile.of(WorldTile.of(3506, 3316, 0), 4), false);
 		}
 		if (getId() == baseId && inCombat(10000)) {
 			transformIntoNPC(baseId + 1);

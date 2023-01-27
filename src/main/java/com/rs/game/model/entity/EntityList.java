@@ -19,7 +19,6 @@ package com.rs.game.model.entity;
 import java.util.AbstractCollection;
 import java.util.Iterator;
 
-import java.lang.SuppressWarnings;
 import it.unimi.dsi.fastutil.ints.IntHeapPriorityQueue;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntPriorityQueue;
@@ -83,8 +82,11 @@ public class EntityList<T extends Entity> extends AbstractCollection<T> {
 	
 	public void processPostTick() {
 		synchronized (lock) {
-			for (int toFree : toFreeUp)
+			for (int toFree : toFreeUp) {
+				if (toFree == 0)
+					continue;
 				freeIndices.enqueue(toFree);
+			}
 			toFreeUp.clear();
 		}
 	}
@@ -92,7 +94,7 @@ public class EntityList<T extends Entity> extends AbstractCollection<T> {
 	@SuppressWarnings("unchecked")
 	public T get(int index) {
 		synchronized (lock) {
-			if (index >= entities.length || index < 0)
+			if (index >= entities.length || index < 1)
 				return null;
 			return (T) entities[index];
 		}

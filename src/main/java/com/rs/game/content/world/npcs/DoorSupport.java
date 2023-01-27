@@ -25,6 +25,7 @@ import com.rs.game.model.object.GameObject;
 import com.rs.lib.game.WorldTile;
 import com.rs.lib.util.Logger;
 import com.rs.plugin.annotations.PluginEventHandler;
+import com.rs.plugin.annotations.ServerStartupEvent;
 import com.rs.plugin.handlers.NPCInstanceHandler;
 import com.rs.utils.Ticks;
 
@@ -71,11 +72,11 @@ public class DoorSupport extends NPC {
 			}
 		}, Ticks.fromSeconds(60));
 	}
+	
+	@ServerStartupEvent
+	public static void addLoSOverrides() {
+		Entity.addLOSOverrides(2440, 2443, 2446);
+	}
 
-	public static NPCInstanceHandler toFunc = new NPCInstanceHandler(2440, 2443, 2446) {
-		@Override
-		public NPC getNPC(int npcId, WorldTile tile) {
-			return new DoorSupport(npcId, tile);
-		}
-	};
+	public static NPCInstanceHandler toFunc = new NPCInstanceHandler(new Object[] { 2440, 2443, 2446 }, (npcId, tile) -> new DoorSupport(npcId, tile));
 }

@@ -31,8 +31,7 @@ import com.rs.lib.game.Item;
 import com.rs.lib.game.WorldTile;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.plugin.events.ButtonClickEvent;
-import com.rs.plugin.events.NPCClickEvent;
+import com.rs.plugin.annotations.ServerStartupEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
 import com.rs.plugin.handlers.NPCClickHandler;
 import com.rs.utils.shop.ShopsHandler;
@@ -75,7 +74,7 @@ public class PuroPuroController extends Controller {
 		switch (object.getId()) {
 		case 25014:
 			player.getControllerManager().forceStop();
-			Magic.sendTeleportSpell(player, 6601, -1, 1118, -1, 0, 0, new WorldTile(2427, 4446, 0), 9, false, Magic.OBJECT_TELEPORT, null);
+			Magic.sendTeleportSpell(player, 6601, -1, 1118, -1, 0, 0, WorldTile.of(2427, 4446, 0), 9, false, Magic.OBJECT_TELEPORT, null);
 			return true;
 		}
 		return true;
@@ -103,11 +102,11 @@ public class PuroPuroController extends Controller {
 			direction = Direction.SOUTHEAST;
 		}
 		player.sendMessage(Utils.getRandomInclusive(2) == 0 ? "You use your strength to push through the wheat in the most efficient fashion." : "You use your strength to push through the wheat.");
-		player.setNextFaceWorldTile(object);
+		player.setNextFaceWorldTile(object.getTile());
 		player.setNextAnimation(new Animation(6594));
 		player.lock();
-		final WorldTile tile = new WorldTile(objectX, objectY, 0);
-		player.setNextFaceWorldTile(object);
+		final WorldTile tile = WorldTile.of(objectX, objectY, 0);
+		player.setNextFaceWorldTile(object.getTile());
 		player.setNextForceMovement(new ForceMovement(tile, 6, direction));
 		WorldTasks.schedule(new WorldTask() {
 
@@ -119,27 +118,19 @@ public class PuroPuroController extends Controller {
 		}, 6);
 	}
 
-	public static NPCClickHandler handleElnock = new NPCClickHandler(new Object[] { 6070 }) {
-		@Override
-		public void handle(NPCClickEvent e) {
-			PuroPuroController.openPuroInterface(e.getPlayer());
-		}
-	};
+	public static NPCClickHandler handleElnock = new NPCClickHandler(new Object[] { 6070 }, e -> PuroPuroController.openPuroInterface(e.getPlayer()));
 
-	public static ButtonClickHandler handlePuroPuroShopButtons = new ButtonClickHandler(540) {
-		@Override
-		public void handle(ButtonClickEvent e) {
-			if (e.getComponentId() == 69)
-				confirmPuroSelection(e.getPlayer());
-			else if (e.getComponentId() == 71)
-				ShopsHandler.openShop(e.getPlayer(), "elnocks_backup_supply");
-			else
-				handlePuroInterface(e.getPlayer(), e.getComponentId());
-		}
-	};
+	public static ButtonClickHandler handlePuroPuroShopButtons = new ButtonClickHandler(540, e -> {
+		if (e.getComponentId() == 69)
+			confirmPuroSelection(e.getPlayer());
+		else if (e.getComponentId() == 71)
+			ShopsHandler.openShop(e.getPlayer(), "elnocks_backup_supply");
+		else
+			handlePuroInterface(e.getPlayer(), e.getComponentId());
+	});
 
 	public static WorldTile getRandomTile() {
-		return new WorldTile(Utils.random(2558 + 3, 2626 - 3), Utils.random(4285 + 3, 4354 - 3), 0);
+		return WorldTile.of(Utils.random(2558 + 3, 2626 - 3), Utils.random(4285 + 3, 4354 - 3), 0);
 	}
 
 	public static int getRandomImplingId() {
@@ -154,6 +145,7 @@ public class PuroPuroController extends Controller {
 		return implings[Utils.getRandomInclusive(5)].getNpcId();
 	}
 
+	@ServerStartupEvent
 	public static void initPuroImplings() {
 		for (int i = 0; i < 5; i++)
 			for (int index = 0; index < 11; index++) {

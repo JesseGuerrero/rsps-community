@@ -16,17 +16,17 @@
 //
 package com.rs.game.content.transportation;
 
-import static com.rs.game.content.quests.handlers.dragonslayer.DragonSlayer.KLARENSE;
+import static com.rs.game.content.quests.dragonslayer.DragonSlayer.KLARENSE;
 
-import com.rs.game.content.dialogue.Conversation;
-import com.rs.game.content.dialogue.Dialogue;
-import com.rs.game.content.dialogue.HeadE;
-import com.rs.game.content.quests.Quest;
-import com.rs.game.content.quests.handlers.dragonslayer.DragonSlayer;
-import com.rs.game.content.quests.handlers.dragonslayer.KlarenseDragonSlayerD;
-import com.rs.game.content.quests.handlers.piratestreasure.CustomsOfficerPiratesTreasureD;
-import com.rs.game.content.quests.handlers.piratestreasure.PiratesTreasure;
+import com.rs.game.content.quests.dragonslayer.DragonSlayer;
+import com.rs.game.content.quests.dragonslayer.KlarenseDragonSlayerD;
+import com.rs.game.content.quests.piratestreasure.CustomsOfficerPiratesTreasureD;
+import com.rs.game.content.quests.piratestreasure.PiratesTreasure;
 import com.rs.game.content.transportation.TravelMethods.Carrier;
+import com.rs.game.engine.dialogue.Conversation;
+import com.rs.game.engine.dialogue.Dialogue;
+import com.rs.game.engine.dialogue.HeadE;
+import com.rs.game.engine.quest.Quest;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.WorldTile;
 
@@ -81,7 +81,7 @@ public class BoatingD extends Conversation {
 		case 378:
 			return new Object[] { Carrier.KARAMJA_FARE, false };
 		case 380:
-			return player.withinDistance(new WorldTile(2772, 3227, 0), 30) ?
+			return player.withinDistance(WorldTile.of(2772, 3227, 0), 30) ?
 					new Object[] { Carrier.BRIMHAVEN_FARE, true } : new Object[] { Carrier.KARAMJA_FARE, true };
 
 		case 381:
@@ -125,7 +125,7 @@ public class BoatingD extends Conversation {
 		case 2438:
 			return new Object[] { Carrier.WATERBIRTH, true };
 		case 3160:
-			return new Object[] { Carrier.TEACH_MOS_LE_HARMLESS, player.withinDistance(new WorldTile(3714, 3499, 1)) ? false : true };
+			return new Object[] { Carrier.TEACH_MOS_LE_HARMLESS, player.withinDistance(WorldTile.of(3714, 3499, 1)) ? false : true };
 		}
 		return null;
 	}

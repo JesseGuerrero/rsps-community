@@ -23,8 +23,8 @@ import java.util.Set;
 import com.rs.cache.loaders.ObjectType;
 import com.rs.game.World;
 import com.rs.game.content.combat.PlayerCombat;
-import com.rs.game.content.quests.Quest;
 import com.rs.game.content.world.areas.wilderness.WildernessController;
+import com.rs.game.engine.quest.Quest;
 import com.rs.game.model.WorldProjectile;
 import com.rs.game.model.entity.Entity;
 import com.rs.game.model.entity.Hit;
@@ -41,8 +41,6 @@ import com.rs.lib.game.Animation;
 import com.rs.lib.game.WorldTile;
 import com.rs.lib.util.Vec2;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.plugin.events.ItemClickEvent;
-import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.ItemClickHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
 
@@ -107,12 +105,9 @@ public class DwarfMultiCannon extends OwnedObject {
 		this.type = type;
 	}
 
-	public static ItemClickHandler handlePlace = new ItemClickHandler(new Object[] { 6, 20494, 20498 }, new String[] { "Set-up" }) {
-		@Override
-		public void handle(ItemClickEvent e) {
-			setUp(e.getPlayer(), e.getItem().getId() == 6 ? 0 : e.getItem().getId() == 20494 ? 1 : 2);
-		}
-	};
+	public static ItemClickHandler handlePlace = new ItemClickHandler(new Object[] { 6, 20494, 20498 }, new String[] { "Set-up" }, e -> {
+		setUp(e.getPlayer(), e.getItem().getId() == 6 ? 0 : e.getItem().getId() == 20494 ? 1 : 2);
+	});
 
 	public static boolean canFreelyReplace(Player player) {
 		return player.getPlacedCannon() > 0 && OwnedObject.getNumOwned(player, DwarfMultiCannon.class) == 0;
@@ -182,18 +177,15 @@ public class DwarfMultiCannon extends OwnedObject {
 		});
 	}
 
-	public static ObjectClickHandler handleOptions = new ObjectClickHandler(new Object[] { "Dwarf multicannon", "Gold dwarf multicannon", "Royale dwarf multicannon" }) {
-		@Override
-		public void handle(ObjectClickEvent e) {
-			if (!(e.getObject() instanceof DwarfMultiCannon))
-				return;
-			DwarfMultiCannon cannon = (DwarfMultiCannon) e.getObject();
-			if (e.getOption().equals("Fire"))
-				cannon.fire(e.getPlayer());
-			else if (e.getOption().equals("Pick-up"))
-				cannon.pickUp(e.getPlayer(), e.getObject());
-		}
-	};
+	public static ObjectClickHandler handleOptions = new ObjectClickHandler(new Object[] { "Dwarf multicannon", "Gold dwarf multicannon", "Royale dwarf multicannon" }, e -> {
+		if (!(e.getObject() instanceof DwarfMultiCannon))
+			return;
+		DwarfMultiCannon cannon = (DwarfMultiCannon) e.getObject();
+		if (e.getOption().equals("Fire"))
+			cannon.fire(e.getPlayer());
+		else if (e.getOption().equals("Pick-up"))
+			cannon.pickUp(e.getPlayer(), e.getObject());
+	});
 	
 	public int getMaxBalls() {
 		return switch(type) {
@@ -260,10 +252,10 @@ public class DwarfMultiCannon extends OwnedObject {
 		else
 			spinRot = Direction.values()[spinRot.ordinal() + 1];
 		World.sendObjectAnimation(null, this, new Animation(CANNON_EMOTES[spinRot.ordinal()]));
-		Set<Integer> npcIndexes = World.getRegion(getRegionId()).getNPCsIndexes();
+		Set<Integer> npcIndexes = World.getRegion(tile.getRegionId()).getNPCsIndexes();
 		if (npcIndexes == null)
 			return;
-		WorldTile cannonTile = this.transform(1, 1, 0);
+		WorldTile cannonTile = this.tile.transform(1, 1, 0);
 		for (int npcIndex : npcIndexes) {
 			NPC npc = World.getNPCs().get(npcIndex);
 			if (npc == null || npc == owner.getFamiliar() || npc.isDead() || npc.hasFinished() || !npc.getDefinitions().hasAttackOption() || !owner.getControllerManager().canHit(npc))
@@ -275,7 +267,7 @@ public class DwarfMultiCannon extends OwnedObject {
 
 			if (npc.withinDistance(cannonTile, 10) && getDirectionTo(npc) == spinRot) {
 				int damage = PlayerCombat.getRandomMaxHit(owner, npc, 0, 300, owner.getEquipment().getWeaponId(), owner.getCombatDefinitions().getAttackStyle(), PlayerCombat.isRanging(owner), true, 1.0);
-				WorldProjectile proj = World.sendProjectile(new WorldTile(getX() + 1, getY() + 1, getPlane()), npc, 53, 38, 38, 30, 1, 0, 0);
+				WorldProjectile proj = World.sendProjectile(WorldTile.of(getX() + 1, getY() + 1, getPlane()), npc, 53, 38, 38, 30, 1, 0, 0);
 				WorldTasks.schedule(proj.getTaskDelay(), () -> npc.applyHit(new Hit(owner, damage, HitLook.CANNON_DAMAGE)));
 				owner.getSkills().addXp(Constants.RANGE, damage / 5);
 				balls--;
@@ -288,7 +280,7 @@ public class DwarfMultiCannon extends OwnedObject {
 
 	public Direction getDirectionTo(Entity entity) {
 		Vec2 to = entity.getMiddleWorldTileAsVector();
-		Vec2 from = new Vec2(transform(1, 1, 0));
+		Vec2 from = new Vec2(tile.transform(1, 1, 0));
 		Vec2 sub = to.sub(from);
 		sub.norm();
 		WorldTile delta = sub.toTile();

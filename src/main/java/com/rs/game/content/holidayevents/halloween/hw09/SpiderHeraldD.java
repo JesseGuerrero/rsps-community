@@ -16,25 +16,21 @@
 //
 package com.rs.game.content.holidayevents.halloween.hw09;
 
-import com.rs.game.content.dialogue.Conversation;
-import com.rs.game.content.dialogue.Dialogue;
-import com.rs.game.content.dialogue.HeadE;
-import com.rs.game.content.dialogue.Options;
+import com.rs.game.engine.dialogue.Conversation;
+import com.rs.game.engine.dialogue.Dialogue;
+import com.rs.game.engine.dialogue.HeadE;
+import com.rs.game.engine.dialogue.Options;
 import com.rs.game.model.entity.player.Player;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.plugin.events.NPCClickEvent;
 import com.rs.plugin.handlers.NPCClickHandler;
 
 @PluginEventHandler
 public class SpiderHeraldD extends Conversation {
 
-	public static NPCClickHandler handleSpiderTalk = new NPCClickHandler(new Object[] { 8976 }) {
-		@Override
-		public void handle(NPCClickEvent e) {
-			e.getNPC().resetDirection();
-			e.getPlayer().startConversation(new SpiderHeraldD(e.getPlayer()));
-		}
-	};
+	public static NPCClickHandler handleSpiderTalk = new NPCClickHandler(new Object[] { 8976 }, e -> {
+		e.getNPC().resetDirection();
+		e.getPlayer().startConversation(new SpiderHeraldD(e.getPlayer()));
+	});
 
 	public SpiderHeraldD(Player player) {
 		super(player);

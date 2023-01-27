@@ -18,9 +18,9 @@ package com.rs.game.content.skills.farming;
 
 import com.rs.game.content.Effect;
 import com.rs.game.content.Potions;
-import com.rs.game.content.dialogue.Dialogue;
 import com.rs.game.content.skills.woodcutting.TreeType;
 import com.rs.game.content.skills.woodcutting.Woodcutting;
+import com.rs.game.engine.dialogue.Dialogue;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.object.GameObject;
 import com.rs.game.tasks.WorldTasks;
@@ -31,8 +31,6 @@ import com.rs.lib.game.Rights;
 import com.rs.lib.net.ClientPacket;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.plugin.events.ItemOnObjectEvent;
-import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.ItemOnObjectHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
 import com.rs.utils.Ticks;
@@ -233,7 +231,7 @@ public class FarmPatch {
 				player.sendMessage("This patch has already been treated with "+(item.getId() == 6032 ? "" : "super")+"compost.");
 				return;
 			}
-			player.setNextFaceWorldTile(object);
+			player.setNextFaceWorldTile(object.getTile());
 			player.getSkills().addXp(Constants.FARMING, 18);
 			player.setNextAnimation(COMPOST_ANIMATION);
 			item.setId(1925);
@@ -249,7 +247,7 @@ public class FarmPatch {
 				player.sendMessage("It is growing just fine.");
 				return;
 			}
-			player.setNextFaceWorldTile(object);
+			player.setNextFaceWorldTile(object.getTile());
 			player.getSkills().addXp(Constants.FARMING, 90);
 			player.setNextAnimation(CURE_PLANT_ANIMATION);
 			item.setId(229);
@@ -497,35 +495,29 @@ public class FarmPatch {
 		return growthStage == seed.stages;
 	}
 
-	public static ObjectClickHandler handlePatches = new ObjectClickHandler(PatchLocation.MAP.keySet().toArray()) {
-		@Override
-		public void handle(ObjectClickEvent e) {
-			PatchLocation loc = PatchLocation.forObject(e.getObjectId());
-			if (loc == null)
-				return;
+	public static ObjectClickHandler handlePatches = new ObjectClickHandler(PatchLocation.MAP.keySet().toArray(), e -> {
+		PatchLocation loc = PatchLocation.forObject(e.getObjectId());
+		if (loc == null)
+			return;
 
-			FarmPatch patch = e.getPlayer().getPatch(loc);
-			if (patch == null)
-				patch = new FarmPatch(loc);
-			patch.handleClick(e.getPlayer(), e.getObject(), e.getOption(), e.getOpNum());
-			e.getPlayer().putPatch(patch);
-		}
-	};
+		FarmPatch patch = e.getPlayer().getPatch(loc);
+		if (patch == null)
+			patch = new FarmPatch(loc);
+		patch.handleClick(e.getPlayer(), e.getObject(), e.getOption(), e.getOpNum());
+		e.getPlayer().putPatch(patch);
+	});
 
-	public static ItemOnObjectHandler handleItemOnPatch = new ItemOnObjectHandler(PatchLocation.MAP.keySet().toArray()) {
-		@Override
-		public void handle(ItemOnObjectEvent e) {
-			PatchLocation loc = PatchLocation.forObject(e.getObjectId());
-			if (loc == null)
-				return;
+	public static ItemOnObjectHandler handleItemOnPatch = new ItemOnObjectHandler(PatchLocation.MAP.keySet().toArray(), e -> {
+		PatchLocation loc = PatchLocation.forObject(e.getObjectId());
+		if (loc == null)
+			return;
 
-			FarmPatch patch = e.getPlayer().getPatch(loc);
-			if (patch == null)
-				patch = new FarmPatch(loc);
-			patch.useItem(e.getPlayer(), e.getObject(), e.getItem());
-			e.getPlayer().putPatch(patch);
-		}
-	};
+		FarmPatch patch = e.getPlayer().getPatch(loc);
+		if (patch == null)
+			patch = new FarmPatch(loc);
+		patch.useItem(e.getPlayer(), e.getObject(), e.getItem());
+		e.getPlayer().putPatch(patch);
+	});
 	
 	@Override
 	public String toString() {

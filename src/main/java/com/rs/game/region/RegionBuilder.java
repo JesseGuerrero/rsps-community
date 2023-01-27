@@ -18,7 +18,6 @@ package com.rs.game.region;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.lang.SuppressWarnings;
 
 import com.rs.cores.CoresManager;
 import com.rs.game.World;
@@ -165,11 +164,11 @@ public final class RegionBuilder {
 		}
 
 		public WorldTile getBase() {
-			return new WorldTile(getBaseX(), getBaseY(), 0);
+			return WorldTile.of(getBaseX(), getBaseY(), 0);
 		}
 
 		public WorldTile getLocalTile(int offsetX, int offsetY, int plane) {
-			return new WorldTile(getLocalX(offsetX), getLocalY(offsetY), plane);
+			return WorldTile.of(getLocalX(offsetX), getLocalY(offsetY), plane);
 		}
 
 		public WorldTile getLocalTile(int offsetX, int offsetY) {

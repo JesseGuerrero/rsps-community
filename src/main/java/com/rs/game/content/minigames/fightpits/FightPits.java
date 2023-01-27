@@ -21,10 +21,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.rs.game.World;
-import com.rs.game.content.dialogue.HeadE;
+import com.rs.game.engine.dialogue.HeadE;
 import com.rs.game.model.entity.Hit;
 import com.rs.game.model.entity.Hit.HitLook;
-import com.rs.game.model.entity.actions.FightPitsViewingOrb;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.tasks.WorldTask;
@@ -34,7 +33,6 @@ import com.rs.lib.game.WorldTile;
 import com.rs.lib.util.Logger;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.plugin.events.ButtonClickEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
 import com.rs.utils.Ticks;
 
@@ -51,17 +49,14 @@ public final class FightPits {
 	private static boolean startedGame;
 	public static String currentChampion;
 
-	private static WorldTile[] GAME_TELEPORTS = { new WorldTile(4577, 5086, 0), new WorldTile(4571, 5083, 0), new WorldTile(4564, 5086, 0), new WorldTile(4564, 5097, 0), new WorldTile(4571, 5101, 0), new WorldTile(4578, 5097, 0) };
+	private static WorldTile[] GAME_TELEPORTS = { WorldTile.of(4577, 5086, 0), WorldTile.of(4571, 5083, 0), WorldTile.of(4564, 5086, 0), WorldTile.of(4564, 5097, 0), WorldTile.of(4571, 5101, 0), WorldTile.of(4578, 5097, 0) };
 
-	public static ButtonClickHandler handleFightPitsViewingOrbButtons = new ButtonClickHandler(374) {
-		@Override
-		public void handle(ButtonClickEvent e) {
-			if (e.getComponentId() >= 5 && e.getComponentId() <= 9)
-				e.getPlayer().setNextWorldTile(new WorldTile(FightPitsViewingOrb.ORB_TELEPORTS[e.getComponentId() - 5]));
-			else if (e.getComponentId() == 15)
-				e.getPlayer().stopAll();
-		}
-	};
+	public static ButtonClickHandler handleFightPitsViewingOrbButtons = new ButtonClickHandler(374, e -> {
+		if (e.getComponentId() >= 5 && e.getComponentId() <= 9)
+			e.getPlayer().setNextWorldTile(WorldTile.of(FightPitsViewingOrb.ORB_TELEPORTS[e.getComponentId() - 5]));
+		else if (e.getComponentId() == 15)
+			e.getPlayer().stopAll();
+	});
 
 	private static class GameTask extends WorldTask {
 
@@ -83,13 +78,13 @@ public final class FightPits {
 							// spawns
 							spawns = new ArrayList<>();
 							for (int i = 0; i < 10; i++)
-								spawns.add(new FightPitsNPC(2734, new WorldTile(GAME_TELEPORTS[Utils.random(GAME_TELEPORTS.length)], 3)));
+								spawns.add(new FightPitsNPC(2734, WorldTile.of(GAME_TELEPORTS[Utils.random(GAME_TELEPORTS.length)], 3)));
 						} else if (minutes == 6)
 							for (int i = 0; i < 10; i++)
-								spawns.add(new TzKekPits(2736, new WorldTile(GAME_TELEPORTS[Utils.random(GAME_TELEPORTS.length)], 3)));
+								spawns.add(new TzKekPits(2736, WorldTile.of(GAME_TELEPORTS[Utils.random(GAME_TELEPORTS.length)], 3)));
 						else if (minutes == 7)
 							for (int i = 0; i < 10; i++)
-								spawns.add(new FightPitsNPC(2739, new WorldTile(GAME_TELEPORTS[Utils.random(GAME_TELEPORTS.length)], 3)));
+								spawns.add(new FightPitsNPC(2739, WorldTile.of(GAME_TELEPORTS[Utils.random(GAME_TELEPORTS.length)], 3)));
 						else if (minutes == 10)
 							// alot hits appears on players
 							WorldTasks.schedule(new WorldTask() {
@@ -162,7 +157,7 @@ public final class FightPits {
 	public static void enterArena(Player player) {
 		player.lock(5);
 		player.getControllerManager().startController(new FightPitsController());
-		player.setNextWorldTile(new WorldTile(GAME_TELEPORTS[Utils.random(GAME_TELEPORTS.length)], 3));
+		player.setNextWorldTile(WorldTile.of(GAME_TELEPORTS[Utils.random(GAME_TELEPORTS.length)], 3));
 		player.npcDialogue(THHAAR_MEJ_KAH, HeadE.T_CALM_TALK, "Please wait for the signal before fight.");
 		player.setCanPvp(true);
 		player.setCantTrade(true);
@@ -194,13 +189,13 @@ public final class FightPits {
 					player.npcDialogue(THHAAR_MEJ_KAH, HeadE.T_CALM_TALK, "Well done in the pit, here take TokKul as reward.");
 					int tokkul = (lobby.size() + arena.size()) * 100;
 					if (!player.getInventory().addItem(6529, tokkul) && type == 1)
-						World.addGroundItem(new Item(6529, tokkul), new WorldTile(4585, 5076, 0), player, true, 180);
+						World.addGroundItem(new Item(6529, tokkul), WorldTile.of(4585, 5076, 0), player, true, 180);
 				}
 				if (type == 1) {
 					player.lock(5);
 					player.addWalkSteps(4585, 5076, 5, false);
 				} else if (type == 2)
-					player.setNextWorldTile(new WorldTile(new WorldTile(4592, 5073, 0), 2));
+					player.setNextWorldTile(WorldTile.of(WorldTile.of(4592, 5073, 0), 2));
 			}
 			refreshFoes();
 			checkPlayersAmmount();

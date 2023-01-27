@@ -17,8 +17,8 @@
 package com.rs.game.content.bosses.nomad;
 
 import com.rs.game.World;
-import com.rs.game.content.dialogue.HeadE;
 import com.rs.game.content.skills.magic.Magic;
+import com.rs.game.engine.dialogue.HeadE;
 import com.rs.game.model.entity.Entity;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.npc.combat.CombatScript;
@@ -79,7 +79,7 @@ public class NomadCombat extends CombatScript {
 				npc.setNextAnimation(new Animation(12701));
 				player.npcDialogue(nomad.getId(), HeadE.ANGRY, "Let's make things interesting!");
 				player.voiceEffect(8039);
-				final WorldTile middle = new WorldTile(player.getTile());
+				final WorldTile middle = WorldTile.of(player.getTile());
 				WorldTasks.schedule(new WorldTask() {
 					int count;
 
@@ -184,7 +184,7 @@ public class NomadCombat extends CombatScript {
 							player.freeze(Ticks.fromSeconds(17));
 							player.npcDialogue(nomad.getId(), HeadE.ANGRY, "Let's see how much punishment you can take!");
 							player.voiceEffect(8001);
-							player.setNextFaceWorldTile(new WorldTile(player.getX(), player.getY() + 1, 0));
+							player.setNextFaceWorldTile(WorldTile.of(player.getX(), player.getY() + 1, 0));
 							player.setNextSpotAnim(new SpotAnim(369));
 							player.unlock();
 							secondLoop = true;

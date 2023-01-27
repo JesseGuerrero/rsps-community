@@ -1,18 +1,16 @@
 package com.rs.game.content.holidayevents.easter.easter22.npcs;
 
-import com.rs.game.content.dialogue.Conversation;
-import com.rs.game.content.dialogue.Dialogue;
-import com.rs.game.content.dialogue.HeadE;
-import com.rs.game.content.dialogue.Options;
-import com.rs.game.content.dialogue.impl.StageSelectDialogue;
 import com.rs.game.content.holidayevents.easter.easter22.Easter2022;
 import com.rs.game.content.holidayevents.easter.easter22.EggHunt;
+import com.rs.game.content.world.unorganized_dialogue.StageSelectDialogue;
+import com.rs.game.engine.dialogue.Conversation;
+import com.rs.game.engine.dialogue.Dialogue;
+import com.rs.game.engine.dialogue.HeadE;
+import com.rs.game.engine.dialogue.Options;
 import com.rs.game.model.entity.player.Equipment;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.Item;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.plugin.events.ItemOnNPCEvent;
-import com.rs.plugin.events.NPCClickEvent;
 import com.rs.plugin.handlers.ItemOnNPCHandler;
 import com.rs.plugin.handlers.NPCClickHandler;
 import com.rs.utils.music.Music;
@@ -191,30 +189,24 @@ public class EvilChickenD extends Conversation {
         create();
     }
 
-    public static NPCClickHandler handleEvilChicken = new NPCClickHandler(new Object[] { Easter2022.EVIL_CHICKEN, Easter2022.EVIL_CHICKEN_MEDIUM, Easter2022.EVIL_CHICKEN_LARGE }) {
-        @Override
-        public void handle(NPCClickEvent e) {
-            if (!Easter2022.ENABLED)
-                return;
-            if (e.getOption().equals("Talk to")) {
-                e.getPlayer().startConversation(new EvilChickenD(e.getPlayer()));
-            }
-        }
-    };
+    public static NPCClickHandler handleEvilChicken = new NPCClickHandler(new Object[] { Easter2022.EVIL_CHICKEN, Easter2022.EVIL_CHICKEN_MEDIUM, Easter2022.EVIL_CHICKEN_LARGE }, e -> {
+    	 if (!Easter2022.ENABLED)
+             return;
+         if (e.getOption().equals("Talk to")) {
+             e.getPlayer().startConversation(new EvilChickenD(e.getPlayer()));
+         }
+    });
 
-    public static ItemOnNPCHandler handleItemOnEvilChicken= new ItemOnNPCHandler(Easter2022.EVIL_CHICKEN, Easter2022.EVIL_CHICKEN_MEDIUM, Easter2022.EVIL_CHICKEN_LARGE) {
-        @Override
-        public void handle(ItemOnNPCEvent e) {
-            if (!Easter2022.ENABLED)
-                return;
-            if (e.getItem().getId() == Easter2022.CHOCOLATE_EGG_ON_FACE_MASK)
-                e.getPlayer().startConversation(new Dialogue().addNPC(Easter2022.EVIL_CHICKEN, HeadE.NO_EXPRESSION, "That mask is unflattering and makes you look fat."));
-            if (e.getItem().getId() == Easter2022.EGG_ON_FACE_MASK)
-                e.getPlayer().startConversation(new Dialogue().addNPC(Easter2022.EVIL_CHICKEN, HeadE.NO_EXPRESSION, "That mask is *entirely* homemade. *bwaaak*"));
-            if (e.getItem().getId() == Easter2022.CHOCOTREAT)
-                e.getPlayer().startConversation(new Dialogue().addNPC(Easter2022.EVIL_CHICKEN, HeadE.NO_EXPRESSION, "Eurgh - disgusting! Do you know that chocolate is my one weakness?"));
-            if (e.getItem().getId() == Easter2022.EVIL_DRUMSTICK)
-                e.getPlayer().startConversation(new Dialogue().addNPC(Easter2022.EVIL_CHICKEN, HeadE.NO_EXPRESSION, "Tasty."));
-        }
-    };
+    public static ItemOnNPCHandler handleItemOnEvilChicken= new ItemOnNPCHandler(new Object[] { Easter2022.EVIL_CHICKEN, Easter2022.EVIL_CHICKEN_MEDIUM, Easter2022.EVIL_CHICKEN_LARGE }, e -> {
+    	if (!Easter2022.ENABLED)
+            return;
+        if (e.getItem().getId() == Easter2022.CHOCOLATE_EGG_ON_FACE_MASK)
+            e.getPlayer().startConversation(new Dialogue().addNPC(Easter2022.EVIL_CHICKEN, HeadE.NO_EXPRESSION, "That mask is unflattering and makes you look fat."));
+        if (e.getItem().getId() == Easter2022.EGG_ON_FACE_MASK)
+            e.getPlayer().startConversation(new Dialogue().addNPC(Easter2022.EVIL_CHICKEN, HeadE.NO_EXPRESSION, "That mask is *entirely* homemade. *bwaaak*"));
+        if (e.getItem().getId() == Easter2022.CHOCOTREAT)
+            e.getPlayer().startConversation(new Dialogue().addNPC(Easter2022.EVIL_CHICKEN, HeadE.NO_EXPRESSION, "Eurgh - disgusting! Do you know that chocolate is my one weakness?"));
+        if (e.getItem().getId() == Easter2022.EVIL_DRUMSTICK)
+            e.getPlayer().startConversation(new Dialogue().addNPC(Easter2022.EVIL_CHICKEN, HeadE.NO_EXPRESSION, "Tasty."));
+    });
 }

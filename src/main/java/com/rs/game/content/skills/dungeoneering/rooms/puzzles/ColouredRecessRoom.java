@@ -17,10 +17,10 @@
 package com.rs.game.content.skills.dungeoneering.rooms.puzzles;
 
 import com.rs.game.World;
-import com.rs.game.content.dialogue.Dialogue;
-import com.rs.game.content.dialogue.Options;
 import com.rs.game.content.skills.dungeoneering.npcs.DungeonNPC;
 import com.rs.game.content.skills.dungeoneering.rooms.PuzzleRoom;
+import com.rs.game.engine.dialogue.Dialogue;
+import com.rs.game.engine.dialogue.Options;
 import com.rs.game.model.entity.ForceMovement;
 import com.rs.game.model.entity.Hit;
 import com.rs.game.model.entity.npc.NPC;
@@ -141,7 +141,7 @@ public class ColouredRecessRoom extends PuzzleRoom {
 					if (!moved) {
 						moved = true;
 						addWalkSteps(getX() + dx, getY() + dy);
-						WorldTile fromTile = new WorldTile(player.getX(), player.getY(), player.getPlane());
+						WorldTile fromTile = WorldTile.of(player.getX(), player.getY(), player.getPlane());
 						player.setNextWorldTile(pTarget);
 						player.setNextForceMovement(new ForceMovement(fromTile, 0, pTarget, 1, WorldUtil.getFaceDirection(getTile(), player)));
 						player.setNextAnimation(new Animation(push ? 3065 : 3065));

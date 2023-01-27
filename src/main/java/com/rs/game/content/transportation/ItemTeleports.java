@@ -16,9 +16,9 @@
 //
 package com.rs.game.content.transportation;
 
-import com.rs.game.content.dialogue.impl.Transportation;
 import com.rs.game.content.skills.magic.Magic;
 import com.rs.game.content.world.HeroesGuild;
+import com.rs.game.content.world.unorganized_dialogue.Transportation;
 import com.rs.game.model.entity.player.Equipment;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.Item;
@@ -67,21 +67,21 @@ public class ItemTeleports {
 	};
 
 	private static final WorldTile[][] COORDINATES = {
-			{ new WorldTile(3316, 3232, 0), new WorldTile(2443, 3089, 0), new WorldTile(2416, 2836, 0), new WorldTile(1701, 5600, 0) },
-			{ new WorldTile(2208, 4940, 0), new WorldTile(2519, 3571, 0), new WorldTile(2970, 9679, 0), new WorldTile(2886, 4377, 2), },
-			{ new WorldTile(3087, 3496, 0), new WorldTile(2918, 3176, 0), new WorldTile(3105, 3251, 0), new WorldTile(3293, 3163, 0) },
-			{ new WorldTile(3087, 3496, 0), new WorldTile(2918, 3176, 0), new WorldTile(3105, 3251, 0), new WorldTile(3293, 3163, 0) },
-			{ new WorldTile(2614, 3384, 0), new WorldTile(3032, 3337, 0), new WorldTile(2933, 3293, 0), new WorldTile(3143, 3442, 0) },
-			{ new WorldTile(2878, 3542, 0), new WorldTile(3191, 3363, 0), new WorldTile(2607, 3220, 0), new WorldTile(2657, 3238, 0) },
-			{ new WorldTile(3356, 3421, 0) },
-			{ new WorldTile(2527, 3860, 0), new WorldTile(3167, 3492, 0) },
-			{ new WorldTile(3353, 3006, 0), new WorldTile(3427, 3538, 0), new WorldTile(2787, 3616, 0), new WorldTile(3150, 4666, 0) },
-			{ new WorldTile(3305, 3489, 0) },
-			{ new WorldTile(3423, 2914, 0) },
-			{ new WorldTile(2796, 3082, 0) },
-			{ new WorldTile(3170, 2982, 0) },
-			{ new WorldTile(2294, 3626, 0) },
-			{ new WorldTile(2519, 3860, 0) },
+			{ WorldTile.of(3316, 3232, 0), WorldTile.of(2443, 3089, 0), WorldTile.of(2416, 2836, 0), WorldTile.of(1701, 5600, 0) },
+			{ WorldTile.of(2208, 4940, 0), WorldTile.of(2519, 3571, 0), WorldTile.of(2970, 9679, 0), WorldTile.of(2886, 4377, 2), },
+			{ WorldTile.of(3087, 3496, 0), WorldTile.of(2918, 3176, 0), WorldTile.of(3105, 3251, 0), WorldTile.of(3293, 3163, 0) },
+			{ WorldTile.of(3087, 3496, 0), WorldTile.of(2918, 3176, 0), WorldTile.of(3105, 3251, 0), WorldTile.of(3293, 3163, 0) },
+			{ WorldTile.of(2614, 3384, 0), WorldTile.of(3032, 3337, 0), WorldTile.of(2933, 3293, 0), WorldTile.of(3143, 3442, 0) },
+			{ WorldTile.of(2878, 3542, 0), WorldTile.of(3191, 3363, 0), WorldTile.of(2607, 3220, 0), WorldTile.of(2657, 3238, 0) },
+			{ WorldTile.of(3356, 3421, 0) },
+			{ WorldTile.of(2527, 3860, 0), WorldTile.of(3167, 3492, 0) },
+			{ WorldTile.of(3353, 3006, 0), WorldTile.of(3427, 3538, 0), WorldTile.of(2787, 3616, 0), WorldTile.of(3150, 4666, 0) },
+			{ WorldTile.of(3305, 3489, 0) },
+			{ WorldTile.of(3423, 2914, 0) },
+			{ WorldTile.of(2796, 3082, 0) },
+			{ WorldTile.of(3170, 2982, 0) },
+			{ WorldTile.of(2294, 3626, 0) },
+			{ WorldTile.of(2519, 3860, 0) },
 	};
 
 
@@ -111,7 +111,7 @@ public class ItemTeleports {
 			player.stopAll(); // nowhere option
 			return false;
 		}
-		if (hasCharges(index) && !isScrollTeleport(index) && (item.getId() == 10362 || !item.getName().toLowerCase().contains("("))) {
+		if (!isScrollTeleport(index) && (item.getId() == 10362 || !item.getName().toLowerCase().contains("("))) {
 			player.sendMessage("Your " + item.getName().toLowerCase() + " has ran out of charges. You need to recharge it if you wish it use it once more.");
 			return false;
 		}
@@ -147,8 +147,6 @@ public class ItemTeleports {
 		if (HeroesGuild.isGloryOrROW(item.getId()))
 			player.getTempAttribs().setB("glory", true);
 		if (Magic.sendTeleportSpell(player, getFirstEmote(index), -2, getFirstGFX(index), -1, 0, 0, COORDINATES[index][optionIndex], 4, true, Magic.ITEM_TELEPORT, null)) {
-			if (!hasCharges(index))
-				return;
 			int newItemId = item.getId() + ((isNegative(index) ? -1 : 1) * (isIncremented(index) ? 2 : 1)), slot = equipmentTeleport ? Equipment.getItemSlot(item.getId()) : player.getInventory().getItems().getThisItemSlot(item);
 			if (item.getId() == LOWEST_AMOUNT[index] && destroyOnEmpty(index)) {
 				if (equipmentTeleport)
@@ -189,12 +187,6 @@ public class ItemTeleports {
 			if (item.getName().toLowerCase().contains(ITEM_NAMES[i]))
 				return i;
 		return -1;
-	}
-
-	private static boolean hasCharges(int index) {
-		if (index == 9 || index == 17 || index == 18)
-			return false;
-		return true;
 	}
 
 	private static boolean isNegative(int index) {

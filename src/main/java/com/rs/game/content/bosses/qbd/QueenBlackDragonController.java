@@ -21,8 +21,8 @@ import com.rs.cache.loaders.ObjectType;
 import com.rs.game.World;
 import com.rs.game.content.bosses.qbd.npcs.QueenBlackDragon;
 import com.rs.game.content.death.DeathOfficeController;
-import com.rs.game.content.dialogue.Dialogue;
 import com.rs.game.content.skills.magic.Magic;
+import com.rs.game.engine.dialogue.Dialogue;
 import com.rs.game.model.entity.Hit;
 import com.rs.game.model.entity.Hit.HitLook;
 import com.rs.game.model.entity.player.Controller;
@@ -38,7 +38,6 @@ import com.rs.lib.game.Item;
 import com.rs.lib.game.WorldTile;
 import com.rs.lib.net.ClientPacket;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.ObjectClickHandler;
 import com.rs.rsps.jessecustom.CustomScripts;
 
@@ -64,20 +63,17 @@ public final class QueenBlackDragonController extends Controller {
 	private DynamicRegionReference rewardRegion;
 	private WorldTile rewardBase;
 	
-	public static ObjectClickHandler entrance = new ObjectClickHandler(new Object[] { 70812 }) {
-		@Override
-		public void handle(ObjectClickEvent e) {
-			if (e.getOption().equals("Investigate")) {
-				e.getPlayer().startConversation(new Dialogue()
-						.addSimple("You will be sent to the heart of this cave complex - alone. There is no way out other than victory, teleportation, or death. Only those who can endure dangerous counters (level 110 or more) should proceed.")
-						.addOptions(ops -> {
-							ops.add("Proceed.", () -> enterPortal(e.getPlayer()));
-							ops.add("Step away from the portal.");
-						}));
-			} else if (e.getOption().equals("Pass through"))
-				enterPortal(e.getPlayer());
-		}
-	};
+	public static ObjectClickHandler entrance = new ObjectClickHandler(new Object[] { 70812 }, e -> {
+		if (e.getOption().equals("Investigate")) {
+			e.getPlayer().startConversation(new Dialogue()
+					.addSimple("You will be sent to the heart of this cave complex - alone. There is no way out other than victory, teleportation, or death. Only those who can endure dangerous counters (level 110 or more) should proceed.")
+					.addOptions(ops -> {
+						ops.add("Proceed.", () -> enterPortal(e.getPlayer()));
+						ops.add("Step away from the portal.");
+					}));
+		} else if (e.getOption().equals("Pass through"))
+			enterPortal(e.getPlayer());
+	});
 	
 	private static void enterPortal(Player player) {
 		if (player.getSkills().getLevelForXp(Constants.SUMMONING) < 60) {
@@ -138,7 +134,7 @@ public final class QueenBlackDragonController extends Controller {
 			return false;
 		}
 		if (object.getId() == 70813) {
-			Magic.sendObjectTeleportSpell(player, true, new WorldTile(2994, 3233, 0));
+			Magic.sendObjectTeleportSpell(player, true, WorldTile.of(2994, 3233, 0));
 			return false;
 		}
 		if (object.getId() == 70814) {
@@ -159,7 +155,7 @@ public final class QueenBlackDragonController extends Controller {
 			player.getMusicsManager().playSongAndUnlock(1118); // QUEEN BLACK DRAGON
 			npc.setSpawningWorms(false);
 			npc.setNextAttack(20);
-			npc.setActiveArtifact(new GameObject(object.getId() + 1, ObjectType.SCENERY_INTERACT, 0, object));
+			npc.setActiveArtifact(new GameObject(object.getId() + 1, ObjectType.SCENERY_INTERACT, 0, object.getTile()));
 			npc.setHitpoints(npc.getMaxHitpoints());
 			npc.setCantInteract(false);
 			npc.setPhase(npc.getPhase() + 1);
@@ -339,7 +335,7 @@ public final class QueenBlackDragonController extends Controller {
 			player.getInterfaceManager().removeSub(Sub.FULL_GAMESPACE_BG);
 			player.getPackets().sendVarc(184, -1);
 		} else
-			player.getTile().setLocation(OUTSIDE);
+			player.setTile(OUTSIDE);
 		removeController();
 		if (npc != null)
 			player.getBank().addItems(npc.getRewards().toArray(), false);

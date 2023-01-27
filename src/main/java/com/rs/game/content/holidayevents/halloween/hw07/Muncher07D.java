@@ -16,9 +16,9 @@
 //
 package com.rs.game.content.holidayevents.halloween.hw07;
 
-import com.rs.game.content.dialogue.Conversation;
-import com.rs.game.content.dialogue.Dialogue;
-import com.rs.game.content.dialogue.HeadE;
+import com.rs.game.engine.dialogue.Conversation;
+import com.rs.game.engine.dialogue.Dialogue;
+import com.rs.game.engine.dialogue.HeadE;
 import com.rs.game.model.entity.Hit;
 import com.rs.game.model.entity.Hit.HitLook;
 import com.rs.game.model.entity.npc.NPC;
@@ -28,7 +28,6 @@ import com.rs.game.tasks.WorldTask;
 import com.rs.game.tasks.WorldTasks;
 import com.rs.lib.game.Animation;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.plugin.events.NPCClickEvent;
 import com.rs.plugin.handlers.NPCClickHandler;
 
 @PluginEventHandler
@@ -82,10 +81,5 @@ public class Muncher07D extends Conversation {
 		create();
 	}
 
-	public static NPCClickHandler handleMuncher = new NPCClickHandler(new Object[] { 2329 }) {
-		@Override
-		public void handle(NPCClickEvent e) {
-			e.getPlayer().startConversation(new Muncher07D(e.getPlayer(), e.getNPC()));
-		}
-	};
+	public static NPCClickHandler handleMuncher = new NPCClickHandler(new Object[] { 2329 }, e -> e.getPlayer().startConversation(new Muncher07D(e.getPlayer(), e.getNPC())));
 }

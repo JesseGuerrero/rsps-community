@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.lang.SuppressWarnings;
 
 import com.rs.Settings;
 import com.rs.cache.loaders.Bonus;
@@ -52,7 +51,6 @@ import com.rs.lib.game.SpotAnim;
 import com.rs.lib.game.WorldTile;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.plugin.events.ItemClickEvent;
 import com.rs.plugin.handlers.ItemClickHandler;
 import com.rs.rsps.jessecustom.customscape.CustomScape;
 import com.rs.utils.Ticks;
@@ -64,37 +62,34 @@ public class PlayerCombat extends PlayerAction {
 	private int max_hit;
 	private CombatSpell spellcasterGloveSpell;
 
-	public static ItemClickHandler handleDFS = new ItemClickHandler(new Object[]{"Dragonfire shield"}, new String[]{"Inspect", "Activate", "Empty"}) {
-		@Override
-		public void handle(ItemClickEvent e) {
-			if (e.getOption().equals("Inspect")) {
-				if (e.getItem().getId() == 11284)
-					e.getPlayer().sendMessage("The shield is empty and unresponsive.");
-				else
-					e.getPlayer().sendMessage("The shield contains " + e.getItem().getMetaDataI("dfsCharges") + " charges.");
-			} else if (e.getOption().equals("Activate")) {
-				if (e.getItem().getMetaDataI("dfsCharges") > 0) {
-					if (World.getServerTicks() > e.getPlayer().getTempAttribs().getL("dfsCd")) {
-						e.getPlayer().getTempAttribs().setB("dfsActive", !e.getPlayer().getTempAttribs().getB("dfsActive"));
-						e.getPlayer().sendMessage("You have " + (e.getPlayer().getTempAttribs().getB("dfsActive") ? "activated" : "deactivated") + " the shield.");
-					} else
-						e.getPlayer().sendMessage("The dragonfire shield is still pretty hot from its last activation.");
+	public static ItemClickHandler handleDFS = new ItemClickHandler(new Object[]{"Dragonfire shield"}, new String[]{"Inspect", "Activate", "Empty"}, e -> {
+		if (e.getOption().equals("Inspect")) {
+			if (e.getItem().getId() == 11284)
+				e.getPlayer().sendMessage("The shield is empty and unresponsive.");
+			else
+				e.getPlayer().sendMessage("The shield contains " + e.getItem().getMetaDataI("dfsCharges") + " charges.");
+		} else if (e.getOption().equals("Activate")) {
+			if (e.getItem().getMetaDataI("dfsCharges") > 0) {
+				if (World.getServerTicks() > e.getPlayer().getTempAttribs().getL("dfsCd")) {
+					e.getPlayer().getTempAttribs().setB("dfsActive", !e.getPlayer().getTempAttribs().getB("dfsActive"));
+					e.getPlayer().sendMessage("You have " + (e.getPlayer().getTempAttribs().getB("dfsActive") ? "activated" : "deactivated") + " the shield.");
 				} else
-					e.getPlayer().sendMessage("The shield is empty and unable to be activated.");
-			} else if (e.getOption().equals("Empty"))
-				if (e.getItem().getId() == 11284 || e.getItem().getMetaDataI("dfsCharges") < 0)
-					e.getPlayer().sendMessage("The shield is already empty.");
-				else
-					e.getPlayer().sendOptionDialogue("Are you sure you would like to empty the " + e.getItem().getMetaDataI("dfsCharges") + " charges?", ops -> {
-						ops.add("Yes, I understand the shield will lose all its stats.", () -> {
-							e.getItem().deleteMetaData();
-							e.getItem().setId(11284);
-							e.getPlayer().getInventory().refresh();
-						});
-						ops.add("No, I want to keep them.");
+					e.getPlayer().sendMessage("The dragonfire shield is still pretty hot from its last activation.");
+			} else
+				e.getPlayer().sendMessage("The shield is empty and unable to be activated.");
+		} else if (e.getOption().equals("Empty"))
+			if (e.getItem().getId() == 11284 || e.getItem().getMetaDataI("dfsCharges") < 0)
+				e.getPlayer().sendMessage("The shield is already empty.");
+			else
+				e.getPlayer().sendOptionDialogue("Are you sure you would like to empty the " + e.getItem().getMetaDataI("dfsCharges") + " charges?", ops -> {
+					ops.add("Yes, I understand the shield will lose all its stats.", () -> {
+						e.getItem().deleteMetaData();
+						e.getItem().setId(11284);
+						e.getPlayer().getInventory().refresh();
 					});
-		}
-	};
+					ops.add("No, I want to keep them.");
+				});
+	});
 
 	public PlayerCombat(Entity target) {
 		this.target = target;
@@ -647,7 +642,7 @@ public class PlayerCombat extends PlayerAction {
 		} else {
 			WorldProjectile p = weapon.getProjectile(player, target);
 			switch (weapon) {
-				case DEATHTOUCHED_DART:
+				case DEATHTOUCHED_DART -> {
 					player.setNextAnimation(weapon.getAttackAnimation());
 					target.setNextSpotAnim(new SpotAnim(44));
 					target.resetWalkSteps();
@@ -660,8 +655,8 @@ public class PlayerCombat extends PlayerAction {
 						return 8;
 					} else
 						return 0;
-				case CHINCHOMPA:
-				case RED_CHINCHOMPA:
+				}
+				case CHINCHOMPA, RED_CHINCHOMPA -> {
 					attackTarget(getMultiAttackTargets(player, target), new MultiAttack() {
 						private boolean nextTarget;
 
@@ -680,19 +675,20 @@ public class PlayerCombat extends PlayerAction {
 						}
 					});
 					dropAmmo(player, Equipment.WEAPON, 1);
-					break;
-				case CROSSBOW:
-				case BRONZE_CROSSBOW:
-				case BLURITE_CROSSBOW:
-				case IRON_CROSSBOW:
-				case STEEL_CROSSBOW:
-				case BLACK_CROSSBOW:
-				case MITH_CROSSBOW:
-				case ADAMANT_CROSSBOW:
-				case RUNE_CROSSBOW:
-				case ARMADYL_CROSSBOW:
-				case CHAOTIC_CROSSBOW:
-				case ZANIKS_CROSSBOW:
+				}
+				case SWAMP_LIZARD, ORANGE_SALAMANDER, RED_SALAMANDER, BLACK_SALAMANDER -> {
+					Hit hit = switch(attackStyle.getName()) {
+					case "Scorch" -> getMeleeHit(player, getRandomMaxHit(player, weaponId, attackStyle, true));
+					case "Flare" -> getRangeHit(player, getRandomMaxHit(player, weaponId, attackStyle, true));
+					case "Blaze" -> getMagicHit(player, getRandomMaxHit(player, weaponId, attackStyle, true));
+					default -> getMeleeHit(player, getRandomMaxHit(player, weaponId, attackStyle, true));
+					};
+					delayHit(p.getTaskDelay(), weaponId, attackStyle, hit);
+					dropAmmo(player, Equipment.AMMO, 1);
+					if (attackStyle.getName().equals("Flare"))
+						combatDelay = 3;
+				}
+				case CROSSBOW, BRONZE_CROSSBOW, BLURITE_CROSSBOW, IRON_CROSSBOW, STEEL_CROSSBOW, BLACK_CROSSBOW, MITH_CROSSBOW, ADAMANT_CROSSBOW, RUNE_CROSSBOW, ARMADYL_CROSSBOW, CHAOTIC_CROSSBOW, ZANIKS_CROSSBOW -> {
 					int damage = 0;
 					boolean specced = false;
 					if (player.getEquipment().getAmmoId() == 9241 && Utils.random(100) <= 55 && !target.getPoison().isPoisoned()) {
@@ -747,12 +743,11 @@ public class PlayerCombat extends PlayerAction {
 						player.getEquipment().removeAmmo(Equipment.AMMO, 1);
 					else
 						dropAmmo(player, Equipment.AMMO, 1);
-					break;
-				case ROYAL_CROSSBOW:
-					if (target instanceof Player) {
-						damage = Utils.random(0, 60);
+				}
+				case ROYAL_CROSSBOW -> {
+					if (target instanceof Player)
 						player.sendMessage("The Royal crossbow seems unresponsive against this target.", true);
-					} else {
+					else {
 						int stacks = player.getTempAttribs().getI("rcbStacks", 0);
 						if (World.getServerTicks() < player.getTempAttribs().getL("rcbLockOnTimer"))
 							stacks++;
@@ -765,7 +760,7 @@ public class PlayerCombat extends PlayerAction {
 						boolean lockedOn = stacks >= 9;
 						player.getTempAttribs().setI("rcbStacks", stacks);
 						player.getTempAttribs().setL("rcbLockOnTimer", World.getServerTicks() + 28);
-						damage = getRandomMaxHit(player, weaponId, attackStyle, true);
+						int damage = getRandomMaxHit(player, weaponId, attackStyle, true);
 						delayHit(p.getTaskDelay(), weaponId, attackStyle, getRangeHit(player, damage), null, () -> {
 							if (weaponId == 24339 || target.isDead() || target.hasFinished())
 								return;
@@ -786,8 +781,8 @@ public class PlayerCombat extends PlayerAction {
 						checkSwiftGlovesEffect(player, p.getTaskDelay(), attackStyle, weaponId, damage, p);
 					}
 					player.getEquipment().removeAmmo(Equipment.AMMO, 1);
-					break;
-				case HAND_CANNON:
+				}
+				case HAND_CANNON -> {
 					if (Utils.getRandomInclusive(player.getSkills().getLevel(Constants.FIREMAKING) << 1) == 0) {
 						player.setNextSpotAnim(new SpotAnim(2140));
 						player.getEquipment().deleteSlot(Equipment.WEAPON);
@@ -798,15 +793,15 @@ public class PlayerCombat extends PlayerAction {
 					}
 					delayHit(p.getTaskDelay(), weaponId, attackStyle, getRangeHit(player, getRandomMaxHit(player, weaponId, attackStyle, true)));
 					dropAmmo(player, Equipment.AMMO, 1);
-					break;
-				case SAGAIE:
+				}
+				case SAGAIE -> {
 					double damageMod = Utils.clampD((Utils.getDistanceI(player.getTile(), target.getMiddleWorldTile()) / (double) getAttackRange(player)) * 0.70, 0.01, 1.0);
-					damage = getRandomMaxHit(player, weaponId, attackStyle, true, true, 1.0D - (damageMod * 0.95), 1.0D + damageMod);
+					int damage = getRandomMaxHit(player, weaponId, attackStyle, true, true, 1.0D - (damageMod * 0.95), 1.0D + damageMod);
 					delayHit(p.getTaskDelay(), weaponId, attackStyle, getRangeHit(player, damage));
 					checkSwiftGlovesEffect(player, p.getTaskDelay(), attackStyle, weaponId, damage, p);
 					dropAmmo(player, Equipment.WEAPON, 1);
-					break;
-				case BOLAS:
+				}
+				case BOLAS -> {
 					int delay = Ticks.fromSeconds(15);
 					if (target instanceof Player t) {
 						boolean slashBased = t.getEquipment().getItem(3) != null;
@@ -831,29 +826,29 @@ public class PlayerCombat extends PlayerAction {
 					}
 					playSound(soundId, player, target);
 					player.getEquipment().removeAmmo(Equipment.WEAPON, 1);
-					break;
-				case DARK_BOW:
+				}
+				case DARK_BOW -> {
 					int hit = getRandomMaxHit(player, weaponId, attackStyle, true);
 					delayHit(p.getTaskDelay(), weaponId, attackStyle, getRangeHit(player, hit));
 					checkSwiftGlovesEffect(player, p.getTaskDelay(), attackStyle, weaponId, hit, p);
 					WorldProjectile p2 = World.sendProjectile(player, target, AmmoType.forId(player.getEquipment().getAmmoId()).getProjAnim(player.getEquipment().getAmmoId()), 30, 50, 1);
 					delayHit(p2.getTaskDelay(), weaponId, attackStyle, getRangeHit(player, getRandomMaxHit(player, weaponId, attackStyle, true)));
 					dropAmmo(player, Equipment.AMMO, 2);
-					break;
-				default:
+				}
+				default -> {
 					if (weapon.isThrown()) {
-						hit = getRandomMaxHit(player, weaponId, attackStyle, true);
+						int hit = getRandomMaxHit(player, weaponId, attackStyle, true);
 						delayHit(p.getTaskDelay(), weaponId, attackStyle, getRangeHit(player, hit));
 						checkSwiftGlovesEffect(player, p.getTaskDelay(), attackStyle, weaponId, hit, p);
 						dropAmmo(player, Equipment.WEAPON, 1);
 					} else {
-						hit = getRandomMaxHit(player, weaponId, attackStyle, true);
+						int hit = getRandomMaxHit(player, weaponId, attackStyle, true);
 						delayHit(p.getTaskDelay(), weaponId, attackStyle, getRangeHit(player, hit));
 						checkSwiftGlovesEffect(player, p.getTaskDelay(), attackStyle, weaponId, hit, p);
 						if (weapon.getAmmos() != null)
 							dropAmmo(player);
 					}
-					break;
+				}
 			}
 			player.setNextAnimation(weapon.getAttackAnimation());
 			SpotAnim attackSpotAnim = weapon.getAttackSpotAnim(player, ammo);
@@ -926,7 +921,7 @@ public class PlayerCombat extends PlayerAction {
 		player.getEquipment().removeAmmo(slot, quantity);
 		if (Utils.random(5) == 0) //1/5 chance to just break the ammo entirely
 			return;
-		World.addGroundItem(new Item(ammoId, quantity), new WorldTile(target.getCoordFaceX(target.getSize()), target.getCoordFaceY(target.getSize()), target.getPlane()), player);
+		World.addGroundItem(new Item(ammoId, quantity), WorldTile.of(target.getCoordFaceX(target.getSize()), target.getCoordFaceY(target.getSize()), target.getPlane()), player);
 	}
 
 	public void dropAmmo(Player player) {
@@ -970,7 +965,7 @@ public class PlayerCombat extends PlayerAction {
 				case 21373:
 				case 21374:
 				case 21375: {
-					final WorldTile tile = new WorldTile(target.getX(), target.getY(), target.getPlane());
+					final WorldTile tile = WorldTile.of(target.getX(), target.getY(), target.getPlane());
 					player.setNextAnimation(new Animation(11971));
 					player.setNextSpotAnim(new SpotAnim(476));
 					WorldTasks.scheduleTimer(tick -> {
@@ -978,7 +973,7 @@ public class PlayerCombat extends PlayerAction {
 							return false;
 						if (tick % 5 == 0) {
 							World.sendSpotAnim(player, new SpotAnim(478), tile);
-							for (Entity entity : getMultiAttackTargets(player, new WorldTile(target.getTile()), 1, 9)) {
+							for (Entity entity : getMultiAttackTargets(player, WorldTile.of(target.getTile()), 1, 9)) {
 								Hit hit = getMeleeHit(player, getRandomMaxHit(player, entity, 0, getMaxHit(player, target, 21371, attackStyle, false, 0.33), 21371, attackStyle, false, true, 1.25));
 								addXp(player, entity, attackStyle.getXpType(), hit);
 								if (hit.getDamage() > 0 && Utils.getRandomInclusive(8) == 0)

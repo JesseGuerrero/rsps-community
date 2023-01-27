@@ -20,11 +20,6 @@ import java.util.function.Consumer;
 
 import com.rs.Settings;
 import com.rs.game.World;
-import com.rs.game.content.dialogue.Conversation;
-import com.rs.game.content.dialogue.Dialogue;
-import com.rs.game.content.dialogue.HeadE;
-import com.rs.game.content.dialogue.statements.NPCStatement;
-import com.rs.game.content.dialogue.statements.OptionStatement;
 import com.rs.game.content.skills.cooking.Cooking;
 import com.rs.game.content.skills.fishing.Fish;
 import com.rs.game.content.skills.fishing.Fishing;
@@ -35,6 +30,11 @@ import com.rs.game.content.skills.smithing.Smelting;
 import com.rs.game.content.skills.woodcutting.TreeType;
 import com.rs.game.content.skills.woodcutting.Woodcutting;
 import com.rs.game.content.world.doors.Doors;
+import com.rs.game.engine.dialogue.Conversation;
+import com.rs.game.engine.dialogue.Dialogue;
+import com.rs.game.engine.dialogue.HeadE;
+import com.rs.game.engine.dialogue.statements.NPCStatement;
+import com.rs.game.engine.dialogue.statements.OptionStatement;
 import com.rs.game.model.entity.Hit;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.player.Controller;
@@ -1096,9 +1096,9 @@ public final class TutorialIslandController extends Controller {
 			player.handleOneWayDoor(object);
 		} else if (object.getId() == 3029 && pastStage(Stage.LEAVE_QUEST_GUIDE_HOUSE)) {
 			nextStage(Stage.TALK_TO_MINING_GUIDE);
-			player.useLadder(new WorldTile(3088, 9520, 0));
+			player.useLadder(WorldTile.of(3088, 9520, 0));
 		} else if (object.getId() == 3028 && pastStage(Stage.LEAVE_QUEST_GUIDE_HOUSE))
-			player.useLadder(new WorldTile(3088, 3120, 0));
+			player.useLadder(WorldTile.of(3088, 3120, 0));
 		else if (object.getId() == 3043)
 			player.getActionManager().setAction(new Mining(RockType.TIN, object));
 		else if (object.getId() == 3042)
@@ -1272,7 +1272,7 @@ public final class TutorialIslandController extends Controller {
 	@Override
 	public void start() {
 		if (getStage() == Stage.TALK_TO_GUIDE)
-			player.setNextWorldTile(new WorldTile(3094, 3107, 0));
+			player.setNextWorldTile(WorldTile.of(3094, 3107, 0));
 		sendInterfaces();
 	}
 

@@ -17,28 +17,22 @@
 package com.rs.game.content.skills.construction;
 
 import com.rs.game.content.Skillcapes;
-import com.rs.game.content.dialogue.Conversation;
-import com.rs.game.content.dialogue.Dialogue;
-import com.rs.game.content.dialogue.Options;
-import com.rs.game.content.quests.Quest;
+import com.rs.game.engine.dialogue.Conversation;
+import com.rs.game.engine.dialogue.Dialogue;
+import com.rs.game.engine.dialogue.Options;
+import com.rs.game.engine.quest.Quest;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.entity.player.Skills;
 import com.rs.lib.Constants;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.plugin.events.NPCClickEvent;
 import com.rs.plugin.handlers.NPCClickHandler;
 import com.rs.utils.shop.ShopsHandler;
 
 @PluginEventHandler
 public class EstateAgentDialogue extends Conversation {
 
-	public static NPCClickHandler handleEstateAgent = new NPCClickHandler(new Object[] { "Estate agent" }) {
-		@Override
-		public void handle(NPCClickEvent e) {
-			e.getPlayer().startConversation(new EstateAgentDialogue(e.getPlayer(), e.getNPCId()));
-		}
-	};
+	public static NPCClickHandler handleEstateAgent = new NPCClickHandler(new Object[] { "Estate agent" }, e -> e.getPlayer().startConversation(new EstateAgentDialogue(e.getPlayer(), e.getNPCId())));
 
 	public EstateAgentDialogue(Player player, int npcId) {
 		super(player);
@@ -81,10 +75,10 @@ public class EstateAgentDialogue extends Conversation {
 
 	public void promptHouseLocation(final String name, final HouseConstants.POHLocation loc, int level, final int cost) {
 		if (player.getSkills().getLevelForXp(Constants.CONSTRUCTION) >= level) {
-			if (player.getInventory().containsItem(995, cost))
+			if (player.getInventory().hasCoins(cost))
 				player.sendOptionDialogue("Are you sure?", ops -> {
 					ops.add("Yes", () -> {
-						player.getInventory().deleteItem(995, cost);
+						player.getInventory().removeCoins(cost);
 						player.getHouse().setLocation(loc);
 						player.sendMessage("Your house location been set to "+name+".");
 					});
@@ -100,10 +94,10 @@ public class EstateAgentDialogue extends Conversation {
 
 	public void promptHouseChange(final String name, final int look, int level, final int cost) {
 		if (player.getSkills().getLevelForXp(Constants.CONSTRUCTION) >= level) {
-			if (player.getInventory().containsItem(995, cost))
+			if (player.getInventory().hasCoins(cost))
 				player.sendOptionDialogue("Are you sure?", ops -> {
 					ops.add("Yes", () -> {
-						player.getInventory().deleteItem(995, cost);
+						player.getInventory().removeCoins(cost);
 						player.getHouse().changeLook(look);
 						player.sendMessage("Your house has been set to "+name+".");
 					});

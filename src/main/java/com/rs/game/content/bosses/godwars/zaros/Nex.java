@@ -37,7 +37,6 @@ import com.rs.lib.game.SpotAnim;
 import com.rs.lib.game.WorldTile;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.ObjectClickHandler;
 import com.rs.utils.WorldUtil;
 
@@ -76,18 +75,15 @@ public final class Nex extends NPC {
 		refreshTicksAttacked();
 	}
 
-	public static ObjectClickHandler handleIcePrison = new ObjectClickHandler(new Object[] { 57263 }) {
-		@Override
-		public void handle(ObjectClickEvent e) {
-			if (e.getPlayer().getTempAttribs().getB("inIcePrison")) {
-				e.getPlayer().sendMessage("You can't move!");
-				return;
-			}
-			e.getPlayer().setNextAnimation(new Animation(PlayerCombat.getWeaponAttackEmote(e.getPlayer().getEquipment().getWeaponId(), e.getPlayer().getCombatDefinitions().getAttackStyle())));
-			e.getPlayer().lock(2);
-			World.removeObject(e.getObject());
+	public static ObjectClickHandler handleIcePrison = new ObjectClickHandler(new Object[] { 57263 }, e -> {
+		if (e.getPlayer().getTempAttribs().getB("inIcePrison")) {
+			e.getPlayer().sendMessage("You can't move!");
+			return;
 		}
-	};
+		e.getPlayer().setNextAnimation(new Animation(PlayerCombat.getWeaponAttackEmote(e.getPlayer().getEquipment().getWeaponId(), e.getPlayer().getCombatDefinitions().getAttackStyle())));
+		e.getPlayer().lock(2);
+		World.removeObject(e.getObject());
+	});
 
 	@Override
 	public void processNPC() {
@@ -133,9 +129,9 @@ public final class Nex extends NPC {
 				if (!WorldUtil.isInRange(getX(), getY(), getSize(), target.getX(), target.getY(), target.getSize(), 5)) {
 					WorldTile tile = target.getNearestTeleTile(this);
 					if (tile == null)
-						tile = new WorldTile(target.getTile());
+						tile = WorldTile.of(target.getTile());
 					if (World.floorAndWallsFree(tile, getSize())) {
-						setNextForceMovement(new ForceMovement(new WorldTile(this.getTile()), 0, tile, 1, Direction.forDelta(tile.getX() - getX(), tile.getY() - getY())));
+						setNextForceMovement(new ForceMovement(WorldTile.of(this.getTile()), 0, tile, 1, Direction.forDelta(tile.getX() - getX(), tile.getY() - getY())));
 						setNextAnimation(new Animation(6985));
 						setNextWorldTile(tile);
 						return;
@@ -171,18 +167,18 @@ public final class Nex extends NPC {
 
 	public void sendWrath() {
 		setNextSpotAnim(new SpotAnim(2259));
-		sendWrathProj(this, new WorldTile(getX() + 3, getY() + 3, getPlane()), 0.4);
-		sendWrathProj(this, new WorldTile(getX() + 3, getY(), getPlane()), 0.4);
-		sendWrathProj(this, new WorldTile(getX() + 3, getY() - 3, getPlane()), 0.4);
-		sendWrathProj(this, new WorldTile(getX() - 3, getY() + 3, getPlane()), 0.4);
-		sendWrathProj(this, new WorldTile(getX() - 3, getY(), getPlane()), 0.4);
-		sendWrathProj(this, new WorldTile(getX() - 3, getY() - 3, getPlane()), 0.4);
-		sendWrathProj(this, new WorldTile(getX(), getY() + 3, getPlane()), 0.4);
-		sendWrathProj(this, new WorldTile(getX(), getY() - 3, getPlane()), 0.4);
-		sendWrathProj(this, new WorldTile(getX() + 2, getY() - 2, getPlane()), 0.4);
-		sendWrathProj(this, new WorldTile(getX() - 2, getY() + 2, getPlane()), 0.4);
-		sendWrathProj(this, new WorldTile(getX() + 2, getY() + 2, getPlane()), 0.4);
-		sendWrathProj(this, new WorldTile(getX() - 2, getY() - 2, getPlane()), 0.4);
+		sendWrathProj(this, WorldTile.of(getX() + 3, getY() + 3, getPlane()), 0.4);
+		sendWrathProj(this, WorldTile.of(getX() + 3, getY(), getPlane()), 0.4);
+		sendWrathProj(this, WorldTile.of(getX() + 3, getY() - 3, getPlane()), 0.4);
+		sendWrathProj(this, WorldTile.of(getX() - 3, getY() + 3, getPlane()), 0.4);
+		sendWrathProj(this, WorldTile.of(getX() - 3, getY(), getPlane()), 0.4);
+		sendWrathProj(this, WorldTile.of(getX() - 3, getY() - 3, getPlane()), 0.4);
+		sendWrathProj(this, WorldTile.of(getX(), getY() + 3, getPlane()), 0.4);
+		sendWrathProj(this, WorldTile.of(getX(), getY() - 3, getPlane()), 0.4);
+		sendWrathProj(this, WorldTile.of(getX() + 2, getY() - 2, getPlane()), 0.4);
+		sendWrathProj(this, WorldTile.of(getX() - 2, getY() + 2, getPlane()), 0.4);
+		sendWrathProj(this, WorldTile.of(getX() + 2, getY() + 2, getPlane()), 0.4);
+		sendWrathProj(this, WorldTile.of(getX() - 2, getY() - 2, getPlane()), 0.4);
 		WorldTasks.schedule(new WorldTask() {
 			@Override
 			public void run() {

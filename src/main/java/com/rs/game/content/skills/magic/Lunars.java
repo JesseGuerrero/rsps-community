@@ -22,12 +22,12 @@ import java.util.Set;
 
 import com.rs.game.World;
 import com.rs.game.content.AchievementTitles;
+import com.rs.game.content.items.water_stuff.FillAction.Filler;
 import com.rs.game.content.skills.construction.SawmillOperator;
 import com.rs.game.content.skills.farming.FarmPatch;
 import com.rs.game.content.skills.farming.PatchLocation;
 import com.rs.game.content.skills.farming.PatchType;
 import com.rs.game.model.entity.Entity;
-import com.rs.game.model.entity.actions.FillAction.Filler;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.entity.player.managers.InterfaceManager.Sub;
 import com.rs.game.model.object.GameObject;
@@ -39,7 +39,6 @@ import com.rs.lib.game.SpotAnim;
 import com.rs.lib.net.ClientPacket;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.plugin.events.ButtonClickEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
 
 @PluginEventHandler
@@ -91,28 +90,25 @@ public class Lunars {
 		return -1;
 	}
 
-	public static ButtonClickHandler handleRemoteFarmButtons = new ButtonClickHandler(1082) {
-		@Override
-		public void handle(ButtonClickEvent e) {
-			if (e.getPacket() == ClientPacket.IF_OP1)
-				if (e.getPlayer().getTempAttribs().getB("RemoteFarm")) {
-					//					int[] names = new int[] { 30, 32, 34, 36, 38, 49, 51, 53, 55, 57, 59, 62, 64, 66, 68, 70, 72, 74, 76, 190, 79, 81, 83, 85, 88, 90, 92, 94, 97, 99, 101, 104, 106, 108, 110, 115, 117, 119, 121, 123, 125, 131, 127, 129, 2, 173, 175, 177, 182, 184, 186, 188 };
-					//					for (int i = 0; i < names.length; i++) {
-					//						if ((names[i]+1) == e.getComponentId()) {
-					//							if (e.getPlayer().getFarming().patches[i] != null) {
-					//								if (e.getPlayer().getFarming().patches[i].diseased) {
-					//									e.getPlayer().getFarming().patches[i].diseased = false;
-					//									refreshRemoteFarm(e.getPlayer());
-					//								} else {
-					//									e.getPlayer().sendMessage("This patch isn't diseased.");
-					//								}
-					//							}
-					//						}
-					//					}
-				} else
-					AchievementTitles.handleButtons(e.getPlayer(), e.getComponentId());
-		}
-	};
+	public static ButtonClickHandler handleRemoteFarmButtons = new ButtonClickHandler(1082, e -> {
+		if (e.getPacket() == ClientPacket.IF_OP1)
+			if (e.getPlayer().getTempAttribs().getB("RemoteFarm")) {
+				//					int[] names = new int[] { 30, 32, 34, 36, 38, 49, 51, 53, 55, 57, 59, 62, 64, 66, 68, 70, 72, 74, 76, 190, 79, 81, 83, 85, 88, 90, 92, 94, 97, 99, 101, 104, 106, 108, 110, 115, 117, 119, 121, 123, 125, 131, 127, 129, 2, 173, 175, 177, 182, 184, 186, 188 };
+				//					for (int i = 0; i < names.length; i++) {
+				//						if ((names[i]+1) == e.getComponentId()) {
+				//							if (e.getPlayer().getFarming().patches[i] != null) {
+				//								if (e.getPlayer().getFarming().patches[i].diseased) {
+				//									e.getPlayer().getFarming().patches[i].diseased = false;
+				//									refreshRemoteFarm(e.getPlayer());
+				//								} else {
+				//									e.getPlayer().sendMessage("This patch isn't diseased.");
+				//								}
+				//							}
+				//						}
+				//					}
+			} else
+				AchievementTitles.handleButtons(e.getPlayer(), e.getComponentId());
+	});
 
 	public static void openRemoteFarm(Player player) {
 		if (!player.canCastSpell()) {
@@ -181,7 +177,7 @@ public class Lunars {
 		
 		int price = (int) (SawmillOperator.prices[index] * 0.7);
 		
-		if (!player.getInventory().containsItem(995, price)) {
+		if (!player.getInventory().hasCoins(price)) {
 			player.sendMessage("You need " + Utils.formatNumber(price) + " gold to convert this log.");
 			return;
 		}
@@ -191,7 +187,7 @@ public class Lunars {
 
 		player.setNextAnimation(new Animation(6298));
 		player.setNextSpotAnim(new SpotAnim(1063, 0, 50));
-		player.getInventory().deleteItem(995, price);
+		player.getInventory().removeCoins(price);
 		player.getInventory().deleteItem(SawmillOperator.logs[index], 1);
 		player.getInventory().addItem(SawmillOperator.planks[index], 1);
 		player.getSkills().addXp(Constants.MAGIC, 90);
@@ -229,7 +225,7 @@ public class Lunars {
 		for (Item item : player.getInventory().getItems().array()) {
 			if (item == null)
 				continue;
-			Filler fill = Filler.forId((short) item.getId());
+			Filler fill = Filler.forEmpty((short) item.getId());
 			if (fill != null)
 				if (player.getInventory().containsItem(fill.getEmptyItem().getId(), 1)) {
 					player.getInventory().deleteItem(fill.getEmptyItem());
@@ -242,7 +238,7 @@ public class Lunars {
 		for (Item item : player.getInventory().getItems().array()) {
 			if (item == null)
 				continue;
-			Filler fill = Filler.forId((short) item.getId());
+			Filler fill = Filler.forEmpty((short) item.getId());
 			if (fill != null)
 				return true;
 		}
@@ -292,7 +288,7 @@ public class Lunars {
 		}
 		if (!Magic.checkMagicAndRunes(player, 83, true, new RuneSet(Rune.ASTRAL, 3, Rune.EARTH, 15, Rune.NATURE, 2)))
 			return;
-		player.setNextFaceWorldTile(object);
+		player.setNextFaceWorldTile(object.getTile());
 		player.getSkills().addXp(Constants.FARMING, 18);
 		player.getSkills().addXp(Constants.MAGIC, 87);
 		player.setNextAnimation(new Animation(4411));
@@ -320,7 +316,7 @@ public class Lunars {
 		}
 		if (!Magic.checkMagicAndRunes(player, 66, true, new RuneSet(Rune.ASTRAL, 1, Rune.EARTH, 8)))
 			return;
-		player.setNextFaceWorldTile(object);
+		player.setNextFaceWorldTile(object.getTile());
 		player.getSkills().addXp(Constants.FARMING, 90);
 		player.getSkills().addXp(Constants.MAGIC, 60);
 		player.setNextAnimation(new Animation(4411));

@@ -35,7 +35,6 @@ import com.rs.cache.loaders.map.RegionSize;
 import com.rs.game.World;
 import com.rs.game.content.Effect;
 import com.rs.game.content.combat.PlayerCombat;
-import com.rs.game.content.skills.dungeoneering.npcs.Stomp;
 import com.rs.game.content.skills.magic.Magic;
 import com.rs.game.content.skills.prayer.Prayer;
 import com.rs.game.content.skills.summoning.Familiar;
@@ -74,6 +73,7 @@ import com.rs.lib.util.Utils;
 import com.rs.lib.util.Vec2;
 import com.rs.plugin.PluginManager;
 import com.rs.plugin.events.PlayerStepEvent;
+import com.rs.utils.TriFunction;
 import com.rs.utils.WorldUtil;
 
 public abstract class Entity {
@@ -148,7 +148,7 @@ public abstract class Entity {
 
 	// saving stuff
 	private int hitpoints;
-	private final WorldTile tile;
+	private WorldTile tile;
 	private RegionSize regionSize;
 
 	private boolean run;
@@ -157,7 +157,7 @@ public abstract class Entity {
 
 	// creates Entity and saved classes
 	public Entity(WorldTile tile) {
-		this.tile = new WorldTile(tile);
+		this.tile = WorldTile.of(tile);
 		this.uuid = UUID.randomUUID().toString();
 		poison = new Poison();
 	}
@@ -248,16 +248,16 @@ public abstract class Entity {
 	}
 	
 	public WorldTile getTileInScene(int x, int y) {
-		WorldTile tile = new WorldTile(x, y, getPlane());
-		return new WorldTile(tile.getXInScene(getSceneBaseChunkId()), tile.getYInScene(getSceneBaseChunkId()), getPlane());
+		WorldTile tile = WorldTile.of(x, y, getPlane());
+		return WorldTile.of(tile.getXInScene(getSceneBaseChunkId()), tile.getYInScene(getSceneBaseChunkId()), getPlane());
 	}
 	
 	public int getSceneX(int targetX) {
-		return new WorldTile(targetX, 0, 0).getXInScene(getSceneBaseChunkId());
+		return WorldTile.of(targetX, 0, 0).getXInScene(getSceneBaseChunkId());
 	}
 	
 	public int getSceneY(int targetY) {
-		return new WorldTile(0, targetY, 0).getYInScene(getSceneBaseChunkId());
+		return WorldTile.of(0, targetY, 0).getYInScene(getSceneBaseChunkId());
 	}
 
 	public final void initEntity() {
@@ -598,7 +598,7 @@ public abstract class Entity {
 		NPC npc = this instanceof NPC ? (NPC) this : null;
 		Player player = this instanceof Player ? (Player) this : null;
 
-		lastWorldTile = new WorldTile(getTile());
+		lastWorldTile = WorldTile.of(getTile());
 		if (lastFaceEntity >= 0) {
 			Entity target = lastFaceEntity >= 32768 ? World.getPlayers().get(lastFaceEntity - 32768) : World.getNPCs().get(lastFaceEntity);
 			if (target != null) {
@@ -608,7 +608,7 @@ public abstract class Entity {
 		}
 		nextWalkDirection = nextRunDirection = null;
 		if (nextWorldTile != null) {
-			getTile().setLocation(nextWorldTile);
+			tile = nextWorldTile;
 			tileBehind = getBackfacingTile();
 			nextWorldTile = null;
 			teleported = true;
@@ -619,7 +619,7 @@ public abstract class Entity {
 				loadMapRegions();
 			if (player != null) {
 				if (World.getRegion(getRegionId(), true) instanceof DynamicRegion)
-					player.setLastNonDynamicTile(new WorldTile(lastWorldTile));
+					player.setLastNonDynamicTile(WorldTile.of(lastWorldTile));
 				else
 					player.clearLastNonDynamicTile();
 			}
@@ -649,7 +649,7 @@ public abstract class Entity {
 			if (nextStep == null)
 				break;
 			if (player != null)
-				PluginManager.handle(new PlayerStepEvent(player, nextStep, new WorldTile(getX() + nextStep.getDir().getDx(), getY() + nextStep.getDir().getDy(), getPlane())));
+				PluginManager.handle(new PlayerStepEvent(player, nextStep, WorldTile.of(getX() + nextStep.getDir().getDx(), getY() + nextStep.getDir().getDy(), getPlane())));
 			if ((nextStep.checkClip() && !World.checkWalkStep(getPlane(), getX(), getY(), nextStep.getDir(), getSize(), getClipType())) || (nextStep.checkClip() && npc != null && !npc.checkNPCCollision(nextStep.getDir())) || !canMove(nextStep.getDir())) {
 				resetWalkSteps();
 				break;
@@ -658,7 +658,7 @@ public abstract class Entity {
 				nextWalkDirection = nextStep.getDir();
 			else
 				nextRunDirection = nextStep.getDir();
-			tileBehind = new WorldTile(getTile());
+			tileBehind = WorldTile.of(getTile());
 			moveLocation(nextStep.getDir().getDx(), nextStep.getDir().getDy(), 0);
 			if (run && stepCount == 0) { // fixes impossible steps TODO is this even necessary?
 				WalkStep previewStep = previewNextWalkStep();
@@ -689,7 +689,7 @@ public abstract class Entity {
 	}
 
 	public void moveLocation(int xOffset, int yOffset, int planeOffset) {
-		getTile().moveLocation(xOffset, yOffset, planeOffset);
+		tile = tile.transform(xOffset, yOffset, planeOffset);
 		faceAngle = Utils.getAngleTo(xOffset, yOffset);
 	}
 
@@ -714,53 +714,62 @@ public abstract class Entity {
 
 	public WorldTile getMiddleWorldTile() {
 		int size = getSize();
-		return size == 1 ? getTile() : new WorldTile(getCoordFaceX(size), getCoordFaceY(size), getPlane());
+		return size == 1 ? getTile() : WorldTile.of(getCoordFaceX(size), getCoordFaceY(size), getPlane());
 	}
 
 	public boolean ignoreWallsWhenMeleeing() {
 		return false;
+	}
+	
+	private static Set<Object> LOS_NPC_OVERRIDES = new HashSet<>();
+	private static List<TriFunction<Entity, Object, Boolean, Boolean>> LOS_FUNCTION_OVERRIDES = new ArrayList<>();
+	
+	public static void addLOSOverride(int npcId) {
+		LOS_NPC_OVERRIDES.add(npcId);
+	}
+	
+	public static void addLOSOverride(String npcName) {
+		LOS_NPC_OVERRIDES.add(npcName);
+	}
+	
+	public static void addLOSOverrides(int... npcIds) {
+		for (int npcId : npcIds)
+			addLOSOverride(npcId);
+	}
+	
+	public static void addLOSOverrides(String... npcNames) {
+		for (String npcName : npcNames)
+			addLOSOverrides(npcName);
+	}
+	
+	public static void addLOSOverride(TriFunction<Entity, Object, Boolean, Boolean> func) {
+		LOS_FUNCTION_OVERRIDES.add(func);
 	}
 
 	public boolean lineOfSightTo(Object target, boolean melee) {
 		WorldTile tile = WorldUtil.targetToTile(target);
 		int targSize = target instanceof Entity ? ((Entity) target).getSize() : 1;
 		if (target instanceof NPC npc) {
+			if (LOS_NPC_OVERRIDES.contains(npc.getId()) || LOS_NPC_OVERRIDES.contains(npc.getName()))
+				return true;
 			switch(npc.getId()) {
-			case 2440:
-			case 2443:
-			case 2446:
-			case 7567:
-			case 3777:
-			case 9712:
-			case 9710:
-			case 706:
-			case 14860:
-			case 14864:
-			case 14858:
-			case 14883:
-			case 2859:
-			case 8709://Desert musician
-			case 8715://Drunken musician
-			case 8723://Elf musician
-			case 8712://Goblin musician
+			case 9712: //dung tutor
+			case 9710: //frem banker
+			case 706: //wizard mizgog
+			case 14860: //Head Farmer Jones
+			case 14864: //Ayleth Beaststalker
+			case 14858: //Alison Elmshaper
+			case 14883: //Marcus Everburn
 				return true;
 			}
 			switch(npc.getName()) {
-			case "Tool leprechaun":
-			case "Xuan":
 			case "Fremennik shipmaster":
-			case "Fishing spot":
-			case "Fishing Spot":
-			case "Cavefish shoal":
-			case "Rocktail shoal":
-			case "Musician":
-			case "Ghostly piper":
-			case "Clan vexillum":
 				return true;
 			}
 		}
-		if (target instanceof Stomp stomp)
-			return stomp.getManager().isAtBossRoom(this.getTile());
+		for (TriFunction<Entity, Object, Boolean, Boolean> func : LOS_FUNCTION_OVERRIDES)
+			if (func.apply(this, target, melee))
+				return true;
 		if (melee && !(target instanceof Entity e ? e.ignoreWallsWhenMeleeing() : false))
 			return World.checkMeleeStep(this, this.getSize(), target, targSize) && World.hasLineOfSight(getMiddleWorldTile(), target instanceof Entity e ? e.getMiddleWorldTile() : tile);
 		return World.hasLineOfSight(getMiddleWorldTile(), target instanceof Entity e ? e.getMiddleWorldTile() : tile);
@@ -1043,7 +1052,7 @@ public abstract class Entity {
 	}
 
 	public void setNextWorldTile(WorldTile nextWorldTile) {
-		this.nextWorldTile = new WorldTile(nextWorldTile);
+		this.nextWorldTile = WorldTile.of(nextWorldTile);
 	}
 
 	public WorldTile getNextWorldTile() {
@@ -1091,19 +1100,19 @@ public abstract class Entity {
 	}
 
 	public void faceNorth() {
-		setNextFaceWorldTile(new WorldTile(getX(), getY()+1, getPlane()));
+		setNextFaceWorldTile(WorldTile.of(getX(), getY()+1, getPlane()));
 	}
 
 	public void faceEast() {
-		setNextFaceWorldTile(new WorldTile(getX()+1, getY(), getPlane()));
+		setNextFaceWorldTile(WorldTile.of(getX()+1, getY(), getPlane()));
 	}
 
 	public void faceSouth() {
-		setNextFaceWorldTile(new WorldTile(getX(), getY()-1, getPlane()));
+		setNextFaceWorldTile(WorldTile.of(getX(), getY()-1, getPlane()));
 	}
 
 	public void faceWest() {
-		setNextFaceWorldTile(new WorldTile(getX()-1, getY(), getPlane()));
+		setNextFaceWorldTile(WorldTile.of(getX()-1, getY(), getPlane()));
 	}
 
 	public abstract int getSize();
@@ -1239,7 +1248,7 @@ public abstract class Entity {
 	}
 
 	public void faceEntity(Entity target) {
-		setNextFaceWorldTile(new WorldTile(target.getCoordFaceX(target.getSize()), target.getCoordFaceY(target.getSize()), target.getPlane()));
+		setNextFaceWorldTile(WorldTile.of(target.getCoordFaceX(target.getSize()), target.getCoordFaceY(target.getSize()), target.getPlane()));
 	}
 
 	public void faceObject(GameObject object) {
@@ -1305,7 +1314,7 @@ public abstract class Entity {
 			x = object.getCoordFaceX();
 			y = object.getCoordFaceY();
 		}
-		setNextFaceWorldTile(new WorldTile(x, y, object.getPlane()));
+		setNextFaceWorldTile(WorldTile.of(x, y, object.getPlane()));
 	}
 
 	public void faceTile(WorldTile tile) {
@@ -1444,15 +1453,15 @@ public abstract class Entity {
 	}
 
 	public void setTile(WorldTile tile) {
-		this.tile.setLocation(tile);
+		this.tile = tile;
 	}
 
 	public void setLocation(WorldTile tile) {
-		tile.setLocation(tile);
+		this.tile = tile;
 	}
 
 	public void setLocation(int x, int y, int z) {
-		tile.setLocation(x, y, z);
+		this.tile = WorldTile.of(x, y, z);
 	}
 
 	public boolean isAt(int x, int y) {

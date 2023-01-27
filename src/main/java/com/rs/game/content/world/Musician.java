@@ -3,22 +3,22 @@ package com.rs.game.content.world;
 import java.util.List;
 
 import com.rs.game.World;
-import com.rs.game.content.dialogue.Conversation;
-import com.rs.game.content.dialogue.Dialogue;
-import com.rs.game.content.dialogue.HeadE;
-import com.rs.game.content.dialogue.Options;
-import com.rs.game.model.entity.actions.RestMusician;
+import com.rs.game.engine.dialogue.Conversation;
+import com.rs.game.engine.dialogue.Dialogue;
+import com.rs.game.engine.dialogue.HeadE;
+import com.rs.game.engine.dialogue.Options;
+import com.rs.game.model.entity.Entity;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.player.Player;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.plugin.events.NPCClickEvent;
+import com.rs.plugin.annotations.ServerStartupEvent;
 import com.rs.plugin.handlers.NPCClickHandler;
 
 @PluginEventHandler
 public class Musician {
 
-	private static Object[] MUSICIANS = { 29, 30, 3463, 3509, 3611, 5442, 5439, 8698,8699, 8700, 8701, 8702, 8703, 8704, 8705, 8706, 8707, 8708, 8709, 8712, 8713, 8715, 8716, 8717, 8718, 8719, 8720, 8721, 8722, 8723, 14628, 14629, 14640 };
-
+	private static int[] MUSICIANS = { 29, 30, 3463, 3509, 3611, 5442, 5439, 8698,8699, 8700, 8701, 8702, 8703, 8704, 8705, 8706, 8707, 8708, 8709, 8712, 8713, 8715, 8716, 8717, 8718, 8719, 8720, 8721, 8722, 8723, 14628, 14629, 14640 };
+	
 	static class MusicianD extends Conversation {
 		public MusicianD(Player player, int npcId) {
 			super(player);
@@ -73,32 +73,34 @@ public class Musician {
 			});
 		}
 	}
+	
+	@ServerStartupEvent
+	public static void addLoSOverrides() {
+		Entity.addLOSOverrides(MUSICIANS);
+	}
 
-	public static NPCClickHandler handleMusicians = new NPCClickHandler(MUSICIANS) {
-		@Override
-		public void handle(NPCClickEvent e) {
-			Player p = e.getPlayer();
-			switch (e.getOption().toLowerCase()) {
-			case "talk-to":
-				e.getNPC().resetDirection();
-				p.startConversation(new MusicianD(p, e.getNPCId()));
-				break;
-			case "listen-to":
-				if (p.getEmotesManager().isAnimating()) {
-					p.sendMessage("You can't rest while perfoming an emote.");
-					return;
-				}
-				if (p.isLocked()) {
-					p.sendMessage("You can't rest while perfoming an action.");
-					return;
-				}
-				p.stopAll();
-				e.getNPC().resetDirection();
-				p.getActionManager().setAction(new RestMusician(e.getNPCId()));
-				break;
+	public static NPCClickHandler handleMusicians = new NPCClickHandler(new Object[] { MUSICIANS }, e -> {
+		Player p = e.getPlayer();
+		switch (e.getOption().toLowerCase()) {
+		case "talk-to":
+			e.getNPC().resetDirection();
+			p.startConversation(new MusicianD(p, e.getNPCId()));
+			break;
+		case "listen-to":
+			if (p.getEmotesManager().isAnimating()) {
+				p.sendMessage("You can't rest while perfoming an emote.");
+				return;
 			}
+			if (p.isLocked()) {
+				p.sendMessage("You can't rest while perfoming an action.");
+				return;
+			}
+			p.stopAll();
+			e.getNPC().resetDirection();
+			p.getActionManager().setAction(new RestMusician(e.getNPCId()));
+			break;
 		}
-	};
+	});
 
 	public static boolean isNearby(Player p) {
 		List<NPC> nearbyNPCs = World.getNPCsInRegion(p.getRegionId());

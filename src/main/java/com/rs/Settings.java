@@ -61,6 +61,7 @@ public final class Settings {
 	private int xpRate;
 	private double dropModifier;
 	private Item[] startItems;
+	private String chatGPTApiKey;
 
 	public Settings() {
 		serverName = "Darkan";
@@ -76,8 +77,8 @@ public final class Settings {
 		lobbyApiKey = "TEST_API_KEY";
 		worldInfo = new WorldInfo(3, "127.0.0.1", 43595, "My Test World", 1, true, true);
 		loginMessage = "";
-		playerStartTile = new WorldTile(3226, 3219, 0);
-		playerRespawnTile = new WorldTile(3221, 3218, 0);
+		playerStartTile = WorldTile.of(3226, 3219, 0);
+		playerRespawnTile = WorldTile.of(3221, 3218, 0);
 		xpRate = 1;
 		dropModifier = 1.0;
 		startItems = new Item[] {
@@ -100,6 +101,7 @@ public final class Settings {
 				new Item(557, 4),
 				new Item(559, 2),
 		};
+		chatGPTApiKey = "YEE_HAW_LMAO";
 	}
 
 	public static final long WORLD_CYCLE_NS = 600000000L;
@@ -180,11 +182,11 @@ public final class Settings {
 	}
 
 	public WorldTile getPlayerStartTile() {
-		return new WorldTile(playerStartTile != null ? playerStartTile : DEFAULTS.playerStartTile);
+		return WorldTile.of(playerStartTile != null ? playerStartTile : DEFAULTS.playerStartTile);
 	}
 
 	public WorldTile getPlayerRespawnTile() {
-		return new WorldTile(playerRespawnTile != null ? playerRespawnTile : DEFAULTS.playerRespawnTile);
+		return WorldTile.of(playerRespawnTile != null ? playerRespawnTile : DEFAULTS.playerRespawnTile);
 	}
 
 	public int getXpRate() {
@@ -232,5 +234,9 @@ public final class Settings {
 			db += ":" + mongoPort;
 		db += "/"+mongoDbName+"?retryWrites=true&w=majority";
 		return db;
+	}
+	
+	public String getChatGPTApiKey() {
+		return chatGPTApiKey;
 	}
 }

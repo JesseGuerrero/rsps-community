@@ -21,16 +21,15 @@ import java.util.Map;
 
 import com.rs.Settings;
 import com.rs.game.content.achievements.SetReward;
-import com.rs.game.content.dialogue.impl.RepairStandD;
-import com.rs.game.content.quests.Quest;
-import com.rs.game.content.quests.handlers.shieldofarrav.ShieldOfArrav;
+import com.rs.game.content.quests.shieldofarrav.ShieldOfArrav;
+import com.rs.game.content.world.unorganized_dialogue.RepairStandD;
+import com.rs.game.engine.quest.Quest;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.Constants;
 import com.rs.lib.game.Item;
 import com.rs.lib.game.Rights;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.plugin.events.ItemClickEvent;
 import com.rs.plugin.handlers.ItemClickHandler;
 import com.rs.rsps.jessecustom.customscape.CustomScape;
 import com.rs.utils.Ticks;
@@ -300,15 +299,12 @@ public class ItemConstants {
 		}
 	}
 
-	public static ItemClickHandler handleGenericCheckCharges = new ItemClickHandler(new String[] { "Check-charges", "Check state", "Check-state" }) {
-		@Override
-		public void handle(ItemClickEvent e) {
-			if (e.getItem().getMetaData("combatCharges") != null)
-				e.getPlayer().sendMessage("<col=FF0000>It looks like it will last another " + Utils.ticksToTime(e.getItem().getMetaDataI("combatCharges")));
-			else
-				e.getPlayer().sendMessage("<col=FF0000>It looks brand new.");
-		}
-	};
+	public static ItemClickHandler handleGenericCheckCharges = new ItemClickHandler(new String[] { "Check-charges", "Check state", "Check-state" }, e -> {
+		if (e.getItem().getMetaData("combatCharges") != null)
+			e.getPlayer().sendMessage("<col=FF0000>It looks like it will last another " + Utils.ticksToTime(e.getItem().getMetaDataI("combatCharges")));
+		else
+			e.getPlayer().sendMessage("<col=FF0000>It looks brand new.");
+	});
 
 	public static void handleRepairs(Player player, Item item, final boolean stand, final int slot) {
 		if (item.getId() >= 18349 && item.getId() <= 18374) {
@@ -319,10 +315,10 @@ public class ItemConstants {
 			if (item.getMetaData("frozenKeyCharges") != null && item.getMetaDataI("frozenKeyCharges") < 100)
 				player.sendOptionDialogue("Would you like to add a charge to your frozen key? It will cost 50,000 coins.", ops -> {
 					ops.add("Yes please.", () -> {
-						if (player.getInventory().containsItem(995, 50000)) {
+						if (player.getInventory().hasCoins(50000)) {
 							if (player.getInventory().getItem(slot) == null || player.getInventory().getItem(slot).getId() != item.getId())
 								return;
-							player.getInventory().deleteItem(995, 50000);
+							player.getInventory().removeCoins(50000);
 							player.getInventory().getItems().set(slot, new Item(20120, 1).addMetaData("frozenKeyCharges", item.getMetaDataI("frozenKeyCharges") + 1));
 						} else
 							player.sendMessage("You don't have enough money to add a charge.");

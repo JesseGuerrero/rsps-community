@@ -40,9 +40,6 @@ import com.rs.lib.game.WorldTile;
 import com.rs.lib.net.ClientPacket;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.plugin.events.ButtonClickEvent;
-import com.rs.plugin.events.ItemClickEvent;
-import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
 import com.rs.plugin.handlers.ItemClickHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
@@ -73,21 +70,21 @@ public class DungManager {
 	private transient Player invitingPlayer;
 
 	public static enum ResourceDungeon {
-		EDGEVILLE_DUNGEON(10, 1100, 52849, new WorldTile(3132, 9933, 0), 52867, new WorldTile(991, 4585, 0)),
-		DWARVEN_MINE(15, 1500, 52855, new WorldTile(3034, 9772, 0), 52864, new WorldTile(1041, 4575, 0)),
-		EDGEVILLE_DUNGEON_2(20, 1600, 52853, new WorldTile(3104, 9826, 0), 52868, new WorldTile(1135, 4589, 0)),
-		KARAMJA_VOLCANO(25, 2100, 52850, new WorldTile(2845, 9557, 0), 52869, new WorldTile(1186, 4598, 0)),
-		DAEMONHEIM_PENINSULA(30, 2400, 52861, new WorldTile(3513, 3666, 0), 52862, new WorldTile(3498, 3633, 0)),
-		BAXTORIAN_FALLS(35, 3000, 52857, new WorldTile(2578, 9898, 0), 52873, new WorldTile(1256, 4592, 0)),
-		MINING_GUILD(45, 4400, 52856, new WorldTile(3022, 9741, 0), 52866, new WorldTile(1052, 4521, 0)),
-		TAVERLEY_DUNGEON_1(55, 6200, 52851, new WorldTile(2854, 9841, 0), 52870, new WorldTile(1394, 4588, 0)),
-		TAVERLEY_DUNGEON_2(60, 7000, 52852, new WorldTile(2912, 9810, 0), 52865, new WorldTile(1000, 4522, 0)),
-		VARROCK_SEWERS(65, 8500, 52863, new WorldTile(3164, 9878, 0), 52876, new WorldTile(1312, 4590, 0)),
-		CHAOS_TUNNELS(70, 9600, 52858, new WorldTile(3160, 5521, 0), 52874, new WorldTile(1238, 4524, 0)),
-		AL_KHARID(75, 11400, 52860, new WorldTile(3298, 3307, 0), 52872, new WorldTile(1182, 4515, 0)),
-		BRIMHAVEN_DUNGEON(80, 12800, 52854, new WorldTile(2697, 9442, 0), 52871, new WorldTile(1140, 4499, 0)),
-		POLYPORE_DUNGEON(82, 13500, 64291, new WorldTile(4661, 5491, 3), 64291, new WorldTile(4695, 5625, 3)),
-		ASGARNIAN_ICE_DUNGEON(85, 15000, 52859, new WorldTile(3033, 9599, 0), 52875, new WorldTile(1297, 4510, 0))
+		EDGEVILLE_DUNGEON(10, 1100, 52849, WorldTile.of(3132, 9933, 0), 52867, WorldTile.of(991, 4585, 0)),
+		DWARVEN_MINE(15, 1500, 52855, WorldTile.of(3034, 9772, 0), 52864, WorldTile.of(1041, 4575, 0)),
+		EDGEVILLE_DUNGEON_2(20, 1600, 52853, WorldTile.of(3104, 9826, 0), 52868, WorldTile.of(1135, 4589, 0)),
+		KARAMJA_VOLCANO(25, 2100, 52850, WorldTile.of(2845, 9557, 0), 52869, WorldTile.of(1186, 4598, 0)),
+		DAEMONHEIM_PENINSULA(30, 2400, 52861, WorldTile.of(3513, 3666, 0), 52862, WorldTile.of(3498, 3633, 0)),
+		BAXTORIAN_FALLS(35, 3000, 52857, WorldTile.of(2578, 9898, 0), 52873, WorldTile.of(1256, 4592, 0)),
+		MINING_GUILD(45, 4400, 52856, WorldTile.of(3022, 9741, 0), 52866, WorldTile.of(1052, 4521, 0)),
+		TAVERLEY_DUNGEON_1(55, 6200, 52851, WorldTile.of(2854, 9841, 0), 52870, WorldTile.of(1394, 4588, 0)),
+		TAVERLEY_DUNGEON_2(60, 7000, 52852, WorldTile.of(2912, 9810, 0), 52865, WorldTile.of(1000, 4522, 0)),
+		VARROCK_SEWERS(65, 8500, 52863, WorldTile.of(3164, 9878, 0), 52876, WorldTile.of(1312, 4590, 0)),
+		CHAOS_TUNNELS(70, 9600, 52858, WorldTile.of(3160, 5521, 0), 52874, WorldTile.of(1238, 4524, 0)),
+		AL_KHARID(75, 11400, 52860, WorldTile.of(3298, 3307, 0), 52872, WorldTile.of(1182, 4515, 0)),
+		BRIMHAVEN_DUNGEON(80, 12800, 52854, WorldTile.of(2697, 9442, 0), 52871, WorldTile.of(1140, 4499, 0)),
+		POLYPORE_DUNGEON(82, 13500, 64291, WorldTile.of(4661, 5491, 3), 64291, WorldTile.of(4695, 5625, 3)),
+		ASGARNIAN_ICE_DUNGEON(85, 15000, 52859, WorldTile.of(3033, 9599, 0), 52875, WorldTile.of(1297, 4510, 0))
 
 		;
 
@@ -122,26 +119,23 @@ public class DungManager {
 		}
 	}
 
-	public static ObjectClickHandler handleResourceDungeonEntrance = new ObjectClickHandler(ResourceDungeon.ID_MAP.keySet().toArray()) {
-		@Override
-		public void handle(ObjectClickEvent e) {
-			ResourceDungeon dung = ResourceDungeon.forId(e.getObjectId());
-			if (dung == null)
-				return;
-			if (e.getPlayer().getSkills().getLevelForXp(Constants.DUNGEONEERING) < dung.level) {
-				e.getPlayer().simpleDialogue("You need a dungeoneering level of " + dung.level + " to enter this resource dungeon.");
-				return;
-			}
-			if (dung == ResourceDungeon.POLYPORE_DUNGEON)
-				Magic.sendTeleportSpell(e.getPlayer(), 13288, 13285, 2516, 2517, 0, 0, e.getObject().getX() == 4695 && e.getObject().getY() == 5626 ? dung.outside : dung.inside, 1, false, Magic.OBJECT_TELEPORT, null);
-			else
-				Magic.sendTeleportSpell(e.getPlayer(), 13288, 13285, 2516, 2517, 0, 0, e.getObject().getId() == dung.insideId ? dung.outside : dung.inside, 1, false, Magic.OBJECT_TELEPORT, null);
-			if (!e.getPlayer().getDungManager().gainedXp(dung)) {
-				e.getPlayer().getDungManager().addGainedXp(dung);
-				e.getPlayer().getSkills().addXp(Constants.DUNGEONEERING, dung.xp);
-			}
+	public static ObjectClickHandler handleResourceDungeonEntrance = new ObjectClickHandler(ResourceDungeon.ID_MAP.keySet().toArray(), e -> {
+		ResourceDungeon dung = ResourceDungeon.forId(e.getObjectId());
+		if (dung == null)
+			return;
+		if (e.getPlayer().getSkills().getLevelForXp(Constants.DUNGEONEERING) < dung.level) {
+			e.getPlayer().simpleDialogue("You need a dungeoneering level of " + dung.level + " to enter this resource dungeon.");
+			return;
 		}
-	};
+		if (dung == ResourceDungeon.POLYPORE_DUNGEON)
+			Magic.sendTeleportSpell(e.getPlayer(), 13288, 13285, 2516, 2517, 0, 0, e.getObject().getX() == 4695 && e.getObject().getY() == 5626 ? dung.outside : dung.inside, 1, false, Magic.OBJECT_TELEPORT, null);
+		else
+			Magic.sendTeleportSpell(e.getPlayer(), 13288, 13285, 2516, 2517, 0, 0, e.getObject().getId() == dung.insideId ? dung.outside : dung.inside, 1, false, Magic.OBJECT_TELEPORT, null);
+		if (!e.getPlayer().getDungManager().gainedXp(dung)) {
+			e.getPlayer().getDungManager().addGainedXp(dung);
+			e.getPlayer().getSkills().addXp(Constants.DUNGEONEERING, dung.xp);
+		}
+	});
 
 	public DungManager(Player player) {
 		setPlayer(player);
@@ -179,52 +173,49 @@ public class DungManager {
 		return kinshipTiers[perk.ordinal()];
 	}
 
-	public static ButtonClickHandler handleKinshipInter = new ButtonClickHandler(993) {
-		@Override
-		public void handle(ButtonClickEvent e) {
-			Item ring = e.getPlayer().getTempAttribs().getO("kinshipToBeCustomized");
-			if (ring == null) {
-				e.getPlayer().closeInterfaces();
-				return;
-			}
-			switch (e.getComponentId()) {
-			case 257:
-			case 242:
-			case 227:
-			case 212:
-				e.getPlayer().getTempAttribs().setI("kinshipTab", (257 - e.getComponentId()) / 15);
-				e.getPlayer().getDungManager().refreshKinshipStrings();
-				break;
-			case 139:
-			case 46:
-			case 88:
-				e.getPlayer().getDungManager().promptRingUpgrade(getPerk(e.getPlayer().getTempAttribs().getI("kinshipTab"), e.getComponentId() == 139 ? 0 : e.getComponentId() == 46 ? 1 : 2));
-				break;
-			case 278:
-				e.getPlayer().getTempAttribs().setO("perkUpgradePrompt", null);
-				break;
-			case 279:
-				e.getPlayer().getDungManager().upgradePerk(e.getPlayer().getTempAttribs().getO("perkUpgradePrompt"));
-				break;
-			case 137:
-			case 44:
-			case 86:
-				if (e.getPacket() == ClientPacket.IF_OP1)
-					e.getPlayer().getDungManager().activeRingPerk = getPerk(e.getPlayer().getTempAttribs().getI("kinshipTab"), e.getComponentId() == 137 ? 0 : e.getComponentId() == 44 ? 1 : 2);
-				else
-					e.getPlayer().getDungManager().quickSwitch = getPerk(e.getPlayer().getTempAttribs().getI("kinshipTab"), e.getComponentId() == 137 ? 0 : e.getComponentId() == 44 ? 1 : 2);
-				if (e.getPlayer().getDungManager().activeRingPerk != null)
-					ring.setId(e.getPlayer().getDungManager().activeRingPerk.getItemId());
-				e.getPlayer().getEquipment().refresh(Equipment.RING);
-				e.getPlayer().getInventory().refresh();
-				e.getPlayer().getDungManager().refreshKinshipStrings();
-				break;
-			case 190:
-				e.getPlayer().getDungManager().promptResetRing();
-				break;
-			}
+	public static ButtonClickHandler handleKinshipInter = new ButtonClickHandler(993, e -> {
+		Item ring = e.getPlayer().getTempAttribs().getO("kinshipToBeCustomized");
+		if (ring == null) {
+			e.getPlayer().closeInterfaces();
+			return;
 		}
-	};
+		switch (e.getComponentId()) {
+		case 257:
+		case 242:
+		case 227:
+		case 212:
+			e.getPlayer().getTempAttribs().setI("kinshipTab", (257 - e.getComponentId()) / 15);
+			e.getPlayer().getDungManager().refreshKinshipStrings();
+			break;
+		case 139:
+		case 46:
+		case 88:
+			e.getPlayer().getDungManager().promptRingUpgrade(getPerk(e.getPlayer().getTempAttribs().getI("kinshipTab"), e.getComponentId() == 139 ? 0 : e.getComponentId() == 46 ? 1 : 2));
+			break;
+		case 278:
+			e.getPlayer().getTempAttribs().setO("perkUpgradePrompt", null);
+			break;
+		case 279:
+			e.getPlayer().getDungManager().upgradePerk(e.getPlayer().getTempAttribs().getO("perkUpgradePrompt"));
+			break;
+		case 137:
+		case 44:
+		case 86:
+			if (e.getPacket() == ClientPacket.IF_OP1)
+				e.getPlayer().getDungManager().activeRingPerk = getPerk(e.getPlayer().getTempAttribs().getI("kinshipTab"), e.getComponentId() == 137 ? 0 : e.getComponentId() == 44 ? 1 : 2);
+			else
+				e.getPlayer().getDungManager().quickSwitch = getPerk(e.getPlayer().getTempAttribs().getI("kinshipTab"), e.getComponentId() == 137 ? 0 : e.getComponentId() == 44 ? 1 : 2);
+			if (e.getPlayer().getDungManager().activeRingPerk != null)
+				ring.setId(e.getPlayer().getDungManager().activeRingPerk.getItemId());
+			e.getPlayer().getEquipment().refresh(Equipment.RING);
+			e.getPlayer().getInventory().refresh();
+			e.getPlayer().getDungManager().refreshKinshipStrings();
+			break;
+		case 190:
+			e.getPlayer().getDungManager().promptResetRing();
+			break;
+		}
+	});
 
 	private void upgradePerk(KinshipPerk perk) {
 		if (perk == null)
@@ -310,42 +301,39 @@ public class DungManager {
 		return KinshipPerk.values()[idx];
 	}
 
-	public static ItemClickHandler handleKinship = new ItemClickHandler(Utils.streamObjects(15707, Utils.range(18817, 18828)), new String[] { "Customise", "Quick-switch", "Teleport to Daemonheim", "Open party interface" }) {
-		@Override
-		public void handle(ItemClickEvent e) {
-			switch (e.getOption()) {
-			case "Teleport to Daemonheim":
-				Magic.sendDamonheimTeleport(e.getPlayer(), new WorldTile(3449, 3698, 0));
-				break;
-			case "Open party interface":
-				e.getPlayer().getDungManager().openPartyInterface();
-				break;
-			case "Customise":
-				if (e.getPlayer().getControllerManager().isIn(DungeonController.class))
-					e.getPlayer().getDungManager().customizeKinship(e.getItem());
+	public static ItemClickHandler handleKinship = new ItemClickHandler(Utils.streamObjects(15707, Utils.range(18817, 18828)), new String[] { "Customise", "Quick-switch", "Teleport to Daemonheim", "Open party interface" }, e -> {
+		switch (e.getOption()) {
+		case "Teleport to Daemonheim":
+			Magic.sendDamonheimTeleport(e.getPlayer(), WorldTile.of(3449, 3698, 0));
+			break;
+		case "Open party interface":
+			e.getPlayer().getDungManager().openPartyInterface();
+			break;
+		case "Customise":
+			if (e.getPlayer().getControllerManager().isIn(DungeonController.class))
+				e.getPlayer().getDungManager().customizeKinship(e.getItem());
+			else
+				e.getPlayer().sendMessage("You cannot customize your ring outside of a dungeon.");
+			break;
+		case "Quick-switch":
+			if (!e.getPlayer().getControllerManager().isIn(DungeonController.class))
+				return;
+			e.getPlayer().closeInterfaces();
+			KinshipPerk active = e.getPlayer().getDungManager().activeRingPerk;
+			KinshipPerk quickSwitch = e.getPlayer().getDungManager().quickSwitch;
+			if (active != null && quickSwitch != null) {
+				e.getPlayer().getDungManager().activeRingPerk = quickSwitch;
+				e.getPlayer().getDungManager().quickSwitch = active;
+				e.getItem().setId(quickSwitch.getItemId());
+				if (e.isEquipped())
+					e.getPlayer().getEquipment().refresh(Equipment.RING);
 				else
-					e.getPlayer().sendMessage("You cannot customize your ring outside of a dungeon.");
-				break;
-			case "Quick-switch":
-				if (!e.getPlayer().getControllerManager().isIn(DungeonController.class))
-					return;
-				e.getPlayer().closeInterfaces();
-				KinshipPerk active = e.getPlayer().getDungManager().activeRingPerk;
-				KinshipPerk quickSwitch = e.getPlayer().getDungManager().quickSwitch;
-				if (active != null && quickSwitch != null) {
-					e.getPlayer().getDungManager().activeRingPerk = quickSwitch;
-					e.getPlayer().getDungManager().quickSwitch = active;
-					e.getItem().setId(quickSwitch.getItemId());
-					if (e.isEquipped())
-						e.getPlayer().getEquipment().refresh(Equipment.RING);
-					else
-						e.getPlayer().getInventory().refresh(e.getItem().getSlot());
-				} else
-					e.getPlayer().sendMessage("You need to have an active perk set and a quick-switch to use this feature.");
-				break;
-			}
+					e.getPlayer().getInventory().refresh(e.getItem().getSlot());
+			} else
+				e.getPlayer().sendMessage("You need to have an active perk set and a quick-switch to use this feature.");
+			break;
 		}
-	};
+	});
 
 	public void addBindedItem(int itemId) {
 		bindedItems.add(new Item(itemId));
@@ -513,82 +501,70 @@ public class DungManager {
 		this.maxComplexity = maxComplexity;
 	}
 
-	public static ButtonClickHandler handleDungTab = new ButtonClickHandler(939) {
-		@Override
-		public void handle(ButtonClickEvent e) {
-			if (e.getComponentId() >= 59 && e.getComponentId() <= 72) {
-				int playerIndex = (e.getComponentId() - 59) / 3;
-				if ((e.getComponentId() & 0x3) != 0 || e.getComponentId() == 68)
-					e.getPlayer().getDungManager().pressOption(playerIndex, e.getPacket() == ClientPacket.IF_OP1 ? 0 : e.getPacket() == ClientPacket.IF_OP2 ? 1 : 2);
-				else
-					e.getPlayer().getDungManager().pressOption(playerIndex, 3);
-			} else if (e.getComponentId() == 45)
-				e.getPlayer().getDungManager().formParty();
-			else if (e.getComponentId() == 33 || e.getComponentId() == 36)
-				e.getPlayer().getDungManager().checkLeaveParty();
-			else if (e.getComponentId() == 43)
-				e.getPlayer().getDungManager().invite();
-			else if (e.getComponentId() == 102)
-				e.getPlayer().getDungManager().changeComplexity();
-			else if (e.getComponentId() == 108)
-				e.getPlayer().getDungManager().changeFloor();
-			else if (e.getComponentId() == 87)
-				e.getPlayer().getDungManager().openResetProgress();
-			else if (e.getComponentId() == 94)
-				e.getPlayer().getDungManager().switchGuideMode();
-			else if (e.getComponentId() == 112)
-				e.getPlayer().getInterfaceManager().sendSubDefault(Sub.TAB_QUEST);
-		}
-	};
+	public static ButtonClickHandler handleDungTab = new ButtonClickHandler(939, e -> {
+		if (e.getComponentId() >= 59 && e.getComponentId() <= 72) {
+			int playerIndex = (e.getComponentId() - 59) / 3;
+			if ((e.getComponentId() & 0x3) != 0 || e.getComponentId() == 68)
+				e.getPlayer().getDungManager().pressOption(playerIndex, e.getPacket() == ClientPacket.IF_OP1 ? 0 : e.getPacket() == ClientPacket.IF_OP2 ? 1 : 2);
+			else
+				e.getPlayer().getDungManager().pressOption(playerIndex, 3);
+		} else if (e.getComponentId() == 45)
+			e.getPlayer().getDungManager().formParty();
+		else if (e.getComponentId() == 33 || e.getComponentId() == 36)
+			e.getPlayer().getDungManager().checkLeaveParty();
+		else if (e.getComponentId() == 43)
+			e.getPlayer().getDungManager().invite();
+		else if (e.getComponentId() == 102)
+			e.getPlayer().getDungManager().changeComplexity();
+		else if (e.getComponentId() == 108)
+			e.getPlayer().getDungManager().changeFloor();
+		else if (e.getComponentId() == 87)
+			e.getPlayer().getDungManager().openResetProgress();
+		else if (e.getComponentId() == 94)
+			e.getPlayer().getDungManager().switchGuideMode();
+		else if (e.getComponentId() == 112)
+			e.getPlayer().getInterfaceManager().sendSubDefault(Sub.TAB_QUEST);
+	});
 
-	public static ButtonClickHandler handleInviteScreen = new ButtonClickHandler(949) {
-		@Override
-		public void handle(ButtonClickEvent e) {
-			if (e.getComponentId() == 65)
-				e.getPlayer().getDungManager().acceptInvite();
-			else if (e.getComponentId() == 61 || e.getComponentId() == 63)
-				e.getPlayer().closeInterfaces();
-		}
-	};
+	public static ButtonClickHandler handleInviteScreen = new ButtonClickHandler(949, e -> {
+		if (e.getComponentId() == 65)
+			e.getPlayer().getDungManager().acceptInvite();
+		else if (e.getComponentId() == 61 || e.getComponentId() == 63)
+			e.getPlayer().closeInterfaces();
+	});
 
-	public static ButtonClickHandler handleComplexitySelect = new ButtonClickHandler(938) {
-		@Override
-		public void handle(ButtonClickEvent e) {
-			switch (e.getComponentId()) {
-			case 39:
-				e.getPlayer().getDungManager().confirmComplexity();
-				break;
-			case 56:
-				e.getPlayer().getDungManager().selectComplexity(1);
-				break;
-			case 61:
-				e.getPlayer().getDungManager().selectComplexity(2);
-				break;
-			case 66:
-				e.getPlayer().getDungManager().selectComplexity(3);
-				break;
-			case 71:
-				e.getPlayer().getDungManager().selectComplexity(4);
-				break;
-			case 76:
-				e.getPlayer().getDungManager().selectComplexity(5);
-				break;
-			case 81:
-				e.getPlayer().getDungManager().selectComplexity(6);
-				break;
-			}
+	public static ButtonClickHandler handleComplexitySelect = new ButtonClickHandler(938, e -> {
+		switch (e.getComponentId()) {
+		case 39:
+			e.getPlayer().getDungManager().confirmComplexity();
+			break;
+		case 56:
+			e.getPlayer().getDungManager().selectComplexity(1);
+			break;
+		case 61:
+			e.getPlayer().getDungManager().selectComplexity(2);
+			break;
+		case 66:
+			e.getPlayer().getDungManager().selectComplexity(3);
+			break;
+		case 71:
+			e.getPlayer().getDungManager().selectComplexity(4);
+			break;
+		case 76:
+			e.getPlayer().getDungManager().selectComplexity(5);
+			break;
+		case 81:
+			e.getPlayer().getDungManager().selectComplexity(6);
+			break;
 		}
-	};
+	});
 
-	public static ButtonClickHandler handleFloorSelect = new ButtonClickHandler(947) {
-		@Override
-		public void handle(ButtonClickEvent e) {
-			if (e.getComponentId() >= 48 && e.getComponentId() <= 107)
-				e.getPlayer().getDungManager().selectFloor((e.getComponentId() - 48) + 1);
-			else if (e.getComponentId() == 766)
-				e.getPlayer().getDungManager().confirmFloor();
-		}
-	};
+	public static ButtonClickHandler handleFloorSelect = new ButtonClickHandler(947, e -> {
+		if (e.getComponentId() >= 48 && e.getComponentId() <= 107)
+			e.getPlayer().getDungManager().selectFloor((e.getComponentId() - 48) + 1);
+		else if (e.getComponentId() == 766)
+			e.getPlayer().getDungManager().confirmFloor();
+	});
 
 	public void openPartyInterface() {
 		player.getInterfaceManager().sendSub(Sub.TAB_QUEST, 939);
@@ -696,22 +672,19 @@ public class DungManager {
 		}
 	}
 
-	public static ButtonClickHandler handleInspectTab = new ButtonClickHandler(936, 946) {
-		@Override
-		public void handle(ButtonClickEvent e) {
-			int comp = e.getComponentId();
-			if (e.getInterfaceId() == 936) {
-				if (comp == 146)// exit button
-					e.getPlayer().getDungManager().openPartyInterface();
-				if (comp == 134)// inventory
-					e.getPlayer().sendMessage("Not implemented");
-				if (comp == 137)// equipment
-					e.getPlayer().sendMessage("Not implemented");
-				if (comp == 140)// summoning
-					e.getPlayer().sendMessage("Not implemented");
-			}
+	public static ButtonClickHandler handleInspectTab = new ButtonClickHandler(new Object[] { 936, 946 }, e -> {
+		int comp = e.getComponentId();
+		if (e.getInterfaceId() == 936) {
+			if (comp == 146)// exit button
+				e.getPlayer().getDungManager().openPartyInterface();
+			if (comp == 134)// inventory
+				e.getPlayer().sendMessage("Not implemented");
+			if (comp == 137)// equipment
+				e.getPlayer().sendMessage("Not implemented");
+			if (comp == 140)// summoning
+				e.getPlayer().sendMessage("Not implemented");
 		}
-	};
+	});
 
 	private void inspectPlayer(Player p) {
 		player.setCloseInterfacesEvent(() -> openPartyInterface());

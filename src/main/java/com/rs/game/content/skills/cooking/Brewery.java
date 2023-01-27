@@ -21,12 +21,10 @@ import com.rs.lib.Constants;
 import com.rs.lib.game.Animation;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.plugin.events.ItemOnObjectEvent;
-import com.rs.plugin.events.LoginEvent;
-import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.ItemOnObjectHandler;
 import com.rs.plugin.handlers.LoginHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
+import com.rs.utils.Ticks;
 
 @PluginEventHandler
 public class Brewery {
@@ -44,7 +42,7 @@ public class Brewery {
 	private static final Animation CALQUAT_LEVEL = new Animation(2284);
 	private static final Animation BEER_GLASS_LEVEL = new Animation(2285);
 
-	private static final long BREWING_CONSTANT = 12 * 60 * 60 * 1000; //12 hours
+	public static final long BREW_TICKS = Ticks.fromHours(12);
 
 	private Brewable brew;
 	private int prep;
@@ -65,62 +63,50 @@ public class Brewery {
 		this.player = player;
 	}
 
-	public static LoginHandler onLogin = new LoginHandler() {
-		@Override
-		public void handle(LoginEvent e) {
-			e.getPlayer().getKeldagrimBrewery().updateVars();
-			e.getPlayer().getPhasmatysBrewery().updateVars();
-		}
-	};
+	public static LoginHandler onLogin = new LoginHandler(e -> {
+		e.getPlayer().getKeldagrimBrewery().updateVars();
+		e.getPlayer().getPhasmatysBrewery().updateVars();
+	});
 
-	public static ObjectClickHandler handleValve = new ObjectClickHandler(new Object[] { 7442, 7443 }) {
-		@Override
-		public void handle(ObjectClickEvent e) {
-			Brewery brewery = e.getObjectId() == 7442 ? e.getPlayer().getKeldagrimBrewery() : e.getPlayer().getPhasmatysBrewery();
-			brewery.turnValve();
-		}
-	};
+	public static ObjectClickHandler handleValve = new ObjectClickHandler(new Object[] { 7442, 7443 }, e -> {
+		Brewery brewery = e.getObjectId() == 7442 ? e.getPlayer().getKeldagrimBrewery() : e.getPlayer().getPhasmatysBrewery();
+		brewery.turnValve();
+	});
 
-	public static ObjectClickHandler handleBarrels = new ObjectClickHandler(new Object[] { 7431, 7432 }) {
-		@Override
-		public void handle(ObjectClickEvent e) {
-			Brewery brewery = e.getObjectId() == 7431 ? e.getPlayer().getKeldagrimBrewery() : e.getPlayer().getPhasmatysBrewery();
-			switch(e.getOption()) {
-			case "Drain":
-				brewery.reset();
-				e.getPlayer().sendMessage("You drain the spoiled drink from the vat.");
-				break;
-			case "Level":
-				brewery.level();
-				break;
-			}
+	public static ObjectClickHandler handleBarrels = new ObjectClickHandler(new Object[] { 7431, 7432 }, e -> {
+		Brewery brewery = e.getObjectId() == 7431 ? e.getPlayer().getKeldagrimBrewery() : e.getPlayer().getPhasmatysBrewery();
+		switch(e.getOption()) {
+		case "Drain":
+			brewery.reset();
+			e.getPlayer().sendMessage("You drain the spoiled drink from the vat.");
+			break;
+		case "Level":
+			brewery.level();
+			break;
 		}
-	};
+	});
 
-	public static ItemOnObjectHandler handleVats = new ItemOnObjectHandler(new Object[] { 7494, 7495 }) {
-		@Override
-		public void handle(ItemOnObjectEvent e) {
-			Brewery brewery = e.getObjectId() == 7494 ? e.getPlayer().getKeldagrimBrewery() : e.getPlayer().getPhasmatysBrewery();
-			switch(e.getItem().getId()) {
-			case BUCKET_OF_WATER:
-				brewery.addWater();
-				break;
-			case BARLEY_MALT:
-				brewery.addMalt();
-				break;
-			case ALE_YEAST:
-				brewery.addYeast();
-				break;
-			case THE_STUFF:
-				brewery.addTheStuff();
-				break;
-			default:
-				brewery.addSecondary(e.getItem().getId());
-				break;
-			}
-			brewery.updateVars();
+	public static ItemOnObjectHandler handleVats = new ItemOnObjectHandler(new Object[] { 7494, 7495 }, e -> {
+		Brewery brewery = e.getObjectId() == 7494 ? e.getPlayer().getKeldagrimBrewery() : e.getPlayer().getPhasmatysBrewery();
+		switch(e.getItem().getId()) {
+		case BUCKET_OF_WATER:
+			brewery.addWater();
+			break;
+		case BARLEY_MALT:
+			brewery.addMalt();
+			break;
+		case ALE_YEAST:
+			brewery.addYeast();
+			break;
+		case THE_STUFF:
+			brewery.addTheStuff();
+			break;
+		default:
+			brewery.addSecondary(e.getItem().getId());
+			break;
 		}
-	};
+		brewery.updateVars();
+	});
 
 	public void ferment() {
 		if (isFinished())
@@ -138,11 +124,11 @@ public class Brewery {
 			return;
 		long currTime = System.currentTimeMillis();
 		long timePassed = currTime - lastTime;
-		if (timePassed > BREWING_CONSTANT) {
-			int cycles = (int) (timePassed / BREWING_CONSTANT);
+		if (timePassed > BREW_TICKS) {
+			int cycles = (int) (timePassed / BREW_TICKS);
 			for (int i = 0;i < cycles;i++)
 				ferment();
-			lastTime = currTime - (timePassed % (cycles * BREWING_CONSTANT));
+			lastTime = currTime - (timePassed % (cycles * BREW_TICKS));
 		}
 		updateVars();
 	}

@@ -18,9 +18,9 @@ package com.rs.game.content.bosses.nomad;
 
 import java.util.ArrayList;
 
-import com.rs.game.content.dialogue.HeadE;
 import com.rs.game.content.skills.summoning.Familiar;
 import com.rs.game.content.transportation.FadingScreen;
+import com.rs.game.engine.dialogue.HeadE;
 import com.rs.game.model.entity.Entity;
 import com.rs.game.model.entity.ForceTalk;
 import com.rs.game.model.entity.Hit;
@@ -175,7 +175,7 @@ public class Nomad extends NPC {
 		/*
 		 * if no throne returns middle of area
 		 */
-		return throneTile == null ? new WorldTile((getRegionX() << 6) + 32, (getRegionY() << 6) + 32, getPlane()) : throneTile;
+		return throneTile == null ? WorldTile.of((getRegionX() << 6) + 32, (getRegionY() << 6) + 32, getPlane()) : throneTile;
 	}
 
 	public void setThroneTile(WorldTile throneTile) {
@@ -262,10 +262,5 @@ public class Nomad extends NPC {
 		this.healed = healed;
 	}
 
-	public static NPCInstanceHandler toFunc = new NPCInstanceHandler(8528, 8529, 8530, 8531, 8532) {
-		@Override
-		public NPC getNPC(int npcId, WorldTile tile) {
-			return new Nomad(npcId, tile, false);
-		}
-	};
+	public static NPCInstanceHandler toFunc = new NPCInstanceHandler(new Object[] { 8528, 8529, 8530, 8531, 8532 }, (npcId, tile) -> new Nomad(npcId, tile, false));
 }

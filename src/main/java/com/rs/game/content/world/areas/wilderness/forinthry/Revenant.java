@@ -19,6 +19,7 @@ package com.rs.game.content.world.areas.wilderness.forinthry;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.rs.game.content.Effect;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.Animation;
@@ -26,6 +27,7 @@ import com.rs.lib.game.Item;
 import com.rs.lib.game.WorldTile;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
+import com.rs.plugin.handlers.ItemClickHandler;
 import com.rs.plugin.handlers.NPCInstanceHandler;
 import com.rs.utils.drop.Drop;
 import com.rs.utils.drop.DropSet;
@@ -39,6 +41,23 @@ public class Revenant extends NPC {
 		setForceAggroDistance(4);
 	}
 
+	public static ItemClickHandler forinthryBrace = new ItemClickHandler(new Object[] { 11095, 11097, 11099, 11101, 11103 }, new String[] { "Repel", "Check" }, e -> {
+		switch(e.getOption()) {
+		case "Check" -> {
+			e.getPlayer().sendMessage("You are currently " + (!e.getPlayer().hasEffect(Effect.REV_AGGRO_IMMUNE) ? "not" : "") + " protected from revenant aggression.");
+			e.getPlayer().sendMessage("You are currently " + (!e.getPlayer().hasEffect(Effect.REV_IMMUNE) ? "not" : "") + " protected from revenant damage.");
+		}
+		case "Repel" -> {
+			if (e.getPlayer().getInventory().containsItem(e.getItem().getId(), 1)) {
+				e.getPlayer().getInventory().deleteItem(e.getItem().getId(), 1);
+				if (e.getItem().getId() != 11103)
+					e.getPlayer().getInventory().addItem(e.getItem().getId() + 2, 1);
+				e.getPlayer().refreshForinthry();
+			}	
+		}
+		}
+	});
+	
 	@Override
 	public void spawn() {
 		super.spawn();
@@ -176,10 +195,5 @@ public class Revenant extends NPC {
 		return drops;
 	}
 
-	public static NPCInstanceHandler toFunc = new NPCInstanceHandler(13465, 13466, 13467, 13468, 13469, 13470, 13471, 13472, 13473, 13474, 13475, 13476, 13477, 13478, 13479, 13480, 13481) {
-		@Override
-		public NPC getNPC(int npcId, WorldTile tile) {
-			return new Revenant(npcId, tile, false);
-		}
-	};
+	public static NPCInstanceHandler toFunc = new NPCInstanceHandler(new Object[] { 13465, 13466, 13467, 13468, 13469, 13470, 13471, 13472, 13473, 13474, 13475, 13476, 13477, 13478, 13479, 13480, 13481 }, (npcId, tile) -> new Revenant(npcId, tile, false));
 }
