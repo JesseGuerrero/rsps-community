@@ -63,6 +63,7 @@ public class ScalingItems {
 		items.addAll(getItemsByID("bandos"));
 		items.addAll(getItemsByID("Saradomin's whisper"));
 		items.addAll(getItemsByID("Regen bracelet"));
+		items.addAll(getItemsByID("torva"));
 		return items.stream().distinct().toArray();
 	}
 
@@ -76,6 +77,7 @@ public class ScalingItems {
 		items.addAll(getItemsByID("hide"));
 		items.addAll(getItemsByID("Regen bracelet"));
 		items.addAll(getItemsByID("Saradomin's murmer"));
+		items.addAll(getItemsByID("pernix"));
 		return items.stream().distinct().toArray();
 	}
 
@@ -103,6 +105,9 @@ public class ScalingItems {
 		items.addAll(getItemsByID("chap"));
 		items.addAll(getItemsByID("coif"));
 		items.addAll(getItemsByID("Regen bracelet"));
+		items.addAll(getItemsByID("pernix"));
+		items.addAll(getItemsByID("torva"));
+		items.addAll(getItemsByName("virtus"));
 		return items.stream().distinct().toArray();
 	}
 	public static Object[] getMagicDefenseScalingItemsByID() {
@@ -122,6 +127,8 @@ public class ScalingItems {
 		items.addAll(getItemsByID("chap"));
 		items.addAll(getItemsByID("coif"));
 		items.addAll(getItemsByID("Regen bracelet"));
+		items.addAll(getItemsByID("pernix"));
+		items.addAll(getItemsByName("virtus"));
 		return items.stream().distinct().toArray();
 	}
 	public static Object[] getMagicAttackScalingItemsByID() {
@@ -138,6 +145,7 @@ public class ScalingItems {
 		items.addAll(getItemsByID("wand"));
 		items.addAll(getItemsByID("wizard"));
 		items.addAll(getItemsByID("Regen bracelet"));
+		items.addAll(getItemsByName("virtus"));
 		return items.stream().distinct().toArray();
 	}
 	
@@ -169,7 +177,7 @@ public class ScalingItems {
 		items.addAll(getItemsByName("scimitar"));
 		items.addAll(getItemsByName("hatchet"));
 		items.addAll(getItemsByName("regen bracelet"));
-		items.addAll(getItemsByName("Saradomin's whisper"));
+		items.addAll(getItemsByName("saradomin's whisper"));
 		return items.stream().distinct().toArray();
 	}
 
@@ -179,6 +187,7 @@ public class ScalingItems {
 		items.addAll(getItemsByName("bandos"));
 		items.addAll(getItemsByName("Saradomin's whisper"));
 		items.addAll(getItemsByName("Regen bracelet"));
+		items.addAll(getItemsByName("torva"));
 		return items.stream().distinct().toArray();
 	}
 
@@ -192,6 +201,7 @@ public class ScalingItems {
 		items.addAll(getItemsByName("hide"));
 		items.addAll(getItemsByName("Regen bracelet"));
 		items.addAll(getItemsByName("Saradomin's murmer"));
+		items.addAll(getItemsByName("pernix"));
 		return items.stream().distinct().toArray();
 	}
 
@@ -219,6 +229,9 @@ public class ScalingItems {
 		items.addAll(getItemsByName("chap"));
 		items.addAll(getItemsByName("coif"));
 		items.addAll(getItemsByName("Regen bracelet"));
+		items.addAll(getItemsByName("pernix"));
+		items.addAll(getItemsByName("torva"));
+		items.addAll(getItemsByName("virtus"));
 		return items.stream().distinct().toArray();
 	}
 	public static Object[] getMagicDefenseScalingItems() {
@@ -238,6 +251,8 @@ public class ScalingItems {
 		items.addAll(getItemsByName("chap"));
 		items.addAll(getItemsByName("coif"));
 		items.addAll(getItemsByName("Regen bracelet"));
+		items.addAll(getItemsByName("pernix"));
+		items.addAll(getItemsByName("virtus"));
 		return items.stream().distinct().toArray();
 	}
 	public static Object[] getMagicAttackScalingItems() {
@@ -254,6 +269,7 @@ public class ScalingItems {
 		items.addAll(getItemsByName("wand"));
 		items.addAll(getItemsByName("wizard"));
 		items.addAll(getItemsByName("Regen bracelet"));
+		items.addAll(getItemsByName("virtus"));
 		return items.stream().distinct().toArray();
 	}
 	
@@ -267,7 +283,13 @@ public class ScalingItems {
 		if(!CustomScape.isPlayerCustomScape(e.getPlayer()))
 			return;
 		int playerScale = e.getPlayer().getI("CustomScapeScale", 0);
+		int id = e.getNPC().getId();
+		if(id == 6260 || id == 6203 || id == 6222 || id == 6247 || id == 1158)
+			playerScale*=4;
+		if(id == 13447 || id == 8133)
+			playerScale*=8;
 		double playerCombatScale = 1 + (playerScale/10.0);
+
 		double npcScale = e.getNPC().getTempAttribs().getI("CustomScapeScale");
 		double npcCombatScale = 1 + (npcScale/10.0);
 		double scale = 1;
