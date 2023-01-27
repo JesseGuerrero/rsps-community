@@ -24,24 +24,20 @@ import com.rs.game.tasks.WorldTasks;
 import com.rs.lib.game.Animation;
 import com.rs.lib.game.WorldTile;
 import com.rs.plugin.annotations.PluginEventHandler;
-import com.rs.plugin.events.ButtonClickEvent;
 import com.rs.plugin.handlers.ButtonClickHandler;
 import com.rs.rsps.jessecustom.CustomScripts;
 
 @PluginEventHandler
 public class CorporealBeastController extends Controller {
 
-	public static ButtonClickHandler handleEnterWarning = new ButtonClickHandler(650) {
-		@Override
-		public void handle(ButtonClickEvent e) {
+	public static ButtonClickHandler handleEnterWarning = new ButtonClickHandler(650, e -> {
 			if (e.getComponentId() == 15) {
 				e.getPlayer().stopAll();
-				e.getPlayer().setNextWorldTile(new WorldTile(2974, 4384, e.getPlayer().getPlane()));
+			e.getPlayer().setNextWorldTile(WorldTile.of(2974, 4384, e.getPlayer().getPlane()));
 				e.getPlayer().getControllerManager().startController(new CorporealBeastController());
 			} else if (e.getComponentId() == 16)
 				e.getPlayer().closeInterfaces();
-		}
-	};
+	});
 
 	@Override
 	public void start() {
@@ -53,7 +49,7 @@ public class CorporealBeastController extends Controller {
 		if (object.getId() == 37929 || object.getId() == 38811) {
 			removeController();
 			player.stopAll();
-			player.setNextWorldTile(new WorldTile(2970, 4384, player.getPlane()));
+			player.setNextWorldTile(WorldTile.of(2970, 4384, player.getPlane()));
 			return false;
 		}
 		return true;
@@ -79,7 +75,7 @@ public class CorporealBeastController extends Controller {
 					if(!CustomScripts.deathCofferIsSuccessful(player)) {
 						player.sendItemsOnDeath(null, false);
 						player.reset();
-						player.setNextWorldTile(new WorldTile(Settings.getConfig().getPlayerRespawnTile()));
+					player.setNextWorldTile(WorldTile.of(Settings.getConfig().getPlayerRespawnTile()));
 						player.setNextAnimation(new Animation(-1));
 					}
 				} else if (loop == 4) {

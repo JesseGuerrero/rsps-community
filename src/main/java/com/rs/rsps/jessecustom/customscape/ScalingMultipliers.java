@@ -46,39 +46,37 @@ public class ScalingMultipliers {
 
 
 
-	public static NPCDropHandler increaseAmountByScale = new NPCDropHandler(null, ScalingMultipliers.scalingAmountMultipliers()) {
-		@Override
-		public void handle(NPCDropEvent e) {
-			if(e.getNPC().getTempAttribs() == null)
-				return;
-			if(e.getNPC() instanceof DungeonNPC)
-				return;
-			if(CustomScape.isPlayerCustomScape(e.getPlayer())) {
-				int playerScale = e.getPlayer().getI("CustomScapeScale", 0);
-				double playerCombatScale = 1 + (playerScale / 10.0);
-				double npcScale = e.getNPC().getTempAttribs().getI("CustomScapeScale");
-				double npcCombatScale = 1 + (npcScale / 10.0);
-				double scale = 1;
-				if (npcCombatScale >= playerCombatScale) {
-					scale = playerCombatScale;
-					if (Settings.getConfig().isDebug())
-						e.getPlayer().sendMessage("This one");
-				}
-				if (npcCombatScale < playerCombatScale) {
-					scale = npcCombatScale;
-					if (Settings.getConfig().isDebug())
-						e.getPlayer().sendMessage("This two " + e.getNPC().getTempAttribs().getD("CustomScapeScale"));
-				}
+	public static NPCDropHandler increaseAmountByScale = new NPCDropHandler(null, ScalingMultipliers.scalingAmountMultipliers(), e -> {
+		if(e.getNPC().getTempAttribs() == null)
+			return;
+		if(e.getNPC() instanceof DungeonNPC)
+			return;
+		if(CustomScape.isPlayerCustomScape(e.getPlayer())) {
+			int playerScale = e.getPlayer().getI("CustomScapeScale", 0);
+			double playerCombatScale = 1 + (playerScale / 10.0);
+			double npcScale = e.getNPC().getTempAttribs().getI("CustomScapeScale");
+			double npcCombatScale = 1 + (npcScale / 10.0);
+			double scale = 1;
+			if (npcCombatScale >= playerCombatScale) {
+				scale = playerCombatScale;
 				if (Settings.getConfig().isDebug())
-					e.getPlayer().sendMessage("scale " + scale);
-				e.getItem().setAmount((int) (e.getItem().getAmount() * scale));
+					e.getPlayer().sendMessage("This one");
 			}
-
-			if (e.getItem().getId() == 995 && e.getPlayer().getInventory().containsItem(25351, 1) && e.getPlayer().getInventory().hasRoomFor(e.getItem())) {
-				e.getPlayer().getInventory().addItem(new Item(e.getItem()));
-				e.deleteItem();
-				return;
+			if (npcCombatScale < playerCombatScale) {
+				scale = npcCombatScale;
+				if (Settings.getConfig().isDebug())
+					e.getPlayer().sendMessage("This two " + e.getNPC().getTempAttribs().getD("CustomScapeScale"));
 			}
+			if (Settings.getConfig().isDebug())
+				e.getPlayer().sendMessage("scale " + scale);
+			e.getItem().setAmount((int) (e.getItem().getAmount() * scale));
 		}
-	};
+
+		if (e.getItem().getId() == 995 && e.getPlayer().getInventory().containsItem(25351, 1) && e.getPlayer().getInventory().hasRoomFor(e.getItem())) {
+			e.getPlayer().getInventory().addItem(new Item(e.getItem()));
+			e.deleteItem();
+			return;
+		}
+	});
+
 }

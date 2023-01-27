@@ -33,6 +33,7 @@ import com.rs.lib.game.WorldTile;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.handlers.NPCClickHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
+import com.rs.rsps.jessecustom.groupironman.BankerCustom;
 import com.rs.utils.shop.ShopsHandler;
 
 @PluginEventHandler
@@ -43,13 +44,14 @@ public class Piscatoris {
 	});
 
 	public static NPCClickHandler handleArnoldPiscatorisBanker = new NPCClickHandler(new Object[] { 3824 }, e -> {
-		if (e.getOption().equalsIgnoreCase("Talk-to"))
-			e.getPlayer().startConversation(new Banker(e.getPlayer(), e.getNPC()));
-		if (e.getOption().equalsIgnoreCase("Trade"))
+		if(e.getOption().equalsIgnoreCase("Talk-to"))
+			e.getPlayer().startConversation(new BankerCustom(e.getPlayer(), e.getNPC()));
+//				e.getPlayer().startConversation(new Banker(e.getPlayer(), e.getNPC()));
+		if(e.getOption().equalsIgnoreCase("Trade"))
 			ShopsHandler.openShop(e.getPlayer(), "arnolds_eclectic_supplies");
-		if (e.getOption().equalsIgnoreCase("Bank"))
+		if(e.getOption().equalsIgnoreCase("Bank"))
 			e.getPlayer().getBank().open();
-		if (e.getOption().equalsIgnoreCase("Collect"))
+		if(e.getOption().equalsIgnoreCase("Collect"))
 			GE.openCollection(e.getPlayer());
 	});
 

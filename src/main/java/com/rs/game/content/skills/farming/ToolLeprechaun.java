@@ -57,7 +57,7 @@ public class ToolLeprechaun {
 	
 	@ServerStartupEvent
 	public static void addLoSOverrides() {
-		Entity.addLOSOverrides("Tool leprechaun", "Tool Leprechaun");
+//		Entity.addLOSOverrides("Tool leprechaun", "Tool Leprechaun");
 	}
 
 	public static NPCClickHandler handleToolLeprechaun = new NPCClickHandler(new Object[] { "Tool leprechaun", "Tool Leprechaun" }, e -> {

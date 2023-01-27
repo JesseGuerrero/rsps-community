@@ -1,9 +1,6 @@
 package com.rs.rsps.skillingtasks;
 
 import com.rs.cache.loaders.NPCDefinitions;
-import com.rs.game.content.dialogue.Dialogue;
-import com.rs.game.content.dialogue.HeadE;
-import com.rs.game.content.dialogue.Options;
 import com.rs.game.content.skills.cooking.Cooking;
 import com.rs.game.content.skills.crafting.GemCutting;
 import com.rs.game.content.skills.farming.HarvestPatch;
@@ -13,6 +10,9 @@ import com.rs.game.content.skills.herblore.Herblore;
 import com.rs.game.content.skills.mining.Mining;
 import com.rs.game.content.skills.smithing.Smithing;
 import com.rs.game.content.skills.woodcutting.Woodcutting;
+import com.rs.game.engine.dialogue.Dialogue;
+import com.rs.game.engine.dialogue.HeadE;
+import com.rs.game.engine.dialogue.Options;
 import com.rs.game.model.entity.actions.Action;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.entity.player.Skills;
@@ -243,27 +243,26 @@ public class SkillingTaskManager {
 		p.save("skillingTasksConsecutively", num);
 	}
 	
-	public static ItemAddedToInventoryHandler onItemAdd = new ItemAddedToInventoryHandler(1511, 1519, 1521, 317) {
+	public static ItemAddedToInventoryHandler onItemAdd = new ItemAddedToInventoryHandler(new Object[]{1511, 1519, 1521, 317}, e -> {
+		SkillingTask task = getCurrentSkillingTask(e.getPlayer());
+		int actionsRemaining = getActionsRemaining(e.getPlayer());
 
-		@Override
-		public void handle(ItemAddedToInventoryEvent e) {
-			SkillingTask task = getCurrentSkillingTask(e.getPlayer());
-			int actionsRemaining = getActionsRemaining(e.getPlayer());
-			
-			if (task == null || e.getItem().getId() != task.getItemId() || !e.getPlayer().getActionManager().doingAction(task.getAction()))
-				return;
+		if (task == null || e.getItem().getId() != task.getItemId() || !e.getPlayer().getActionManager().doingAction(task.getAction()))
+			return;
+
+		actionsRemaining--;
+		setActionsRemaining(e.getPlayer(), actionsRemaining);
+
+		if (actionsRemaining % 10 == 0 && actionsRemaining != 0)
+			e.getPlayer().sendMessage("<col=FF0000><shad=000000>" + "You're doing great, only " + actionsRemaining + " " + task.name().toString().toLowerCase().replace("_", " ") + " left to " + task.getActionString());
+
+		if (actionsRemaining == 0)
+			completeTask(e.getPlayer());
+	});
+
+
 		
-			actionsRemaining--;
-			setActionsRemaining(e.getPlayer(), actionsRemaining);
-			
-			if (actionsRemaining % 10 == 0 && actionsRemaining != 0)
-				e.getPlayer().sendMessage("<col=FF0000><shad=000000>" + "You're doing great, only " + actionsRemaining + " " + task.name().toString().toLowerCase().replace("_", " ") + " left to " + task.getActionString());
-			
-			if (actionsRemaining == 0)
-				completeTask(e.getPlayer());
-		}
-		
-	};
+
 
 	public static void completeTask(Player p) {
 		if (getCurrentSkillingTask(p) == null)
@@ -316,64 +315,64 @@ public class SkillingTaskManager {
 		p.startConversation(new Dialogue().addSimple("Your new task is to " + task.getActionString() + " " + amount + " " + task.name().toString().toLowerCase().replace("_", " ")));
 	}
 	
-	public static NPCClickHandler handleTaskMaster = new NPCClickHandler(new Object[]{ 100000 }) {
-		@Override
-		public void handle(NPCClickEvent e) {
-			if (e.getOption().contains("Talk-to")) {
-				SkillingTask task = getCurrentSkillingTask(e.getPlayer());
-				int actionsRemaining = getActionsRemaining(e.getPlayer());
-				
-				Dialogue taskMasterD = new Dialogue();
-				taskMasterD.addOptions(new Options() {
-					@Override
-					public void create() {
-						option("Get new task", new Dialogue().addOptions("Select a difficulty", new Options() {	
-							@Override
-							public void create() {
-								if (task != null) {
-									e.getPlayer().startConversation(new Dialogue().addSimple("You have already been assigned a skilling task."));
-									return;
-								}
-								option("Easy", () -> { generateNewTask(e.getPlayer(), Difficulty.EASY); });
-								option("Medium", () -> { generateNewTask(e.getPlayer(), Difficulty.MEDIUM); });
-								option("Hard", () -> { generateNewTask(e.getPlayer(), Difficulty.HARD); });
-								option("Elite", () -> { generateNewTask(e.getPlayer(), Difficulty.ELITE); });
+	public static NPCClickHandler handleTaskMaster = new NPCClickHandler(new Object[]{ 100000 }, e -> {
+		if (e.getOption().contains("Talk-to")) {
+			SkillingTask task = getCurrentSkillingTask(e.getPlayer());
+			int actionsRemaining = getActionsRemaining(e.getPlayer());
+
+			Dialogue taskMasterD = new Dialogue();
+			taskMasterD.addOptions(new Options() {
+				@Override
+				public void create() {
+					option("Get new task", new Dialogue().addOptions("Select a difficulty", new Options() {
+						@Override
+						public void create() {
+							if (task != null) {
+								e.getPlayer().startConversation(new Dialogue().addSimple("You have already been assigned a skilling task."));
+								return;
 							}
-						}));
-						if (task != null)
-							option("Check task", new Dialogue().addNPC(taskMaster, HeadE.CALM, "You're doing great, only " + actionsRemaining + " " + task.name().toString().toLowerCase().replace("_", " ") + (actionsRemaining > 1 ? "s" : "") + " left to " + task.getActionString()));
-						if (task != null) {
-							option("Cancel task", () -> { 
-								if (!e.getPlayer().getInventory().containsItem(skillingTickets, 5)) {
-									e.getPlayer().startConversation(new Dialogue()
-											.addNPC(taskMaster, HeadE.CALM, "You seem to be running low on skilling tickets. I suppose I could give you another task but I'd have to end your streak.")
-											.addOption("Get a new task?", "Yes, end my streak.", "No thanks.")
-											.addNext(() -> {
-												setCurrentSkillingTask(e.getPlayer(), null);
-												setActionsRemaining(e.getPlayer(), -1);
-												setConsecutiveTasks(e.getPlayer(), 0);
-											})
-									);
-								} else {
-									e.getPlayer().startConversation(new Dialogue()
-											.addNPC(taskMaster, HeadE.CALM, "I suppose I could give you a new task in exchange for 5 skilling tickets.")
-											.addOption("Get a new task?", "Yes, pay 5 skilling tickets.", "No thanks.")
-											.addNext(() -> {
-												e.getPlayer().getInventory().deleteItem(skillingTickets, 5);
-												setCurrentSkillingTask(e.getPlayer(), null);
-												setActionsRemaining(e.getPlayer(), -1);
-											})
-									);
-								}
-							});
+							option("Easy", () -> { generateNewTask(e.getPlayer(), Difficulty.EASY); });
+							option("Medium", () -> { generateNewTask(e.getPlayer(), Difficulty.MEDIUM); });
+							option("Hard", () -> { generateNewTask(e.getPlayer(), Difficulty.HARD); });
+							option("Elite", () -> { generateNewTask(e.getPlayer(), Difficulty.ELITE); });
 						}
-						option("Open shop", () -> { e.getPlayer().startConversation(new Dialogue().addSimple("Shop not yet added")); });
+					}));
+					if (task != null)
+						option("Check task", new Dialogue().addNPC(taskMaster, HeadE.CALM, "You're doing great, only " + actionsRemaining + " " + task.name().toString().toLowerCase().replace("_", " ") + (actionsRemaining > 1 ? "s" : "") + " left to " + task.getActionString()));
+					if (task != null) {
+						option("Cancel task", () -> {
+							if (!e.getPlayer().getInventory().containsItem(skillingTickets, 5)) {
+								e.getPlayer().startConversation(new Dialogue()
+										.addNPC(taskMaster, HeadE.CALM, "You seem to be running low on skilling tickets. I suppose I could give you another task but I'd have to end your streak.")
+										.addOption("Get a new task?", "Yes, end my streak.", "No thanks.")
+										.addNext(() -> {
+											setCurrentSkillingTask(e.getPlayer(), null);
+											setActionsRemaining(e.getPlayer(), -1);
+											setConsecutiveTasks(e.getPlayer(), 0);
+										})
+								);
+							} else {
+								e.getPlayer().startConversation(new Dialogue()
+										.addNPC(taskMaster, HeadE.CALM, "I suppose I could give you a new task in exchange for 5 skilling tickets.")
+										.addOption("Get a new task?", "Yes, pay 5 skilling tickets.", "No thanks.")
+										.addNext(() -> {
+											e.getPlayer().getInventory().deleteItem(skillingTickets, 5);
+											setCurrentSkillingTask(e.getPlayer(), null);
+											setActionsRemaining(e.getPlayer(), -1);
+										})
+								);
+							}
+						});
 					}
-				});
-				e.getPlayer().startConversation(taskMasterD);
-			} else if (e.getOption().contains("Trade")) {
-				e.getPlayer().startConversation(new Dialogue().addSimple("Shop not yet added"));
-			}
+					option("Open shop", () -> { e.getPlayer().startConversation(new Dialogue().addSimple("Shop not yet added")); });
+				}
+			});
+			e.getPlayer().startConversation(taskMasterD);
+		} else if (e.getOption().contains("Trade")) {
+			e.getPlayer().startConversation(new Dialogue().addSimple("Shop not yet added"));
 		}
-	};
+	});
+
+
+
 }

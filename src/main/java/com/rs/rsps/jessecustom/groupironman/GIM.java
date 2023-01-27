@@ -82,20 +82,18 @@ public class GIM {
 	}
 
 	public static ObjectClickHandler openChest = new ObjectClickHandler(new Object[] { 170 }, new WorldTile[]{
-			new WorldTile(3173, 3485, 0),
-			new WorldTile(3156, 3485, 0),
-			new WorldTile(3173, 3497, 0),
-			new WorldTile(3156, 3497, 0)}) {
-		@Override
-		public void handle(ObjectClickEvent e) {
-			if (e.getPlayer().getBool("Group IronMan")) {
-				if (e.getPlayer().getO("GIM Team") == null) {
-					e.getPlayer().sendMessage("You need to be part of a group to access a shared bank...");
-					return;
-				}
-				e.getPlayer().getBank().openGIMBank();
-			} else
-				e.getPlayer().sendMessage("Only GIM have access to this chest.");
-		}
-	};
+			WorldTile.of(3173, 3485, 0),
+			WorldTile.of(3156, 3485, 0),
+			WorldTile.of(3173, 3497, 0),
+			WorldTile.of(3156, 3497, 0)}, e -> {
+		if (e.getPlayer().getBool("Group IronMan")) {
+			if (e.getPlayer().getO("GIM Team") == null) {
+				e.getPlayer().sendMessage("You need to be part of a group to access a shared bank...");
+				return;
+			}
+			e.getPlayer().getBank().openGIMBank();
+		} else
+			e.getPlayer().sendMessage("Only GIM have access to this chest.");
+	});
+
 }

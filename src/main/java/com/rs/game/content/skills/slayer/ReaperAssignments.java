@@ -16,10 +16,10 @@
 //
 package com.rs.game.content.skills.slayer;
 
-import com.rs.game.content.dialogue.Conversation;
-import com.rs.game.content.dialogue.Dialogue;
-import com.rs.game.content.dialogue.HeadE;
-import com.rs.game.content.dialogue.Options;
+import com.rs.game.engine.dialogue.Conversation;
+import com.rs.game.engine.dialogue.Dialogue;
+import com.rs.game.engine.dialogue.HeadE;
+import com.rs.game.engine.dialogue.Options;
 import com.rs.game.model.entity.player.Player;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ItemClickEvent;
@@ -156,10 +156,8 @@ public class ReaperAssignments  {
 		return d;
 	}
 
-	public static ItemClickHandler handleGrimGem = new ItemClickHandler(24806) {
-		@Override
-		public void handle(ItemClickEvent e) {
-			switch(e.getOption()) {
+	public static ItemClickHandler handleGrimGem = new ItemClickHandler(new Object[]{24806}, e -> {
+		switch(e.getOption()) {
 			case "Activate":
 				e.getPlayer().startConversation(new ReaperDialogue(e.getPlayer()));
 				break;
@@ -172,14 +170,14 @@ public class ReaperAssignments  {
 			case "Assignment":
 				talkAboutAssignment(e.getPlayer());
 				break;
-			}
 		}
-	};
+	});
 
-	public static NPCClickHandler handleDeath = new NPCClickHandler(new Object[] { 15661 }) {
-		@Override
-		public void handle(NPCClickEvent e) {
-			switch(e.getOpNum()) {
+
+
+
+	public static NPCClickHandler handleDeath = new NPCClickHandler(new Object[] { 15661 }, e -> {
+		switch(e.getOpNum()) {
 			case 1:
 				e.getPlayer().startConversation(new ReaperDialogue(e.getPlayer()));
 				break;
@@ -192,8 +190,6 @@ public class ReaperAssignments  {
 				break;
 			case 5:
 				break;
-			}
 		}
-	};
-
+	});
 }

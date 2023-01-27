@@ -5,14 +5,14 @@ import com.rs.cache.loaders.Bonus;
 import com.rs.cache.loaders.ItemDefinitions;
 import com.rs.game.World;
 import com.rs.game.content.Toolbelt;
-import com.rs.game.content.commands.Commands;
-import com.rs.game.content.dialogue.Conversation;
-import com.rs.game.content.dialogue.Dialogue;
-import com.rs.game.content.dialogue.HeadE;
-import com.rs.game.content.dialogue.Options;
-import com.rs.game.content.quests.Quest;
+import com.rs.game.content.skills.magic.LodestoneAction;
 import com.rs.game.content.skills.slayer.Master;
-import com.rs.game.model.entity.actions.LodestoneAction;
+import com.rs.game.engine.command.Commands;
+import com.rs.game.engine.dialogue.Conversation;
+import com.rs.game.engine.dialogue.Dialogue;
+import com.rs.game.engine.dialogue.HeadE;
+import com.rs.game.engine.dialogue.Options;
+import com.rs.game.engine.quest.Quest;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.Constants;
 import com.rs.lib.game.Item;
@@ -25,12 +25,6 @@ import com.rs.plugin.events.LoginEvent;
 import com.rs.plugin.handlers.ItemOnItemHandler;
 import com.rs.plugin.handlers.ItemOnNPCHandler;
 import com.rs.plugin.handlers.LoginHandler;
-import com.rs.rsps.jessecustom.bosses.corp.CorporealBeastScalingInstanceController;
-import com.rs.rsps.jessecustom.bosses.godwars.armadyl.KreeArraScalingInstanceController;
-import com.rs.rsps.jessecustom.bosses.godwars.bandos.GeneralGraardorScalingInstanceController;
-import com.rs.rsps.jessecustom.bosses.godwars.saradomin.CommanderZilyanaScalingInstanceController;
-import com.rs.rsps.jessecustom.bosses.godwars.zamorak.KrilTstsarothScalingInstanceController;
-import com.rs.rsps.jessecustom.bosses.kalphitequeen.KalphiteQueenScalingInstanceController;
 import com.rs.rsps.jessecustom.customscape.CustomScape;
 import com.rs.rsps.jessecustom.groupironman.GIM;
 
@@ -41,7 +35,7 @@ public class CustomScripts {
 
 
 	public static Master highestSlayerMaster(Player player, Master master) {
-		if (player.withinDistance(new WorldTile(3161, 3461, 0))) {
+		if (player.withinDistance(WorldTile.of(3161, 3461, 0))) {
 			for (int i = Master.values().length - 1; i >= 0; i--) {
 				if (player.getSkills().getCombatLevelWithSummoning() >= Master.values()[i].requiredCombatLevel
 						&& player.getSkills().getLevelForXp(Constants.SLAYER) >= Master.values()[i].reqSlayerLevel) {
@@ -128,29 +122,29 @@ public class CustomScripts {
 			p.stopAll();
 		});
 
-		Commands.add(Rights.PLAYER, "kq [scale]", "Start qbd", (p, args) -> {
-			p.getControllerManager().startController(new KalphiteQueenScalingInstanceController());
-		});
-
-		Commands.add(Rights.PLAYER, "bando [scale]", "Start qbd", (p, args) -> {
-			p.getControllerManager().startController(new GeneralGraardorScalingInstanceController());
-		});
-
-		Commands.add(Rights.PLAYER, "corp [scale]", "Start qbd", (p, args) -> {
-			p.getControllerManager().startController(new CorporealBeastScalingInstanceController());
-		});
-
-		Commands.add(Rights.PLAYER, "zammy [scale]", "Start qbd", (p, args) -> {
-			p.getControllerManager().startController(new KrilTstsarothScalingInstanceController());
-		});
-
-		Commands.add(Rights.PLAYER, "arma [scale]", "Start qbd", (p, args) -> {
-			p.getControllerManager().startController(new KreeArraScalingInstanceController());
-		});
-
-		Commands.add(Rights.PLAYER, "sara [scale]", "Start qbd", (p, args) -> {
-			p.getControllerManager().startController(new CommanderZilyanaScalingInstanceController());
-		});
+//		Commands.add(Rights.PLAYER, "kq [scale]", "Start qbd", (p, args) -> {
+//			p.getControllerManager().startController(new KalphiteQueenScalingInstanceController());
+//		});
+//
+//		Commands.add(Rights.PLAYER, "bando [scale]", "Start qbd", (p, args) -> {
+//			p.getControllerManager().startController(new GeneralGraardorScalingInstanceController());
+//		});
+//
+//		Commands.add(Rights.PLAYER, "corp [scale]", "Start qbd", (p, args) -> {
+//			p.getControllerManager().startController(new CorporealBeastScalingInstanceController());
+//		});
+//
+//		Commands.add(Rights.PLAYER, "zammy [scale]", "Start qbd", (p, args) -> {
+//			p.getControllerManager().startController(new KrilTstsarothScalingInstanceController());
+//		});
+//
+//		Commands.add(Rights.PLAYER, "arma [scale]", "Start qbd", (p, args) -> {
+//			p.getControllerManager().startController(new KreeArraScalingInstanceController());
+//		});
+//
+//		Commands.add(Rights.PLAYER, "sara [scale]", "Start qbd", (p, args) -> {
+//			p.getControllerManager().startController(new CommanderZilyanaScalingInstanceController());
+//		});
 
 		Commands.add(Rights.PLAYER, "ipeek [itemId]", "Spawns an item with specified id and scaling.", (p, args) -> {
 			if (ItemDefinitions.getDefs(Integer.valueOf(args[0])).getName().equals("null")) {
@@ -173,17 +167,17 @@ public class CustomScripts {
 
 
 
-	public static ItemOnItemHandler handleMakeVineWhip = new ItemOnItemHandler(new int[]{21369}, new int[]{4151}) {//blamish oil, fly fishing rod
-		@Override
-		public void handle(ItemOnItemEvent e) {
-			if(e.getItem1().getId() == 4151)
-				e.getItem1().setId(21371);
-			if(e.getItem2().getId() == 4151)
-				e.getItem2().setId(21371);
-			e.getPlayer().getInventory().deleteItem(21369, 1); // WHIP VINE
-			e.getPlayer().getInventory().refresh();
-		}
-	};
+	public static ItemOnItemHandler handleMakeVineWhip = new ItemOnItemHandler(new int[]{21369}, new int[]{4151}, e-> {
+		if(e.getItem1().getId() == 4151)
+			e.getItem1().setId(21371);
+		if(e.getItem2().getId() == 4151)
+			e.getItem2().setId(21371);
+		e.getPlayer().getInventory().deleteItem(21369, 1); // WHIP VINE
+		e.getPlayer().getInventory().refresh();
+	});
+
+
+
 
 	public static void handleWhipSplit(Player p, Item item) {
 		if (p.getInventory().getFreeSlots() >= 1) {
@@ -220,17 +214,17 @@ public class CustomScripts {
 
 
 
-	public static LoginHandler onLoginUpdateGIMQuests = new LoginHandler() {
-		@Override
-		public void handle(LoginEvent e) {
-			if(GIM.isGIM(e.getPlayer()) && (boolean)e.getPlayer().get("resetQuestsGIM") == false) {
-				e.getPlayer().save("resetQuestsGIM", true);
-				for (Quest quest : Quest.values())
-					if (quest.isImplemented())
-						e.getPlayer().getQuestManager().resetQuest(quest);
-			}
+	public static LoginHandler onLoginUpdateGIMQuests = new LoginHandler(e -> {
+		if(GIM.isGIM(e.getPlayer()) && (boolean)e.getPlayer().get("resetQuestsGIM") == false) {
+			e.getPlayer().save("resetQuestsGIM", true);
+			for (Quest quest : Quest.values())
+				if (quest.isImplemented())
+					e.getPlayer().getQuestManager().resetQuest(quest);
 		}
-	};
+	});
+
+
+
 
 
 	public static boolean completeTreasureTrail(Player player, int level, Item item) {
@@ -426,55 +420,55 @@ public class CustomScripts {
 		Toolbelt.refreshToolbelt(p);
 	}
 
-	public static ItemOnNPCHandler handleLightCreatures = new ItemOnNPCHandler(true, new Object[] { 15661 }) {
-		@Override
-		public void handle(ItemOnNPCEvent e) {
-			int NPC = e.getNPC().getId();
-			Player player = e.getPlayer();
-			Item weapon = e.getItem();
+	public static ItemOnNPCHandler handleDeathOptions = new ItemOnNPCHandler(true, new Object[] { 15661 }, e -> {
+		int NPC = e.getNPC().getId();
+		Player player = e.getPlayer();
+		Item weapon = e.getItem();
 
-			if (weapon.getMetaData("HitBonus") == null) {
-				player.startConversation(new Dialogue().addNPC(NPC, HeadE.CALM_TALK, "Your weapon must first taste death before taking on a name..."));
-				return;
-			}
-
-			if(weapon.getMetaData("WeaponName") != null) {
-				player.startConversation(new Dialogue()
-						.addNPC(NPC, HeadE.CALM_TALK, "Mortal, you have already named this weapon..."));
-				return;
-			}
-
-			if (weapon.getMetaData("HitBonus") != null && weapon.getMetaData("WeaponName") == null)
-				player.startConversation(new Dialogue()
-						.addNPC(NPC, HeadE.CALM_TALK, "I see you have a weapon of death...")
-						.addPlayer(HeadE.EVIL_LAUGH, "Yes I do, thank you very much.")
-						.addPlayer(HeadE.CALM_TALK, "What of it?")
-						.addNPC(NPC, HeadE.CALM_TALK, "I can name your weapon once and forever that will be its brand...")
-						.addOptions("Name your weapon?", options -> {
-							options.add("No");
-							options.add("Yes", new Dialogue()
-									.addPlayer(HeadE.CALM_TALK, "Yes, ill name it")
-									.addNext(()->{
-										player.sendInputName("What name for your weapon?", name -> {
-											player.startConversation(new Dialogue()
-													.addNPC(NPC, HeadE.CALM_TALK, "Are you sure you want \"" + name + "\"?")
-													.addOptions("Set name to \"" + name + "\"?", option -> {
-														option.add("No");
-														option.add("Yes", () -> {
-															weapon.setMetaDataO("WeaponName", name);
-															player.sendMessage("Your weapon is now named \"" + name + "\"...");
-														});
-													})
-											);
-
-										});
-									})
-							);
-						})
-				);
-
+		if (weapon.getMetaData("HitBonus") == null) {
+			player.startConversation(new Dialogue().addNPC(NPC, HeadE.CALM_TALK, "Your weapon must first taste death before taking on a name..."));
+			return;
 		}
-	};
+
+		if(weapon.getMetaData("WeaponName") != null) {
+			player.startConversation(new Dialogue()
+					.addNPC(NPC, HeadE.CALM_TALK, "Mortal, you have already named this weapon..."));
+			return;
+		}
+
+		if (weapon.getMetaData("HitBonus") != null && weapon.getMetaData("WeaponName") == null)
+			player.startConversation(new Dialogue()
+					.addNPC(NPC, HeadE.CALM_TALK, "I see you have a weapon of death...")
+					.addPlayer(HeadE.EVIL_LAUGH, "Yes I do, thank you very much.")
+					.addPlayer(HeadE.CALM_TALK, "What of it?")
+					.addNPC(NPC, HeadE.CALM_TALK, "I can name your weapon once and forever that will be its brand...")
+					.addOptions("Name your weapon?", options -> {
+						options.add("No");
+						options.add("Yes", new Dialogue()
+								.addPlayer(HeadE.CALM_TALK, "Yes, ill name it")
+								.addNext(()->{
+									player.sendInputName("What name for your weapon?", name -> {
+										player.startConversation(new Dialogue()
+												.addNPC(NPC, HeadE.CALM_TALK, "Are you sure you want \"" + name + "\"?")
+												.addOptions("Set name to \"" + name + "\"?", option -> {
+													option.add("No");
+													option.add("Yes", () -> {
+														weapon.setMetaDataO("WeaponName", name);
+														player.sendMessage("Your weapon is now named \"" + name + "\"...");
+													});
+												})
+										);
+
+									});
+								})
+						);
+					})
+			);
+	});
+
+
+
+
 
 	public static boolean removeCorpStatReset() {
 		return false;

@@ -18,10 +18,10 @@ package com.rs.game.content.world;
 
 import com.rs.game.content.ItemConstants;
 import com.rs.game.content.bosses.qbd.QueenBlackDragonController;
-import com.rs.game.content.dialogue.Conversation;
-import com.rs.game.content.dialogue.Dialogue;
-import com.rs.game.content.dialogue.HeadE;
-import com.rs.game.content.dialogue.Options;
+import com.rs.game.engine.dialogue.Conversation;
+import com.rs.game.engine.dialogue.Dialogue;
+import com.rs.game.engine.dialogue.HeadE;
+import com.rs.game.engine.dialogue.Options;
 import com.rs.game.model.entity.player.Equipment;
 import com.rs.game.tasks.WorldTasks;
 import com.rs.lib.game.Animation;
@@ -36,10 +36,8 @@ import com.rs.rsps.jessecustom.customscape.CustomScape;
 @PluginEventHandler
 public class RoyalCrossbow {
 
-	public static ItemClickHandler handleRCB = new ItemClickHandler(new Object[] { 24337, 24338, 24339 }, new String[] { "Split", "Brandish" }) {
-		@Override
-		public void handle(ItemClickEvent e) {
-			switch(e.getOption()) {
+	public static ItemClickHandler handleRCB = new ItemClickHandler(new Object[] { 24337, 24338, 24339 }, new String[] { "Split", "Brandish" }, e -> {
+		switch(e.getOption()) {
 			case "Split":
 				if (e.getPlayer().getInventory().getFreeSlots() < 4) {
 					e.getPlayer().sendMessage("You don't have enough inventory space.");
@@ -77,31 +75,32 @@ public class RoyalCrossbow {
 				e.getPlayer().getEquipment().refresh(Equipment.WEAPON);
 				e.getPlayer().getInventory().refresh();
 				break;
-			}
 		}
-	};
+	});
 
-	public static NPCClickHandler talkToCerebrum = new NPCClickHandler(new Object[] { 15460 }) {
-		@Override
-		public void handle(NPCClickEvent e) {
-			e.getPlayer().startConversation(new Conversation(e.getPlayer()) {
-				{
-					addNPC(e.getNPCId(), HeadE.DRUNK, "Half, adventurer! Go no further! Mortal, wormy peril lies within this cave!");
-					addOptions(new Options() {
-						@Override
-						public void create() {
-							option("Wormy?");
-							option("Who are you again?");
-							option("Don't worry, I eat peril for breakfast.");
-							if (!e.getPlayer().containsItems(24303, 24337, 24338, 24339))
-								option("Would you happen to have found a Coral Crossbow?", new Dialogue()
-										.addNPC(e.getNPCId(), HeadE.DRUNK, "Why, yes I have! The Raptor passed by earlier. He said you might need it.")
-										.addItemToInv(e.getPlayer(), new Item(24303, 1), "You recieve the Coral Crossbow."));
-						}
-					});
-				}
-			});
-		}
-	};
+
+
+
+	public static NPCClickHandler talkToCerebrum = new NPCClickHandler(new Object[] { 15460 }, e -> {
+		e.getPlayer().startConversation(new Conversation(e.getPlayer()) {
+			{
+				addNPC(e.getNPCId(), HeadE.DRUNK, "Half, adventurer! Go no further! Mortal, wormy peril lies within this cave!");
+				addOptions(new Options() {
+					@Override
+					public void create() {
+						option("Wormy?");
+						option("Who are you again?");
+						option("Don't worry, I eat peril for breakfast.");
+						if (!e.getPlayer().containsItems(24303, 24337, 24338, 24339))
+							option("Would you happen to have found a Coral Crossbow?", new Dialogue()
+									.addNPC(e.getNPCId(), HeadE.DRUNK, "Why, yes I have! The Raptor passed by earlier. He said you might need it.")
+									.addItemToInv(e.getPlayer(), new Item(24303, 1), "You recieve the Coral Crossbow."));
+					}
+				});
+			}
+		});
+	});
+
+
 
 }

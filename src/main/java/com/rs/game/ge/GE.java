@@ -63,107 +63,105 @@ public class GE {
 		BUY, SELL;
 	}
 
-	public static ButtonClickHandler mainInterface = new ButtonClickHandler(105) {
-		@Override
-		public void handle(ButtonClickEvent e) {;
+	public static ButtonClickHandler mainInterface = new ButtonClickHandler(105, e -> {
 		if (e.getPlayer().isIronMan()) {
 			e.getPlayer().sendMessage("Ironmen stand alone.");
 			return;
 		}
 		if (e.getPlayer().getTempAttribs().getB("geLocked"))
 			return;
-		
+
 		switch(e.getComponentId()) {
-		//Buy box selection
-		case 31 -> openBuy(e.getPlayer(), 0);
-		case 47 -> openBuy(e.getPlayer(), 1);
-		case 63 -> openBuy(e.getPlayer(), 2);
-		case 82 -> openBuy(e.getPlayer(), 3);
-		case 101 -> openBuy(e.getPlayer(), 4);
-		case 120 -> openBuy(e.getPlayer(), 5);
+			//Buy box selection
+			case 31 -> openBuy(e.getPlayer(), 0);
+			case 47 -> openBuy(e.getPlayer(), 1);
+			case 63 -> openBuy(e.getPlayer(), 2);
+			case 82 -> openBuy(e.getPlayer(), 3);
+			case 101 -> openBuy(e.getPlayer(), 4);
+			case 120 -> openBuy(e.getPlayer(), 5);
 
-		//Sell box selection
-		case 32 -> openSell(e.getPlayer(), 0);
-		case 48 -> openSell(e.getPlayer(), 1);
-		case 64 -> openSell(e.getPlayer(), 2);
-		case 83 -> openSell(e.getPlayer(), 3);
-		case 102 -> openSell(e.getPlayer(), 4);
-		case 121 -> openSell(e.getPlayer(), 5);
+			//Sell box selection
+			case 32 -> openSell(e.getPlayer(), 0);
+			case 48 -> openSell(e.getPlayer(), 1);
+			case 64 -> openSell(e.getPlayer(), 2);
+			case 83 -> openSell(e.getPlayer(), 3);
+			case 102 -> openSell(e.getPlayer(), 4);
+			case 121 -> openSell(e.getPlayer(), 5);
 
-		case 19 -> clickBox(e.getPlayer(), 0, e.getPacket() != ClientPacket.IF_OP1);
-		case 35 -> clickBox(e.getPlayer(), 1, e.getPacket() != ClientPacket.IF_OP1);
-		case 51 -> clickBox(e.getPlayer(), 2, e.getPacket() != ClientPacket.IF_OP1);
-		case 70 -> clickBox(e.getPlayer(), 3, e.getPacket() != ClientPacket.IF_OP1);
-		case 89 -> clickBox(e.getPlayer(), 4, e.getPacket() != ClientPacket.IF_OP1);
-		case 108 -> clickBox(e.getPlayer(), 5, e.getPacket() != ClientPacket.IF_OP1);
-		case 200 -> clickBox(e.getPlayer(), e.getPlayer().getVars().getVar(VAR_CURR_BOX), true);
+			case 19 -> clickBox(e.getPlayer(), 0, e.getPacket() != ClientPacket.IF_OP1);
+			case 35 -> clickBox(e.getPlayer(), 1, e.getPacket() != ClientPacket.IF_OP1);
+			case 51 -> clickBox(e.getPlayer(), 2, e.getPacket() != ClientPacket.IF_OP1);
+			case 70 -> clickBox(e.getPlayer(), 3, e.getPacket() != ClientPacket.IF_OP1);
+			case 89 -> clickBox(e.getPlayer(), 4, e.getPacket() != ClientPacket.IF_OP1);
+			case 108 -> clickBox(e.getPlayer(), 5, e.getPacket() != ClientPacket.IF_OP1);
+			case 200 -> clickBox(e.getPlayer(), e.getPlayer().getVars().getVar(VAR_CURR_BOX), true);
 
-		//Back button
-		case 128 -> open(e.getPlayer());
+			//Back button
+			case 128 -> open(e.getPlayer());
 
-		case 206, 208 -> collectItems(e.getPlayer(), e.getPlayer().getVars().getVar(VAR_CURR_BOX), e.getComponentId() == 206 ? 0 : 1, e.getPacket() == ClientPacket.IF_OP1);
+			case 206, 208 -> collectItems(e.getPlayer(), e.getPlayer().getVars().getVar(VAR_CURR_BOX), e.getComponentId() == 206 ? 0 : 1, e.getPacket() == ClientPacket.IF_OP1);
 
-		//Amount adjustments
-		case 155 -> e.getPlayer().getVars().setVar(VAR_ITEM_AMOUNT, Utils.clampI(e.getPlayer().getVars().getVar(VAR_ITEM_AMOUNT) - 1, 0, Integer.MAX_VALUE));
-		case 157 -> e.getPlayer().getVars().setVar(VAR_ITEM_AMOUNT, Utils.clampI(e.getPlayer().getVars().getVar(VAR_ITEM_AMOUNT) + 1, 0, Integer.MAX_VALUE));
-		case 160 -> e.getPlayer().getVars().setVar(VAR_ITEM_AMOUNT, e.getPlayer().getVars().getVar(VAR_IS_SELLING) == 1 ? 1 : Utils.clampI(e.getPlayer().getVars().getVar(VAR_ITEM_AMOUNT) + 1, 0, Integer.MAX_VALUE));
-		case 162 -> e.getPlayer().getVars().setVar(VAR_ITEM_AMOUNT, e.getPlayer().getVars().getVar(VAR_IS_SELLING) == 1 ? 10 : Utils.clampI(e.getPlayer().getVars().getVar(VAR_ITEM_AMOUNT) + 10, 0, Integer.MAX_VALUE));
-		case 164 -> e.getPlayer().getVars().setVar(VAR_ITEM_AMOUNT, e.getPlayer().getVars().getVar(VAR_IS_SELLING) == 1 ? 100 : Utils.clampI(e.getPlayer().getVars().getVar(VAR_ITEM_AMOUNT) + 100, 0, Integer.MAX_VALUE));
-		case 166 -> e.getPlayer().getVars().setVar(VAR_ITEM_AMOUNT, e.getPlayer().getVars().getVar(VAR_IS_SELLING) == 1 ? e.getPlayer().getInventory().getAmountOf(e.getPlayer().getVars().getVar(VAR_ITEM)) : Utils.clampI(e.getPlayer().getVars().getVar(VAR_ITEM_AMOUNT) + 1000, 0, Integer.MAX_VALUE));
-		case 168 -> e.getPlayer().sendInputInteger("Enter amount", amount -> e.getPlayer().getVars().setVar(VAR_ITEM_AMOUNT, Utils.clampI(amount, 0, Integer.MAX_VALUE)));
+			//Amount adjustments
+			case 155 -> e.getPlayer().getVars().setVar(VAR_ITEM_AMOUNT, Utils.clampI(e.getPlayer().getVars().getVar(VAR_ITEM_AMOUNT) - 1, 0, Integer.MAX_VALUE));
+			case 157 -> e.getPlayer().getVars().setVar(VAR_ITEM_AMOUNT, Utils.clampI(e.getPlayer().getVars().getVar(VAR_ITEM_AMOUNT) + 1, 0, Integer.MAX_VALUE));
+			case 160 -> e.getPlayer().getVars().setVar(VAR_ITEM_AMOUNT, e.getPlayer().getVars().getVar(VAR_IS_SELLING) == 1 ? 1 : Utils.clampI(e.getPlayer().getVars().getVar(VAR_ITEM_AMOUNT) + 1, 0, Integer.MAX_VALUE));
+			case 162 -> e.getPlayer().getVars().setVar(VAR_ITEM_AMOUNT, e.getPlayer().getVars().getVar(VAR_IS_SELLING) == 1 ? 10 : Utils.clampI(e.getPlayer().getVars().getVar(VAR_ITEM_AMOUNT) + 10, 0, Integer.MAX_VALUE));
+			case 164 -> e.getPlayer().getVars().setVar(VAR_ITEM_AMOUNT, e.getPlayer().getVars().getVar(VAR_IS_SELLING) == 1 ? 100 : Utils.clampI(e.getPlayer().getVars().getVar(VAR_ITEM_AMOUNT) + 100, 0, Integer.MAX_VALUE));
+			case 166 -> e.getPlayer().getVars().setVar(VAR_ITEM_AMOUNT, e.getPlayer().getVars().getVar(VAR_IS_SELLING) == 1 ? e.getPlayer().getInventory().getAmountOf(e.getPlayer().getVars().getVar(VAR_ITEM)) : Utils.clampI(e.getPlayer().getVars().getVar(VAR_ITEM_AMOUNT) + 1000, 0, Integer.MAX_VALUE));
+			case 168 -> e.getPlayer().sendInputInteger("Enter amount", amount -> e.getPlayer().getVars().setVar(VAR_ITEM_AMOUNT, Utils.clampI(amount, 0, Integer.MAX_VALUE)));
 
-		//Price adjustments
-		case 169 -> e.getPlayer().getVars().setVar(VAR_FOR_PRICE_TEXT, Utils.clampI(e.getPlayer().getVars().getVar(VAR_FOR_PRICE_TEXT) - 1, 0, Integer.MAX_VALUE));
-		case 171 -> e.getPlayer().getVars().setVar(VAR_FOR_PRICE_TEXT, Utils.clampI(e.getPlayer().getVars().getVar(VAR_FOR_PRICE_TEXT) + 1, 0, Integer.MAX_VALUE));
-		case 175 -> e.getPlayer().getVars().setVar(VAR_FOR_PRICE_TEXT, e.getPlayer().getVars().getVar(VAR_MEDIAN_PRICE));
-		case 179 -> e.getPlayer().getVars().setVar(VAR_FOR_PRICE_TEXT, Utils.clampI((int) (e.getPlayer().getVars().getVar(VAR_FOR_PRICE_TEXT) * 1.05), 0, Integer.MAX_VALUE));
-		case 181 -> e.getPlayer().getVars().setVar(VAR_FOR_PRICE_TEXT, Utils.clampI((int) (e.getPlayer().getVars().getVar(VAR_FOR_PRICE_TEXT) * 0.95), 0, Integer.MAX_VALUE));
-		case 177 -> e.getPlayer().sendInputInteger("Enter desired price", price -> e.getPlayer().getVars().setVar(VAR_FOR_PRICE_TEXT, Utils.clampI(price, 0, Integer.MAX_VALUE)));
+			//Price adjustments
+			case 169 -> e.getPlayer().getVars().setVar(VAR_FOR_PRICE_TEXT, Utils.clampI(e.getPlayer().getVars().getVar(VAR_FOR_PRICE_TEXT) - 1, 0, Integer.MAX_VALUE));
+			case 171 -> e.getPlayer().getVars().setVar(VAR_FOR_PRICE_TEXT, Utils.clampI(e.getPlayer().getVars().getVar(VAR_FOR_PRICE_TEXT) + 1, 0, Integer.MAX_VALUE));
+			case 175 -> e.getPlayer().getVars().setVar(VAR_FOR_PRICE_TEXT, e.getPlayer().getVars().getVar(VAR_MEDIAN_PRICE));
+			case 179 -> e.getPlayer().getVars().setVar(VAR_FOR_PRICE_TEXT, Utils.clampI((int) (e.getPlayer().getVars().getVar(VAR_FOR_PRICE_TEXT) * 1.05), 0, Integer.MAX_VALUE));
+			case 181 -> e.getPlayer().getVars().setVar(VAR_FOR_PRICE_TEXT, Utils.clampI((int) (e.getPlayer().getVars().getVar(VAR_FOR_PRICE_TEXT) * 0.95), 0, Integer.MAX_VALUE));
+			case 177 -> e.getPlayer().sendInputInteger("Enter desired price", price -> e.getPlayer().getVars().setVar(VAR_FOR_PRICE_TEXT, Utils.clampI(price, 0, Integer.MAX_VALUE)));
 
-		//Confirm offer
-		case 186 -> confirmOffer(e.getPlayer());
+			//Confirm offer
+			case 186 -> confirmOffer(e.getPlayer());
 
-		//Search item
-		case 190 -> e.getPlayer().getPackets().openGESearch();
+			//Search item
+			case 190 -> e.getPlayer().getPackets().openGESearch();
 
-		default -> Logger.debug(GE.class, "mainInterface", "Unhandled GE button: " + e.getComponentId() + ", " + e.getSlotId());
+			default -> Logger.debug(GE.class, "mainInterface", "Unhandled GE button: " + e.getComponentId() + ", " + e.getSlotId());
 		}
-		}
-	};
+	});
 
-	public static ButtonClickHandler sellInv = new ButtonClickHandler(SPECIAL_DEPOSIT_INV) {
-		@Override
-		public void handle(ButtonClickEvent e) {
-			if (e.getPlayer().isIronMan()) {
-				e.getPlayer().sendMessage("Ironmen stand alone.");
+
+
+
+	public static ButtonClickHandler sellInv = new ButtonClickHandler(SPECIAL_DEPOSIT_INV, e -> {
+		if (e.getPlayer().isIronMan()) {
+			e.getPlayer().sendMessage("Ironmen stand alone.");
+			return;
+		}
+		if (e.getPlayer().getTempAttribs().getB("geLocked"))
+			return;
+		if (e.getComponentId() == 18) {
+			Item item = e.getPlayer().getInventory().getItem(e.getSlotId());
+			if (item == null)
+				return;
+			if(CustomScape.hasMetaBonusWhichPreventsExchange(e.getPlayer(), item)) {
 				return;
 			}
-			if (e.getPlayer().getTempAttribs().getB("geLocked"))
-				return;
-			if (e.getComponentId() == 18) {
-				Item item = e.getPlayer().getInventory().getItem(e.getSlotId());
-				if (item == null)
-					return;
-				if(CustomScape.hasMetaBonusWhichPreventsExchange(e.getPlayer(), item)) {
-					return;
-				}
-				if (item.getDefinitions().isNoted())
-					item = new Item(item.getDefinitions().getCertId(), item.getAmount());
-				selectItem(e.getPlayer(), item.getId(), item.getAmount());
-			}
+			if (item.getDefinitions().isNoted())
+				item = new Item(item.getDefinitions().getCertId(), item.getAmount());
+			selectItem(e.getPlayer(), item.getId(), item.getAmount());
 		}
-	};
+	});
 
-	public static ButtonClickHandler collBox = new ButtonClickHandler(COLLECTION_BOX) {
-		@Override
-		public void handle(ButtonClickEvent e) {
-			if (e.getPlayer().isIronMan()) {
-				e.getPlayer().sendMessage("Ironmen stand alone.");
-				return;
-			}
-			if (e.getPlayer().getTempAttribs().getB("geLocked"))
-				return;
-			switch(e.getComponentId()) {
+
+
+
+	public static ButtonClickHandler collBox = new ButtonClickHandler(COLLECTION_BOX, e -> {
+		if (e.getPlayer().isIronMan()) {
+			e.getPlayer().sendMessage("Ironmen stand alone.");
+			return;
+		}
+		if (e.getPlayer().getTempAttribs().getB("geLocked"))
+			return;
+		switch(e.getComponentId()) {
 			case 19 -> collectItems(e.getPlayer(), 0, e.getSlotId() / 2, e.getPacket() == ClientPacket.IF_OP1);
 			case 23 -> collectItems(e.getPlayer(), 1, e.getSlotId() / 2, e.getPacket() == ClientPacket.IF_OP1);
 			case 27 -> collectItems(e.getPlayer(), 2, e.getSlotId() / 2, e.getPacket() == ClientPacket.IF_OP1);
@@ -171,9 +169,11 @@ public class GE {
 			case 37 -> collectItems(e.getPlayer(), 4, e.getSlotId() / 2, e.getPacket() == ClientPacket.IF_OP1);
 			case 42 -> collectItems(e.getPlayer(), 5, e.getSlotId() / 2, e.getPacket() == ClientPacket.IF_OP1);
 			default -> Logger.debug(GE.class, "collBox", "Unhandled collection box button: " + e.getComponentId() + ", " + e.getSlotId());
-			}
 		}
-	};
+	});
+
+
+
 
 	public static void open(Player player) {
 		player.getSession().writeToQueue(ServerPacket.TRIGGER_ONDIALOGABORT);
@@ -479,17 +479,12 @@ public class GE {
 		return -1;
 	}
 
-	public static NPCInteractionDistanceHandler clerkDistance = new NPCInteractionDistanceHandler("Grand Exchange clerk") {
-		@Override
-		public int getDistance(Player player, NPC npc) {
-			return 1;
-		}
-	};
+	public static NPCInteractionDistanceHandler clerkDistance = new NPCInteractionDistanceHandler("Grand Exchange clerk", (p, n) -> {
+		return 1;
+	});
 
-	public static NPCClickHandler handleClerks = new NPCClickHandler(new Object[] { "Grand Exchange clerk" }) {
-		@Override
-		public void handle(NPCClickEvent e) {
-			switch (e.getOption()) {
+	public static NPCClickHandler handleClerks = new NPCClickHandler(new Object[] { "Grand Exchange clerk" }, e -> {
+		switch (e.getOption()) {
 			case "Talk-to":
 				e.getPlayer().sendOptionDialogue("What would you like to do?", ops -> {
 					ops.add("Open the Grand Exchange", () -> GE.open(e.getPlayer()));
@@ -504,7 +499,9 @@ public class GE {
 			case "Sets":
 				Sets.open(e.getPlayer());
 				break;
-			}
 		}
-	};
+	});
+
+
+
 }

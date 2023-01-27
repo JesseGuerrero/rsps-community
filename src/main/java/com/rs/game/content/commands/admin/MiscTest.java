@@ -738,7 +738,7 @@ public class MiscTest {
 							if (p.hasFinished())
 								stop();
 							p.sendMessage("ID: " + startId);
-							p.getSession().writeToQueue(new HintTrail(new WorldTile(p.getTile()), startId--, bufferX, bufferY, steps));
+							p.getSession().writeToQueue(new HintTrail(WorldTile.of(p.getTile()), startId--, bufferX, bufferY, steps));
 
 						}
 					}, 2, 1);

@@ -25,14 +25,13 @@ public class PrestigeGIMManager {
 		COMPLETIONIST = 5;
 	private transient GroupIronMan group;
 
-	public static LoginHandler onLoginUpdatePrestige = new LoginHandler() {
-		@Override
-		public void handle(LoginEvent e) {
-			if(GIM.hasTeam(e.getPlayer()))
-				if(GIM.getGroupPrestige(e.getPlayer()) > GIM.getIndividualPrestige(e.getPlayer()))
-					GIM.setIndividualPrestige(e.getPlayer(), GIM.getGroupPrestige(e.getPlayer()));
-		}
-	};
+	public static LoginHandler onLoginUpdatePrestige = new LoginHandler(e -> {
+		if(GIM.hasTeam(e.getPlayer()))
+			if(GIM.getGroupPrestige(e.getPlayer()) > GIM.getIndividualPrestige(e.getPlayer()))
+				GIM.setIndividualPrestige(e.getPlayer(), GIM.getGroupPrestige(e.getPlayer()));
+	});
+
+
 
 	public void setGroup(GroupIronMan group) {
 		this.group = group;

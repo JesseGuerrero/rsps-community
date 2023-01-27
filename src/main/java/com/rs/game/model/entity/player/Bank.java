@@ -28,11 +28,11 @@ import com.rs.cache.loaders.ItemDefinitions;
 import com.rs.cache.loaders.interfaces.IFEvents;
 import com.rs.cache.loaders.interfaces.IFEvents.UseFlag;
 import com.rs.db.WorldDB;
-import com.rs.game.content.dialogue.Dialogue;
-import com.rs.game.content.dialogue.Options;
 import com.rs.game.content.holidayevents.easter.easter22.Easter2022;
 import com.rs.game.content.skills.runecrafting.Runecrafting;
 import com.rs.game.content.skills.summoning.Familiar;
+import com.rs.game.engine.dialogue.Dialogue;
+import com.rs.game.engine.dialogue.Options;
 import com.rs.game.model.entity.player.managers.InterfaceManager.Sub;
 import com.rs.game.tasks.WorldTask;
 import com.rs.game.tasks.WorldTasks;
@@ -69,162 +69,157 @@ public class Bank {
 		bankTabs = new Item[1][0];
 	}
 
-	public static ButtonClickHandler handleDepositBox = new ButtonClickHandler(11) {
-		@Override
-		public void handle(ButtonClickEvent e) {
-			if(e.getPlayer().getO("GIM Team") == null) {
-				if (e.getComponentId() == 17) {
-					if (e.getPacket() == ClientPacket.IF_OP1)
-						e.getPlayer().getBank().depositItem(e.getSlotId(), 1, false);
-					else if (e.getPacket() == ClientPacket.IF_OP2)
-						e.getPlayer().getBank().depositItem(e.getSlotId(), 5, false);
-					else if (e.getPacket() == ClientPacket.IF_OP3)
-						e.getPlayer().getBank().depositItem(e.getSlotId(), 10, false);
-					else if (e.getPacket() == ClientPacket.IF_OP4)
-						e.getPlayer().getBank().depositItem(e.getSlotId(), Integer.MAX_VALUE, false);
-					else if (e.getPacket() == ClientPacket.IF_OP5)
-						e.getPlayer().sendInputInteger("How many would you like to deposit?", (integer) -> e.getPlayer().getBank().depositItem(e.getSlotId(), integer, true));
-					else if (e.getPacket() == ClientPacket.IF_OP6)
-						e.getPlayer().getInventory().sendExamine(e.getSlotId());
-				} else if (e.getComponentId() == 18)
-					e.getPlayer().getBank().depositAllInventory(false);
-				else if (e.getComponentId() == 22)
-					e.getPlayer().getBank().depositAllEquipment(false);
+	public static ButtonClickHandler handleDepositBox = new ButtonClickHandler(11, e -> {
+		if(e.getPlayer().getO("GIM Team") == null) {
+			if (e.getComponentId() == 17) {
+				if (e.getPacket() == ClientPacket.IF_OP1)
+					e.getPlayer().getBank().depositItem(e.getSlotId(), 1, false);
+				else if (e.getPacket() == ClientPacket.IF_OP2)
+					e.getPlayer().getBank().depositItem(e.getSlotId(), 5, false);
+				else if (e.getPacket() == ClientPacket.IF_OP3)
+					e.getPlayer().getBank().depositItem(e.getSlotId(), 10, false);
+				else if (e.getPacket() == ClientPacket.IF_OP4)
+					e.getPlayer().getBank().depositItem(e.getSlotId(), Integer.MAX_VALUE, false);
+				else if (e.getPacket() == ClientPacket.IF_OP5)
+					e.getPlayer().sendInputInteger("How many would you like to deposit?", (integer) -> e.getPlayer().getBank().depositItem(e.getSlotId(), integer, true));
+				else if (e.getPacket() == ClientPacket.IF_OP6)
+					e.getPlayer().getInventory().sendExamine(e.getSlotId());
+			} else if (e.getComponentId() == 18)
+				e.getPlayer().getBank().depositAllInventory(false);
+			else if (e.getComponentId() == 22)
+				e.getPlayer().getBank().depositAllEquipment(false);
+			return;
+		}
+
+		WorldDB.getGIMS().getByGroupName(e.getPlayer().getO("GIM Team"), group -> {
+			if(group.isBank1Open()) {
+				e.getPlayer().sendMessage("The group bank is in use.");
 				return;
 			}
-
-			WorldDB.getGIMS().getByGroupName(e.getPlayer().getO("GIM Team"), group -> {
-				if(group.isBank1Open()) {
-					e.getPlayer().sendMessage("The group bank is in use.");
-					return;
-				}
-				group.setBank1Open(true);
-				group.getBank1().setPlayer(e.getPlayer());
-				if (e.getComponentId() == 17) {
-					if (e.getPacket() == ClientPacket.IF_OP1)
-						group.getBank1().depositItem(e.getSlotId(), 1, false);
-					else if (e.getPacket() == ClientPacket.IF_OP2)
-						group.getBank1().depositItem(e.getSlotId(), 5, false);
-					else if (e.getPacket() == ClientPacket.IF_OP3)
-						group.getBank1().depositItem(e.getSlotId(), 10, false);
-					else if (e.getPacket() == ClientPacket.IF_OP4)
-						group.getBank1().depositItem(e.getSlotId(), Integer.MAX_VALUE, false);
-					else if (e.getPacket() == ClientPacket.IF_OP5)
-						e.getPlayer().sendInputInteger("How many would you like to deposit?", (integer) -> group.getBank1().depositItem(e.getSlotId(), integer, true));
-					else if (e.getPacket() == ClientPacket.IF_OP6)
-						e.getPlayer().getInventory().sendExamine(e.getSlotId());
-				} else if (e.getComponentId() == 18)
-					group.getBank1().depositAllInventory(false);
-				else if (e.getComponentId() == 22)
-					group.getBank1().depositAllEquipment(false);
-				group.setBank1Open(false);
-				WorldDB.getGIMS().saveSync(group);
-			});
-		}
-	};
-
-	public static ButtonClickHandler handleInvButtons = new ButtonClickHandler(762) {
-		@Override
-		public void handle(ButtonClickEvent e) {
-			if (e.getPlayer().getTempAttribs().getB("viewingOtherBank"))
-				return;
-			Bank bank = e.getPlayer().getBank();
-			if(e.getPlayer().getTempAttribs().getO("GIM Bank") != null)
-				bank = e.getPlayer().getTempAttribs().getO("GIM Bank");
-			if (e.getComponentId() == 15)
-				bank.switchInsertItems();
-			else if (e.getComponentId() == 19)
-				bank.switchWithdrawNotes();
-			else if (e.getComponentId() == 33)
-				bank.depositAllInventory(true);
-			else if (e.getComponentId() == 37)
-				bank.depositAllEquipment(true);
-			else if (e.getComponentId() == 39)
-				bank.depositAllBob(true);
-			else if (e.getComponentId() == 35)
-				e.getPlayer().sendMessage("Coin pouch is disabled.");
-			else if (e.getComponentId() == 46) {
-				e.getPlayer().closeInterfaces();
-				e.getPlayer().getInterfaceManager().sendInterface(767);
-				e.getPlayer().setCloseInterfacesEvent(() -> {
-					if(e.getPlayer().getTempAttribs().getO("GIM Bank") == null)
-						e.getPlayer().getBank().open();
-				});
-			} else if (e.getComponentId() >= 46 && e.getComponentId() <= 64) {
-				int tabId = 9 - ((e.getComponentId() - 46) / 2);
+			group.setBank1Open(true);
+			group.getBank1().setPlayer(e.getPlayer());
+			if (e.getComponentId() == 17) {
 				if (e.getPacket() == ClientPacket.IF_OP1)
-					bank.setCurrentTab(tabId);
+					group.getBank1().depositItem(e.getSlotId(), 1, false);
 				else if (e.getPacket() == ClientPacket.IF_OP2)
-					bank.collapse(tabId);
-			} else if (e.getComponentId() == 95) {
-				if (e.getPacket() == ClientPacket.IF_OP1)
-					bank.withdrawItem(e.getSlotId(), 1);
-				else if (e.getPacket() == ClientPacket.IF_OP2)
-					bank.withdrawItem(e.getSlotId(), 5);
+					group.getBank1().depositItem(e.getSlotId(), 5, false);
 				else if (e.getPacket() == ClientPacket.IF_OP3)
-					bank.withdrawItem(e.getSlotId(), 10);
+					group.getBank1().depositItem(e.getSlotId(), 10, false);
 				else if (e.getPacket() == ClientPacket.IF_OP4)
-					bank.withdrawLastAmount(e.getSlotId());
-				else if (e.getPacket() == ClientPacket.IF_OP5) {
-					e.getPlayer().sendInputInteger("How many would you like to withdraw?", amount -> {
-						Bank inputBank = e.getPlayer().getBank();
-						if (amount < 0)
-							return;
-						if(e.getPlayer().getTempAttribs().getO("GIM Bank") != null)
-							inputBank = e.getPlayer().getTempAttribs().getO("GIM Bank");
-						inputBank.setLastX(amount);
-						inputBank.refreshLastX();
-						inputBank.withdrawItem(e.getSlotId(), amount);
-					});
-				}
-				else if (e.getPacket() == ClientPacket.IF_OP6)
-					bank.withdrawItem(e.getSlotId(), Integer.MAX_VALUE);
-				else if (e.getPacket() == ClientPacket.IF_OP7)
-					bank.withdrawItemButOne(e.getSlotId());
-				else if (e.getPacket() == ClientPacket.IF_OP10)
-					bank.sendExamine(e.getSlotId());
-
-			} else if (e.getComponentId() == 119)
-				Equipment.openEquipmentBonuses(e.getPlayer(), true);
-		}
-	};
-
-	public static ButtonClickHandler handleBankButtons = new ButtonClickHandler(763) {
-		@Override
-		public void handle(ButtonClickEvent e) {
-			if (e.getPlayer().getTempAttribs().getB("viewingOtherBank"))
-				return;
-			Bank bank = e.getPlayer().getBank();
-			if(e.getPlayer().getTempAttribs().getO("GIM Bank") != null)
-				bank = e.getPlayer().getTempAttribs().getO("GIM Bank");
-			if (e.getComponentId() == 0)
-				if (e.getPacket() == ClientPacket.IF_OP1)
-					bank.depositItem(e.getSlotId(), 1, true);
-				else if (e.getPacket() == ClientPacket.IF_OP2)
-					bank.depositItem(e.getSlotId(), 5, true);
-				else if (e.getPacket() == ClientPacket.IF_OP3)
-					bank.depositItem(e.getSlotId(), 10, true);
-				else if (e.getPacket() == ClientPacket.IF_OP4)
-					bank.depositLastAmount(e.getSlotId());
+					group.getBank1().depositItem(e.getSlotId(), Integer.MAX_VALUE, false);
 				else if (e.getPacket() == ClientPacket.IF_OP5)
-					e.getPlayer().sendInputInteger("How many would you like to deposit?", amount -> {
-						if (amount < 0)
-							return;
-						Bank depositBank = e.getPlayer().getBank();
-						if (amount < 0)
-							return;
-						if(e.getPlayer().getTempAttribs().getO("GIM Bank") != null)
-							depositBank = e.getPlayer().getTempAttribs().getO("GIM Bank");
-						depositBank.setLastX(amount);
-						depositBank.refreshLastX();
-						depositBank.depositItem(e.getSlotId(), amount, e.getPlayer().getInterfaceManager().topOpen(11) ? false : true);
-					});
+					e.getPlayer().sendInputInteger("How many would you like to deposit?", (integer) -> group.getBank1().depositItem(e.getSlotId(), integer, true));
 				else if (e.getPacket() == ClientPacket.IF_OP6)
-					bank.depositItem(e.getSlotId(), Integer.MAX_VALUE, true);
-				else if (e.getPacket() == ClientPacket.IF_OP10)
 					e.getPlayer().getInventory().sendExamine(e.getSlotId());
-		}
-	};
+			} else if (e.getComponentId() == 18)
+				group.getBank1().depositAllInventory(false);
+			else if (e.getComponentId() == 22)
+				group.getBank1().depositAllEquipment(false);
+			group.setBank1Open(false);
+			WorldDB.getGIMS().saveSync(group);
+		});
+	});
+
+	public static ButtonClickHandler handleInvButtons = new ButtonClickHandler(762, e -> {
+		if (e.getPlayer().getTempAttribs().getB("viewingOtherBank"))
+			return;
+		Bank bank = e.getPlayer().getBank();
+		if(e.getPlayer().getTempAttribs().getO("GIM Bank") != null)
+			bank = e.getPlayer().getTempAttribs().getO("GIM Bank");
+		if (e.getComponentId() == 15)
+			bank.switchInsertItems();
+		else if (e.getComponentId() == 19)
+			bank.switchWithdrawNotes();
+		else if (e.getComponentId() == 33)
+			bank.depositAllInventory(true);
+		else if (e.getComponentId() == 37)
+			bank.depositAllEquipment(true);
+		else if (e.getComponentId() == 39)
+			bank.depositAllBob(true);
+		else if (e.getComponentId() == 35)
+			e.getPlayer().sendMessage("Coin pouch is disabled.");
+		else if (e.getComponentId() == 46) {
+			e.getPlayer().closeInterfaces();
+			e.getPlayer().getInterfaceManager().sendInterface(767);
+			e.getPlayer().setCloseInterfacesEvent(() -> {
+				if(e.getPlayer().getTempAttribs().getO("GIM Bank") == null)
+					e.getPlayer().getBank().open();
+			});
+		} else if (e.getComponentId() >= 46 && e.getComponentId() <= 64) {
+			int tabId = 9 - ((e.getComponentId() - 46) / 2);
+			if (e.getPacket() == ClientPacket.IF_OP1)
+				bank.setCurrentTab(tabId);
+			else if (e.getPacket() == ClientPacket.IF_OP2)
+				bank.collapse(tabId);
+		} else if (e.getComponentId() == 95) {
+			if (e.getPacket() == ClientPacket.IF_OP1)
+				bank.withdrawItem(e.getSlotId(), 1);
+			else if (e.getPacket() == ClientPacket.IF_OP2)
+				bank.withdrawItem(e.getSlotId(), 5);
+			else if (e.getPacket() == ClientPacket.IF_OP3)
+				bank.withdrawItem(e.getSlotId(), 10);
+			else if (e.getPacket() == ClientPacket.IF_OP4)
+				bank.withdrawLastAmount(e.getSlotId());
+			else if (e.getPacket() == ClientPacket.IF_OP5) {
+				e.getPlayer().sendInputInteger("How many would you like to withdraw?", amount -> {
+					Bank inputBank = e.getPlayer().getBank();
+					if (amount < 0)
+						return;
+					if(e.getPlayer().getTempAttribs().getO("GIM Bank") != null)
+						inputBank = e.getPlayer().getTempAttribs().getO("GIM Bank");
+					inputBank.setLastX(amount);
+					inputBank.refreshLastX();
+					inputBank.withdrawItem(e.getSlotId(), amount);
+				});
+			}
+			else if (e.getPacket() == ClientPacket.IF_OP6)
+				bank.withdrawItem(e.getSlotId(), Integer.MAX_VALUE);
+			else if (e.getPacket() == ClientPacket.IF_OP7)
+				bank.withdrawItemButOne(e.getSlotId());
+			else if (e.getPacket() == ClientPacket.IF_OP10)
+				bank.sendExamine(e.getSlotId());
+
+		} else if (e.getComponentId() == 119)
+			Equipment.openEquipmentBonuses(e.getPlayer(), true);
+	});
+
+
+
+	public static ButtonClickHandler handleBankButtons = new ButtonClickHandler(763, e -> {
+		if (e.getPlayer().getTempAttribs().getB("viewingOtherBank"))
+			return;
+		Bank bank = e.getPlayer().getBank();
+		if(e.getPlayer().getTempAttribs().getO("GIM Bank") != null)
+			bank = e.getPlayer().getTempAttribs().getO("GIM Bank");
+		if (e.getComponentId() == 0)
+			if (e.getPacket() == ClientPacket.IF_OP1)
+				bank.depositItem(e.getSlotId(), 1, true);
+			else if (e.getPacket() == ClientPacket.IF_OP2)
+				bank.depositItem(e.getSlotId(), 5, true);
+			else if (e.getPacket() == ClientPacket.IF_OP3)
+				bank.depositItem(e.getSlotId(), 10, true);
+			else if (e.getPacket() == ClientPacket.IF_OP4)
+				bank.depositLastAmount(e.getSlotId());
+			else if (e.getPacket() == ClientPacket.IF_OP5)
+				e.getPlayer().sendInputInteger("How many would you like to deposit?", amount -> {
+					if (amount < 0)
+						return;
+					Bank depositBank = e.getPlayer().getBank();
+					if (amount < 0)
+						return;
+					if(e.getPlayer().getTempAttribs().getO("GIM Bank") != null)
+						depositBank = e.getPlayer().getTempAttribs().getO("GIM Bank");
+					depositBank.setLastX(amount);
+					depositBank.refreshLastX();
+					depositBank.depositItem(e.getSlotId(), amount, e.getPlayer().getInterfaceManager().topOpen(11) ? false : true);
+				});
+			else if (e.getPacket() == ClientPacket.IF_OP6)
+				bank.depositItem(e.getSlotId(), Integer.MAX_VALUE, true);
+			else if (e.getPacket() == ClientPacket.IF_OP10)
+				e.getPlayer().getInventory().sendExamine(e.getSlotId());
+
+	});
+
 
 	public void removeItem(int id) {
 		if (bankTabs != null)
@@ -545,39 +540,37 @@ public class Bank {
 		player.getPackets().sendRunScriptBlank(1107);
 	}
 
-	public static ButtonClickHandler handlePin = new ButtonClickHandler(13, 14, 759) {
-		@Override
-		public void handle(ButtonClickEvent e) {
-			switch(e.getInterfaceId()) {
+	public static ButtonClickHandler handlePin = new ButtonClickHandler(new Object[] {13, 14, 759}, e -> {
+		switch(e.getInterfaceId()) {
 			case 14:
 				switch(e.getComponentId()) {
-				case 18:
-					if (e.getPlayer().getBank().bankPin == 0)
-						e.getPlayer().getBank().confirmSetPin();
-					else
-						e.getPlayer().getBank().confirmChangePin();
-					break;
-				case 33:
-					if (e.getPlayer().getBank().bankPin == 0)
-						e.getPlayer().getBank().openPin();
-					else if (e.getPlayer().getTempAttribs().getB("changingPin")) {
-						e.getPlayer().getBank().bankPin = 0;
-						e.getPlayer().sendMessage("Your pin has been removed. Please set a new one.");
-						e.getPlayer().getBank().openPin();
-					} else {
-						e.getPlayer().getBank().bankPin = 0;
-						e.getPlayer().sendMessage("Your pin has been removed.");
-					}
-					break;
-				case 19:
-					e.getPlayer().getBank().confirmCancelPin();
-					break;
-				case 35:
-					e.getPlayer().getBank().openPinSettings();
-					break;
-				default:
-					e.getPlayer().getBank().openPinSettings();
-					break;
+					case 18:
+						if (e.getPlayer().getBank().bankPin == 0)
+							e.getPlayer().getBank().confirmSetPin();
+						else
+							e.getPlayer().getBank().confirmChangePin();
+						break;
+					case 33:
+						if (e.getPlayer().getBank().bankPin == 0)
+							e.getPlayer().getBank().openPin();
+						else if (e.getPlayer().getTempAttribs().getB("changingPin")) {
+							e.getPlayer().getBank().bankPin = 0;
+							e.getPlayer().sendMessage("Your pin has been removed. Please set a new one.");
+							e.getPlayer().getBank().openPin();
+						} else {
+							e.getPlayer().getBank().bankPin = 0;
+							e.getPlayer().sendMessage("Your pin has been removed.");
+						}
+						break;
+					case 19:
+						e.getPlayer().getBank().confirmCancelPin();
+						break;
+					case 35:
+						e.getPlayer().getBank().openPinSettings();
+						break;
+					default:
+						e.getPlayer().getBank().openPinSettings();
+						break;
 				}
 				break;
 			case 13:
@@ -622,9 +615,10 @@ public class Bank {
 					}
 				}
 				break;
-			}
 		}
-	};
+	});
+
+
 
 	private void openBank() {
 		player.getTempAttribs().removeB("viewingOtherBank");

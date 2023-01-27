@@ -2,10 +2,10 @@ package com.rs.rsps.jessecustom.groupironman.adventurer_dialogue;
 
 import com.rs.db.WorldDB;
 import com.rs.game.World;
-import com.rs.game.content.dialogue.Conversation;
-import com.rs.game.content.dialogue.Dialogue;
-import com.rs.game.content.dialogue.HeadE;
-import com.rs.game.content.dialogue.Options;
+import com.rs.game.engine.dialogue.Conversation;
+import com.rs.game.engine.dialogue.Dialogue;
+import com.rs.game.engine.dialogue.HeadE;
+import com.rs.game.engine.dialogue.Options;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;

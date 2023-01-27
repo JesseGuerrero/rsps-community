@@ -4,10 +4,10 @@ import com.rs.Settings;
 import com.rs.cache.loaders.Bonus;
 import com.rs.game.World;
 import com.rs.game.content.ItemConstants;
-import com.rs.game.content.dialogue.Dialogue;
-import com.rs.game.content.quests.Quest;
-import com.rs.game.content.quests.handlers.shieldofarrav.ShieldOfArrav;
+import com.rs.game.content.quests.shieldofarrav.ShieldOfArrav;
 import com.rs.game.content.skills.dungeoneering.npcs.DungeonNPC;
+import com.rs.game.engine.dialogue.Dialogue;
+import com.rs.game.engine.quest.Quest;
 import com.rs.game.model.entity.Entity;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.npc.combat.NPCCombatDefinitions;
@@ -21,12 +21,7 @@ import com.rs.plugin.events.LoginEvent;
 import com.rs.plugin.events.ObjectClickEvent;
 import com.rs.plugin.handlers.LoginHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
-import com.rs.rsps.jessecustom.bosses.corp.CorporealBeastScalingInstanceController;
 import com.rs.rsps.jessecustom.bosses.corp.ScalingCorporealBeast;
-import com.rs.rsps.jessecustom.bosses.godwars.armadyl.KreeArraScalingInstanceController;
-import com.rs.rsps.jessecustom.bosses.godwars.bandos.GeneralGraardorScalingInstanceController;
-import com.rs.rsps.jessecustom.bosses.godwars.saradomin.CommanderZilyanaScalingInstanceController;
-import com.rs.rsps.jessecustom.bosses.godwars.zamorak.KrilTstsarothScalingInstanceController;
 import com.rs.rsps.jessecustom.groupironman.GIM;
 
 import java.util.*;
@@ -47,9 +42,8 @@ public class CustomScape {
 		return player.getBool("isCustomScape");
 	}
 
-		public static LoginHandler onLoginUpdates = new LoginHandler() {
-		@Override
-		public void handle(LoginEvent e) {
+		public static LoginHandler onLoginUpdates = new LoginHandler(e-> {
+
 //			if(GIM.isGIM(e.getPlayer()))
 //				return;
 			if(!GIM.isGIM(e.getPlayer()) && !isPlayerCustomScape(e.getPlayer()))
@@ -62,8 +56,8 @@ public class CustomScape {
 					e.getPlayer().getQuestManager().resetQuest(Quest.KNIGHTS_SWORD);
 					e.getPlayer().getQuestManager().resetQuest(Quest.WATERFALL_QUEST);
 				}
-		}
-	};
+	});
+
 
 	public static void questsEnabled(Player p, boolean enabled) {
 		if (!enabled) {
@@ -143,13 +137,11 @@ public class CustomScape {
 	}
 
 
-	public static ObjectClickHandler handleKalphiteQueenLairEntrance = new ObjectClickHandler(true, new Object[] { 48803 }) {
-		@Override
-		public void handle(ObjectClickEvent e) {
-			Player player = e.getPlayer();
-			if(e.getPlayer().isKalphiteLairSetted()) {
+	public static ObjectClickHandler handleKalphiteQueenLairEntrance = new ObjectClickHandler(true, new Object[] { 48803 }, e -> {
+		Player player = e.getPlayer();
+		if(e.getPlayer().isKalphiteLairSetted()) {
 //				if(!CustomScape.isPlayerCustomScape(e.getPlayer())) {
-//					e.getPlayer().setNextWorldTile(new WorldTile(3508, 9494, 0));
+//					e.getPlayer().setNextWorldTile(WorldTile.of(3508, 9494, 0));
 //					return;
 //				}
 //				if(e.getPlayer().getInventory().getAmountOf(995) >= 5_000) {
@@ -158,19 +150,20 @@ public class CustomScape {
 //								option.add("Yes", ()->{
 //									player.getControllerManager().startController(new KalphiteQueenScalingInstanceController());
 //								});
-//								option.add("No", () -> {e.getPlayer().setNextWorldTile(new WorldTile(3508, 9494, 0));});
+//								option.add("No", () -> {e.getPlayer().setNextWorldTile(WorldTile.of(3508, 9494, 0));});
 //							})
 //					);
 //					return;
 //				}
 //				e.getPlayer().sendMessage("You need 5k coins for an instance");
-				e.getPlayer().setNextWorldTile(new WorldTile(3508, 9494, 0));
-			}
+			e.getPlayer().setNextWorldTile(WorldTile.of(3508, 9494, 0));
 		}
-	};
+	});
+
+
 
 /*else if (id == 48803 && player.isKalphiteLairSetted())
-				player.setNextWorldTile(new WorldTile(3508, 9494, 0));*/
+				player.setNextWorldTile(WorldTile.of(3508, 9494, 0));*/
 
 	public static boolean isBindedItem(Item item) {
 		String name = item.getName();
@@ -292,29 +285,29 @@ public class CustomScape {
 	public static void createGWDScalingDialogueFromAltar(Player player, int altarID) {
 		if(!isPlayerCustomScape(player))
 			return;
-		if (player.getInventory().getAmountOf(995) >= 5_000) {
-			player.startConversation(new Dialogue()
-					.addOptions("Start a boss instance?", option -> {
-						option.add("Yes", () -> {
-							player.getInventory().removeItems(new Item(995, 5000));
-							if (altarID == 26289)
-								player.getControllerManager().startController(new GeneralGraardorScalingInstanceController());
-							if(altarID == 26286)
-								player.getControllerManager().startController(new KrilTstsarothScalingInstanceController());
-							if(altarID == 26288)
-								player.getControllerManager().startController(new KreeArraScalingInstanceController());
-							if(altarID == 26287)
-								player.getControllerManager().startController(new CommanderZilyanaScalingInstanceController());
-						});
-						option.add("No", new Dialogue());
-					}));
-		} else
-			player.sendMessage("You need 5k coins for an instance");
+//		if (player.getInventory().getAmountOf(995) >= 5_000) {
+//			player.startConversation(new Dialogue()
+//					.addOptions("Start a boss instance?", option -> {
+//						option.add("Yes", () -> {
+//							player.getInventory().removeItems(new Item(995, 5000));
+//							if (altarID == 26289)
+//								player.getControllerManager().startController(new GeneralGraardorScalingInstanceController());
+//							if(altarID == 26286)
+//								player.getControllerManager().startController(new KrilTstsarothScalingInstanceController());
+//							if(altarID == 26288)
+//								player.getControllerManager().startController(new KreeArraScalingInstanceController());
+//							if(altarID == 26287)
+//								player.getControllerManager().startController(new CommanderZilyanaScalingInstanceController());
+//						});
+//						option.add("No", new Dialogue());
+//					}));
+//		} else
+//			player.sendMessage("You need 5k coins for an instance");
 	}
 
 	public static void createCorpScalingDialogue(Player player) {
 		if(!isPlayerCustomScape(player)) {
-			player.setNextWorldTile(new WorldTile(2921, player.getY(), 2));
+			player.setNextWorldTile(WorldTile.of(2921, player.getY(), 2));
 			return;
 		}
 		if (player.getInventory().getAmountOf(995) >= 5_000) {
@@ -322,13 +315,13 @@ public class CustomScape {
 					.addOptions("Start a boss instance?", option -> {
 						option.add("Yes", () -> {
 							player.getInventory().removeItems(new Item(995, 5000));
-							player.getControllerManager().startController(new CorporealBeastScalingInstanceController());
+//							player.getControllerManager().startController(new CorporealBeastScalingInstanceController());
 						});
-						option.add("No", ()->{player.setNextWorldTile(new WorldTile(2921, player.getY(), 2));});
+						option.add("No", ()->{player.setNextWorldTile(WorldTile.of(2921, player.getY(), 2));});
 					}));
 		} else {
 			player.sendMessage("You need 5k coins for an instance");
-			player.setNextWorldTile(new WorldTile(2921, player.getY(), 2));
+			player.setNextWorldTile(WorldTile.of(2921, player.getY(), 2));
 		}
 
 	}

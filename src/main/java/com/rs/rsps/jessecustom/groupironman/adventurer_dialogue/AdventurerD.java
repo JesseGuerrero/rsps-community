@@ -1,7 +1,7 @@
 package com.rs.rsps.jessecustom.groupironman.adventurer_dialogue;
 
-import com.rs.game.content.dialogue.Conversation;
-import com.rs.game.content.dialogue.HeadE;
+import com.rs.game.engine.dialogue.Conversation;
+import com.rs.game.engine.dialogue.HeadE;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
@@ -18,22 +18,22 @@ public class AdventurerD extends Conversation {
 
 	String[] ranks = new String[] {"Nubby", "Novice", "Intermediate", "Advanced", "Veteran", "Completionist"};
 
-	public static NPCClickHandler handleGIMDialogue = new NPCClickHandler(new Object[] { 1512 }) {
-		@Override
-		public void handle(NPCClickEvent e) {
-			if(!e.getPlayer().getBank().checkPin())
-				return;
-			if(GIM.isGIM(e.getPlayer())) {
-				if(e.getPlayer().getI("GroupPrestige") >= PrestigeGIMManager.NOVICE) {
-					e.getPlayer().startConversation(new AdventurerD(e.getPlayer()));
-					return;
-				}
-				e.getPlayer().startConversation(new AdventurerDIntroduction(e.getPlayer()));
+	public static NPCClickHandler handleGIMDialogue = new NPCClickHandler(new Object[] { 1512 }, e -> {
+		if(!e.getPlayer().getBank().checkPin())
+			return;
+		if(GIM.isGIM(e.getPlayer())) {
+			if(e.getPlayer().getI("GroupPrestige") >= PrestigeGIMManager.NOVICE) {
+				e.getPlayer().startConversation(new AdventurerD(e.getPlayer()));
 				return;
 			}
-			e.getPlayer().sendMessage("Only GIM can talk to the adventurer...");
+			e.getPlayer().startConversation(new AdventurerDIntroduction(e.getPlayer()));
+			return;
 		}
-	};
+		e.getPlayer().sendMessage("Only GIM can talk to the adventurer...");
+	});
+
+
+
 
 	public AdventurerD(Player player) {
 		super(player);

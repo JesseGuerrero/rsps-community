@@ -259,34 +259,31 @@ public class ScalingItems {
 	
 
 
-	public static NPCDropHandler addMetas = new NPCDropHandler(null, ScalingItems.getAllScalingItemsByID()) {
-		@Override
-		public void handle(NPCDropEvent e) {
-			if(e.getNPC().getTempAttribs() == null)
-				return;
-			if(e.getNPC() instanceof DungeonNPC)
-				return;
-			if(!CustomScape.isPlayerCustomScape(e.getPlayer()))
-				return;
-			int playerScale = e.getPlayer().getI("CustomScapeScale", 0);
-			double playerCombatScale = 1 + (playerScale/10.0);
-			double npcScale = e.getNPC().getTempAttribs().getI("CustomScapeScale");
-			double npcCombatScale = 1 + (npcScale/10.0);
-			double scale = 1;
-			if(npcCombatScale >= playerCombatScale) {
-				scale = playerCombatScale;
-				if(Settings.getConfig().isDebug())
-					e.getPlayer().sendMessage("This one");
-			}
-			if(npcCombatScale < playerCombatScale) {
-				scale = npcCombatScale;
-				if(Settings.getConfig().isDebug())
-					e.getPlayer().sendMessage("This two " + e.getNPC().getTempAttribs().getD("CustomScapeScale"));
-			}
+	public static NPCDropHandler addMetas = new NPCDropHandler(null, ScalingItems.getAllScalingItemsByID(), e -> {
+		if(e.getNPC().getTempAttribs() == null)
+			return;
+		if(e.getNPC() instanceof DungeonNPC)
+			return;
+		if(!CustomScape.isPlayerCustomScape(e.getPlayer()))
+			return;
+		int playerScale = e.getPlayer().getI("CustomScapeScale", 0);
+		double playerCombatScale = 1 + (playerScale/10.0);
+		double npcScale = e.getNPC().getTempAttribs().getI("CustomScapeScale");
+		double npcCombatScale = 1 + (npcScale/10.0);
+		double scale = 1;
+		if(npcCombatScale >= playerCombatScale) {
+			scale = playerCombatScale;
 			if(Settings.getConfig().isDebug())
-				e.getPlayer().sendMessage("scale " + scale);
-			CustomScape.scaleEquipmentBonus(e.getItem(), scale);
+				e.getPlayer().sendMessage("This one");
 		}
-	};
+		if(npcCombatScale < playerCombatScale) {
+			scale = npcCombatScale;
+			if(Settings.getConfig().isDebug())
+				e.getPlayer().sendMessage("This two " + e.getNPC().getTempAttribs().getD("CustomScapeScale"));
+		}
+		if(Settings.getConfig().isDebug())
+			e.getPlayer().sendMessage("scale " + scale);
+		CustomScape.scaleEquipmentBonus(e.getItem(), scale);
+	});
 
 }

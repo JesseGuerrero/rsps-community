@@ -221,17 +221,17 @@ public class GodSwordCreation {
 		//spotanim 450 sagie
 		return false;
 	}
-	public static ItemClickHandler handleAbyssalVineWhip = new ItemClickHandler(new Object[] { "Abyssal vine whip" }, new String[] { "Split" }) {
-		@Override
-		public void handle(ItemClickEvent e) {
-			CustomScripts.handleWhipSplit(e.getPlayer(), e.getItem());
-//			if (e.getPlayer().getInventory().getFreeSlots() >= 1) {
+	public static ItemClickHandler handleAbyssalVineWhip = new ItemClickHandler(new Object[] { "Abyssal vine whip" }, new String[] { "Split" }, e -> {
+		CustomScripts.handleWhipSplit(e.getPlayer(), e.getItem());
+		//			if (e.getPlayer().getInventory().getFreeSlots() >= 1) {
 //				e.getPlayer().getInventory().deleteItem(e.getItem());
 //				e.getPlayer().getInventory().addItem(4151);
 //				e.getPlayer().getInventory().addItem(21369);
 //				e.getPlayer().sendMessage("You split the vine from the whip.");
 //			} else
 //				e.getPlayer().sendMessage("Not enough space in your inventory.");
-		}
-	};
+	});
+
+
+
 }

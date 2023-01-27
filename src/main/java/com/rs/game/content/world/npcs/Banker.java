@@ -16,10 +16,10 @@
 //
 package com.rs.game.content.world.npcs;
 
-import com.rs.game.content.dialogue.Conversation;
-import com.rs.game.content.dialogue.Dialogue;
-import com.rs.game.content.dialogue.HeadE;
-import com.rs.game.content.dialogue.Options;
+import com.rs.game.engine.dialogue.Conversation;
+import com.rs.game.engine.dialogue.Dialogue;
+import com.rs.game.engine.dialogue.HeadE;
+import com.rs.game.engine.dialogue.Options;
 import com.rs.game.ge.GE;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.player.Player;
@@ -59,7 +59,7 @@ public class Banker extends Conversation {
 				option("I'd like to change my theshold for valuable loot notifications.", new Dialogue()
 						.addPlayer(HeadE.HAPPY_TALKING, "I'd like to change my theshold for valuable loot notifications.")
 						.addNPC(npc.getId(), HeadE.HAPPY_TALKING, "Okay, your current threshold is " + player.getI("lootbeamThreshold", 90000) + " GP. What would you like to set it to?")
-						.addNext(() -> { 
+						.addNext(() -> {
 							player.sendInputInteger("What would you like to set it to?", new InputIntegerEvent() {
 								@Override
 								public void run(int amount) {
@@ -75,17 +75,12 @@ public class Banker extends Conversation {
 		create();
 	}
 
-	public static NPCInteractionDistanceHandler bankerDistance = new NPCInteractionDistanceHandler("Banker") {
-		@Override
-		public int getDistance(Player player, NPC npc) {
-			return 1;
-		}
-	};
+	public static NPCInteractionDistanceHandler bankerDistance = new NPCInteractionDistanceHandler(new Object[]{"Banker"}, (p, n) -> {
+		return 1;
+	});
 
-	public static NPCClickHandler bankerHandler = new NPCClickHandler(new Object[] { "Banker", 14707, 2619, 13455, 2617, 2618, 15194 }) {
-		@Override
-		public void handle(NPCClickEvent e) {
-			switch(e.getOption()) {
+	public static NPCClickHandler bankerHandler = new NPCClickHandler(new Object[]{"Banker", 14707, 2619, 13455, 15194}, e -> {
+		switch (e.getOption()) {
 			case "Bank":
 				e.getPlayer().getBank().open();
 				break;
@@ -96,14 +91,12 @@ public class Banker extends Conversation {
 //				e.getPlayer().startConversation(new Banker(e.getPlayer(), e.getNPC()));
 				e.getPlayer().startConversation(new BankerCustom(e.getPlayer(), e.getNPC()));
 				break;
-			}
 		}
-	};
+	});
 
-	public static ObjectClickHandler bankObjHandler = new ObjectClickHandler(new Object[] { "Bank booth", "Bank", "Bank chest", "Bank table", "Counter", "Shantay chest", "Darkmeyer Treasury" }) {
-		@Override
-		public void handle(ObjectClickEvent e) {
-			switch(e.getOption()) {
+
+	public static ObjectClickHandler bankObjHandler = new ObjectClickHandler(new Object[]{"Bank booth", "Bank", "Bank chest", "Bank table", "Counter", "Shantay chest", "Darkmeyer Treasury"}, e -> {
+		switch (e.getOption()) {
 			case "Bank":
 				e.getPlayer().getBank().open();
 				break;
@@ -121,14 +114,12 @@ public class Banker extends Conversation {
 			default:
 				e.getPlayer().sendMessage("Unhandled bank object option: " + e.getOption());
 				break;
-			}
 		}
-	};
+	});
 
-	public static ObjectClickHandler depositBoxHandler = new ObjectClickHandler(new Object[] { "Bank deposit box", "Deposit box", "Deposit Box", "Deposit chest", "Pulley lift" }) {
-		@Override
-		public void handle(ObjectClickEvent e) {
-			switch(e.getOption()) {
+
+	public static ObjectClickHandler depositBoxHandler = new ObjectClickHandler(new Object[]{"Bank deposit box", "Deposit box", "Deposit Box", "Deposit chest", "Pulley lift"}, e -> {
+		switch (e.getOption()) {
 			case "Deposit":
 			case "Use":
 				e.getPlayer().getBank().openDepositBox();
@@ -136,7 +127,10 @@ public class Banker extends Conversation {
 			default:
 				e.getPlayer().sendMessage("Unhandled deposit box object option: " + e.getOption());
 				break;
-			}
 		}
-	};
+	});
 }
+
+
+
+
