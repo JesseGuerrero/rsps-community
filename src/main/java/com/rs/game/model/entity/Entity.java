@@ -50,6 +50,7 @@ import com.rs.game.model.entity.pathing.DumbRouteFinder;
 import com.rs.game.model.entity.pathing.EntityStrategy;
 import com.rs.game.model.entity.pathing.FixedTileStrategy;
 import com.rs.game.model.entity.pathing.ObjectStrategy;
+import com.rs.game.model.entity.pathing.Route;
 import com.rs.game.model.entity.pathing.RouteEvent;
 import com.rs.game.model.entity.pathing.RouteFinder;
 import com.rs.game.model.entity.pathing.WalkStep;
@@ -501,15 +502,13 @@ public abstract class Entity {
 
 	public boolean calcFollow(Object target, int maxStepsCount, boolean intelligent) {
 		if (intelligent) {
-			int steps = RouteFinder.findRoute(RouteFinder.WALK_ROUTEFINDER, getX(), getY(), getPlane(), getSize(), target instanceof GameObject go ? new ObjectStrategy(go) : target instanceof Entity e ? new EntityStrategy(e) : new FixedTileStrategy(((WorldTile) target).getX(), ((WorldTile) target).getY()), true);
-			if (steps == -1)
+			Route route = RouteFinder.find(getX(), getY(), getPlane(), getSize(), target instanceof GameObject go ? new ObjectStrategy(go) : target instanceof Entity e ? new EntityStrategy(e) : new FixedTileStrategy(((WorldTile) target).getX(), ((WorldTile) target).getY()), true);
+			if (route.getStepCount() == -1)
 				return false;
-			if (steps == 0)
+			if (route.getStepCount() == 0)
 				return DumbRouteFinder.addDumbPathfinderSteps(this, target, getClipType());
-			int[] bufferX = RouteFinder.getLastPathBufferX();
-			int[] bufferY = RouteFinder.getLastPathBufferY();
-			for (int step = steps - 1; step >= 0; step--)
-				if (!addWalkSteps(bufferX[step], bufferY[step], maxStepsCount, true, true))
+			for (int step = route.getStepCount() - 1; step >= 0; step--)
+				if (!addWalkSteps(route.getBufferX()[step], route.getBufferY()[step], maxStepsCount, true, true))
 					break;
 			return true;
 		}
@@ -739,7 +738,7 @@ public abstract class Entity {
 	
 	public static void addLOSOverrides(String... npcNames) {
 		for (String npcName : npcNames)
-			addLOSOverrides(npcName);
+			addLOSOverride(npcName);
 	}
 	
 	public static void addLOSOverride(TriFunction<Entity, Object, Boolean, Boolean> func) {
@@ -1715,11 +1714,11 @@ public abstract class Entity {
 			player.getSkills().lowerStat(skillId, perc, maxDrain);
 		} else if (this instanceof NPC npc) {
 			switch(skillId) {
-			case Skills.ATTACK -> npc.lowerAttack(skillId, maxDrain);
-			case Skills.STRENGTH -> npc.lowerStrength(skillId, maxDrain);
-			case Skills.DEFENSE -> npc.lowerDefense(skillId, maxDrain);
-			case Skills.MAGIC -> npc.lowerMagic(skillId, maxDrain);
-			case Skills.RANGE -> npc.lowerRange(skillId, maxDrain);
+			case Skills.ATTACK -> npc.lowerAttack(perc, maxDrain);
+			case Skills.STRENGTH -> npc.lowerStrength(perc, maxDrain);
+			case Skills.DEFENSE -> npc.lowerDefense(perc, maxDrain);
+			case Skills.MAGIC -> npc.lowerMagic(perc, maxDrain);
+			case Skills.RANGE -> npc.lowerRange(perc, maxDrain);
 			}
 		}
 	}
