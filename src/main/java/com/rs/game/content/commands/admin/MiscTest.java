@@ -723,24 +723,24 @@ public class MiscTest {
 		});
 
 		Commands.add(Rights.DEVELOPER, "hinttrailcheck [x y modelIdfirst]", "Sets a hint trail from the player to the specified location.", (p, args) -> {
-					int x = Integer.valueOf(args[0]);
-					int y = Integer.valueOf(args[1]);
-					final int modelId = Integer.valueOf(args[2]);
-					int steps = RouteFinder.findRoute(RouteFinder.WALK_ROUTEFINDER, p.getX(), p.getY(), p.getPlane(), 1, new FixedTileStrategy(x, y), true);
-					int[] bufferX = RouteFinder.getLastPathBufferX();
-					int[] bufferY = RouteFinder.getLastPathBufferY();
-					//4055 black tile
-					WorldTasks.schedule(new WorldTask() {
-						int startId = modelId;
-						@Override
-						public void run() {
-							if (p.hasFinished())
-								stop();
-							p.sendMessage("ID: " + startId);
-							p.getSession().writeToQueue(new HintTrail(WorldTile.of(p.getTile()), startId--, bufferX, bufferY, steps));
-
-						}
-					}, 2, 1);
+//					int x = Integer.valueOf(args[0]);
+//					int y = Integer.valueOf(args[1]);
+//					final int modelId = Integer.valueOf(args[2]);
+//					int steps = RouteFinder.findRoute(RouteFinder.WALK_ROUTEFINDER, p.getX(), p.getY(), p.getPlane(), 1, new FixedTileStrategy(x, y), true);
+//					int[] bufferX = RouteFinder.getLastPathBufferX();
+//					int[] bufferY = RouteFinder.getLastPathBufferY();
+//					//4055 black tile
+//					WorldTasks.schedule(new WorldTask() {
+//						int startId = modelId;
+//						@Override
+//						public void run() {
+//							if (p.hasFinished())
+//								stop();
+//							p.sendMessage("ID: " + startId);
+//							p.getSession().writeToQueue(new HintTrail(WorldTile.of(p.getTile()), startId--, bufferX, bufferY, steps));
+//
+//						}
+//					}, 2, 1);
 		});
 
 		Commands.add(Rights.ADMIN, "maxhit", "Displays the player's max hit.", (p, args) -> {

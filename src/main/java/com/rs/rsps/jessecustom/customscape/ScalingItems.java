@@ -284,7 +284,7 @@ public class ScalingItems {
 			return;
 		int playerScale = e.getPlayer().getI("CustomScapeScale", 0);
 		int id = e.getNPC().getId();
-		if(id == 6260 || id == 6203 || id == 6222 || id == 6247 || id == 1158)
+		if(id == 6260 || id == 6203 || id == 6222 || id == 6247 || id == 1158 || id == 8349)
 			playerScale*=4;
 		if(id == 13447 || id == 8133)
 			playerScale*=8;

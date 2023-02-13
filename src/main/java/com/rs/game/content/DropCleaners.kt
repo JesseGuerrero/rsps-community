@@ -35,12 +35,12 @@ class DropCleaners {
                 e.deleteItem()
             }
         }
-        var goldAccumulator = NPCDropHandler(null, arrayOf(995)) { e ->
-            if (e.player.inventory.containsItem(25351, 1) && e.player.inventory.hasRoomFor(e.item)) {
-                e.player.inventory.addCoins(e.item.amount)
-                e.deleteItem()
-            }
-        }
+//        var goldAccumulator = NPCDropHandler(null, arrayOf(995)) { e ->
+//            if (e.player.inventory.containsItem(25351, 1) && e.player.inventory.hasRoomFor(e.item)) {
+//                e.player.inventory.addCoins(e.item.amount)
+//                e.deleteItem()
+//            }
+//        }
 
         fun herbicide(player: Player, item: Item): Boolean {
             if (!player.inventory.containsItem(19675, 1)) return false
