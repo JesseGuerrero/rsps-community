@@ -309,6 +309,9 @@ public final class QueenBlackDragonController extends Controller {
 						player.getControllerManager().startController(new DeathOfficeController(OUTSIDE, player.hasSkull()));
 				} else if (loop == 4) {
 					player.jingle(90);
+					player.setNextAnimation(new Animation(-1));
+				}  else if (loop == 5) {
+					player.unlock();
 					stop();
 				}
 				loop++;

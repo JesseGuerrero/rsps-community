@@ -262,6 +262,7 @@ public class CustomScripts {
 			return false;
 		}
 		if(player.getI("death coffer") >= 10_000) {
+			player.reset();
 			player.save("death coffer", player.getI("death coffer") - 10_000);
 			player.setNextWorldTile(Settings.getConfig().getPlayerRespawnTile());
 			player.lock(3);
