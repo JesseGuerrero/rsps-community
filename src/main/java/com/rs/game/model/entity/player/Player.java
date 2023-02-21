@@ -85,6 +85,7 @@ import com.rs.game.content.skills.slayer.TaskMonster;
 import com.rs.game.content.skills.summoning.Familiar;
 import com.rs.game.content.skills.summoning.Pouch;
 import com.rs.game.content.transportation.FadingScreen;
+import com.rs.game.content.tutorialisland.GamemodeSelection;
 import com.rs.game.content.tutorialisland.TutorialIslandController;
 import com.rs.game.content.world.Musician;
 import com.rs.game.engine.book.Book;
@@ -1369,9 +1370,12 @@ public class Player extends Entity {
 				getControllerManager().startController(new TutorialIslandController());
 			else
 				setStarter(1);
-			PlayerLook.openCharacterCustomizing(this);
-//			startConversation(new GamemodeSelection(this));
-			startConversation(new GamemodeSelectionCustom(this));
+			if (!getUsername().startsWith("cli_bot")) {
+				PlayerLook.openCharacterCustomizing(this);
+//				startConversation(new GamemodeSelection(this));
+				startConversation(new GamemodeSelectionCustom(this));
+			} else
+				setChosenAccountType(true);
 		}
 		//getPackets().write(new UpdateRichPresence("state", "Logged in as " + getDisplayName()));
 		PluginManager.handle(new LoginEvent(this));
