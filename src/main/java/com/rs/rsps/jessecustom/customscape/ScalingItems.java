@@ -284,10 +284,6 @@ public class ScalingItems {
 			return;
 		int playerScale = e.getPlayer().getI("CustomScapeScale", 0);
 		int id = e.getNPC().getId();
-		if(id == 6260 || id == 6203 || id == 6222 || id == 6247 || id == 1158 || id == 8349)
-			playerScale*=4;
-		if(id == 13447 || id == 8133)
-			playerScale*=8;
 		double playerCombatScale = 1 + (playerScale/10.0);
 
 		double npcScale = e.getNPC().getTempAttribs().getI("CustomScapeScale");
@@ -303,6 +299,12 @@ public class ScalingItems {
 			if(Settings.getConfig().isDebug())
 				e.getPlayer().sendMessage("This two " + e.getNPC().getTempAttribs().getD("CustomScapeScale"));
 		}
+		if(id == 6247 )
+			scale *= 2;
+		if(id == 6260 || id == 6203 || id == 6222 || id == 1158 || id == 8349)
+			scale*=4;
+		if(id == 13447 || id == 8133)
+			scale*=8;
 		if(Settings.getConfig().isDebug())
 			e.getPlayer().sendMessage("scale " + scale);
 		CustomScape.scaleEquipmentBonus(e.getItem(), scale);

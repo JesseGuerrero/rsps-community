@@ -53,6 +53,8 @@ public class GodwarsController extends Controller {
 
 	@Override
 	public void start() {
+		for(int i = 0; i <= 4; i++)
+			killcount[i] = player.getI("GWD_KILLS" + String.valueOf(i), 0);
 		sendInterfaces();
 	}
 
@@ -308,6 +310,8 @@ public class GodwarsController extends Controller {
 		player.getVars().setVarBit(8725, killcount[ZAROS]);
 		player.getVars().setVarBit(3941, killcount[BANDOS]);
 		player.getVars().setVarBit(3942, killcount[ZAMORAK]);
+		for(int i = 0; i <= 4; i++)
+			player.save("GWD_KILLS" + String.valueOf(i), killcount[i]);
 	}
 
 	public void sendKill(int index) {
