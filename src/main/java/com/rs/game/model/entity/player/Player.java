@@ -169,6 +169,7 @@ import com.rs.plugin.events.LoginEvent;
 import com.rs.rsps.jessecustom.CustomScripts;
 import com.rs.rsps.jessecustom.GamemodeSelectionCustom;
 import com.rs.rsps.jessecustom.groupironman.GIM;
+import com.rs.utils.AccountLimiter;
 import com.rs.utils.MachineInformation;
 import com.rs.utils.Ticks;
 import com.rs.utils.record.Recorder;
@@ -1023,8 +1024,7 @@ public class Player extends Entity {
 					if (!(combat.getAction().getTarget() instanceof Player))
 						idleLog();
 				} else
-					if(!CustomScripts.isInfiniteLogout())
-						logout(true);
+					logout(true);
 			}
 			if (disconnected && !finishing)
 				finish(0);
@@ -1268,10 +1268,8 @@ public class Player extends Entity {
 				LobbyCommunicator.updateRights(this);
 			}
 		LobbyCommunicator.addWorldPlayer(account, response -> {
-			if (!response) {
+			if (response == null || !response)
 				forceLogout();
-				return;
-			}
 		});
 		getClan(clan -> appearence.generateAppearanceData());
 		getGuestClan();
@@ -1763,6 +1761,7 @@ public class Player extends Entity {
 			pet.finish();
 		lastLoggedIn = System.currentTimeMillis();
 		setFinished(true);
+		AccountLimiter.remove(getSession().getIP());
 		session.setDecoder(null);
 		WorldDB.getPlayers().save(this, () -> {
 			LobbyCommunicator.removeWorldPlayer(this);
@@ -2198,9 +2197,6 @@ public class Player extends Entity {
 
 	}
 
-	private Player getSelf() {
-		return this;
-	}
 	@Override
 	public void sendDeath(final Entity source) {
 		incrementCount("Deaths");
@@ -2324,10 +2320,8 @@ public class Player extends Entity {
 					reset();
 					if (source instanceof Player opp && opp.hasRights(Rights.ADMIN))
 						setNextWorldTile(Settings.getConfig().getPlayerRespawnTile());
-					else {
-						if(!CustomScripts.deathCofferIsSuccessful(getSelf()))
-							controllerManager.startController(new DeathOfficeController(deathTile, hasSkull()));
-					}
+					else
+						controllerManager.startController(new DeathOfficeController(deathTile, hasSkull()));
 				} else if (loop == 3) {
 					setNextAnimation(new Animation(-1));
 				} else if (loop == 4) {
@@ -2360,30 +2354,29 @@ public class Player extends Entity {
 		WorldDB.getPlayers().save(this);
 		for (Item item : items[0])
 			inventory.addItem(item);
-		if(CustomScripts.dontConvertItemsOnDeathTileDrop())
-			for (Item item : items[1]) {
-				if (item == null)
-					continue;
-				ItemDegrade deg = null;
-				for(ItemDegrade d : ItemDegrade.values())
-					if (d.getDegradedId() == item.getId() || d.getItemId() == item.getId()) {
-						deg = d;
-						break;
-					}
-				if (deg != null && CustomScripts.chargesLostOnDeath())
-					if (deg.getBrokenId() != -1) {
-						item.setId(deg.getBrokenId());
-						item.deleteMetaData();
-					} else {
-						item.setAmount(ItemDefinitions.getDefs(item.getId()).getValue());
-						item.setId(995);
-						item.deleteMetaData();
-					}
-			}
+		for (Item item : items[1]) {
+			if (item == null)
+				continue;
+			ItemDegrade deg = null;
+			for(ItemDegrade d : ItemDegrade.values())
+				if (d.getDegradedId() == item.getId() || d.getItemId() == item.getId()) {
+					deg = d;
+					break;
+				}
+			if (deg != null)
+				if (deg.getBrokenId() != -1) {
+					item.setId(deg.getBrokenId());
+					item.deleteMetaData();
+				} else {
+					item.setAmount(ItemDefinitions.getDefs(item.getId()).getValue());
+					item.setId(995);
+					item.deleteMetaData();
+				}
+		}
 		if (items[1].length != 0)
 			if (noGravestone)
 				for (Item item : items[1])
-					World.addGroundItem(item, deathTile, killer == null ? this : killer, true, 210, (killer == null || killer == this) ? DropMethod.NORMAL : CustomScripts.untradeablesDropNormal()/*DropMethod.TURN_UNTRADEABLES_TO_COINS*/);
+					World.addGroundItem(item, deathTile, killer == null ? this : killer, true, 210, (killer == null || killer == this) ? DropMethod.NORMAL : DropMethod.TURN_UNTRADEABLES_TO_COINS);
 			else
 				new GraveStone(this, deathTile, items[1]);
 	}
@@ -3157,7 +3150,6 @@ public class Player extends Entity {
 		sendMessage("Welcome to " + Settings.getConfig().getServerName() + ".");
 		if (!Settings.getConfig().getLoginMessage().isEmpty())
 			sendMessage(Settings.getConfig().getLoginMessage());
-		CustomScripts.giveToolsLoadestones(this);
 		getAppearance().generateAppearanceData();
 	}
 
@@ -4428,4 +4420,10 @@ public class Player extends Entity {
     public void playCutscene(Cutscene scene) {
 		getCutsceneManager().play(scene);
     }
+
+	@Override
+	public void setBasNoReset(int bas) {
+		super.setBasNoReset(bas);
+		getAppearance().generateAppearanceData();
+	}
 }
