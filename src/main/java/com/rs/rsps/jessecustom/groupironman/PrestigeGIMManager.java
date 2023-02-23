@@ -134,11 +134,11 @@ public class PrestigeGIMManager {
 
 		if(!allQuestsComplete.get())
 			deservesAdvanced.set(false);
-		if(numOfReaperKills.get() < group.getSize()*10)
-			deservesAdvanced.set(false);
-		if(numOfPCGames.get() < group.getSize()*30)
-			deservesAdvanced.set(false);
-		if(!completedFightCaves.get())
+//		if(numOfReaperKills.get() < group.getSize()*10)
+//			deservesAdvanced.set(false);
+//		if(numOfPCGames.get() < group.getSize()*30)
+//			deservesAdvanced.set(false);
+//		if(!completedFightCaves.get())
 			deservesAdvanced.set(false);
 		return deservesAdvanced.get();
 	}
@@ -160,12 +160,12 @@ public class PrestigeGIMManager {
 		});
 		if(!allPlayersHaveTotalLevels.get())
 			deservesVeteran.set(false);
-		if(numOfReaperKills.get() < group.getSize()*25)
-			deservesVeteran.set(false);
-		if(numOfPCGames.get() < group.getSize()*100)
-			deservesVeteran.set(false);
-		if(numOfFightKilnCleared.get() < 1)
-			deservesVeteran.set(false);
+//		if(numOfReaperKills.get() < group.getSize()*25)
+//			deservesVeteran.set(false);
+//		if(numOfPCGames.get() < group.getSize()*100)
+//			deservesVeteran.set(false);
+//		if(numOfFightKilnCleared.get() < 1)
+//			deservesVeteran.set(false);
 		return deservesVeteran.get();
 	}
 
@@ -183,8 +183,8 @@ public class PrestigeGIMManager {
 		});
 		if(!allPlayersHaveTotalLevels.get())
 			deservesCompletionist.set(false);
-		if(numOfReaperKills.get() < group.getSize()*100)
-			deservesCompletionist.set(false);
+///		if(numOfReaperKills.get() < group.getSize()*100)
+//			deservesCompletionist.set(false);
 		return deservesCompletionist.get();
 	}
 

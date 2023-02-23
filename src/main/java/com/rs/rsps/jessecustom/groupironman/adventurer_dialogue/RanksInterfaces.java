@@ -108,15 +108,15 @@ public class RanksInterfaces {
 			;
 			ArrayList<String> lines = new ArrayList<>();
 			lines.add((allQuestsComplete.get() ? "<str>" : "") + "All quests completed");
-			lines.add((numOfReaperKills.get() >= group.getSize()*10 ? "<str>" : "") + "Has done " + group.getPlayers().size()*10 + " reaper tasks");
-			lines.add((numOfPCGames.get() >= group.getSize()*30 ? "<str>" : "") + "Finished a total of " + group.getSize()*30 + " pest control games");
-			lines.add((completedFightCaves.get() ? "<str>" : "") + "1 player completed fight caves");
+//			lines.add((numOfReaperKills.get() >= group.getSize()*10 ? "<str>" : "") + "Has done " + group.getPlayers().size()*10 + " reaper tasks");
+//			lines.add((numOfPCGames.get() >= group.getSize()*30 ? "<str>" : "") + "Finished a total of " + group.getSize()*30 + " pest control games");
+//			lines.add((completedFightCaves.get() ? "<str>" : "") + "1 player completed fight caves");
 			lines.add("");
 			lines.add("");
 			lines.add("~~Rewards~~");
 			lines.add("30k loyalty points each");
 			lines.add("+1 GIM bank");
-			if(allQuestsComplete.get() && numOfReaperKills.get() < group.getSize()*10 &&  numOfPCGames.get() < group.getSize()*30 && completedFightCaves.get()
+			if(allQuestsComplete.get() /*&& numOfReaperKills.get() < group.getSize()*10 &&  numOfPCGames.get() < group.getSize()*30 && completedFightCaves.get()*/
 					|| group.getPrestigeManager().getPrestige() >= PrestigeGIMManager.ADVANCED) {
 				lines.add("");
 				lines.add("Congratulations, You pass this rank!");
@@ -148,17 +148,17 @@ public class RanksInterfaces {
 			});
 			if(!allPlayersHaveTotalLevels.get())
 				deservesVeteran.set(false);
-			if(numOfReaperKills.get() < group.getSize()*25)
-				deservesVeteran.set(false);
-			if(numOfPCGames.get() < group.getSize()*100)
-				deservesVeteran.set(false);
-			if(numOfFightKilnCleared.get() < 1)
-				deservesVeteran.set(false);
+//			if(numOfReaperKills.get() < group.getSize()*25)
+//				deservesVeteran.set(false);
+//			if(numOfPCGames.get() < group.getSize()*100)
+//				deservesVeteran.set(false);
+//			if(numOfFightKilnCleared.get() < 1)
+//				deservesVeteran.set(false);
 			ArrayList<String> lines = new ArrayList<>();
 			lines.add((allPlayersHaveTotalLevels.get() ? "<str>" : "") + "All players have 2496 total levels");
-			lines.add((numOfReaperKills.get() >= group.getSize()*25 ? "<str>" : "") + "Has done " + group.getPlayers().size()*25 + " reaper tasks");
-			lines.add((numOfPCGames.get() >= group.getSize()*100 ? "<str>" : "") + "Finished a total of " + group.getSize()*100 + " pest control games");
-			lines.add((numOfFightKilnCleared.get() >= 1 ? "<str>" : "") + "1 player completed fight kiln");
+//			lines.add((numOfReaperKills.get() >= group.getSize()*25 ? "<str>" : "") + "Has done " + group.getPlayers().size()*25 + " reaper tasks");
+//			lines.add((numOfPCGames.get() >= group.getSize()*100 ? "<str>" : "") + "Finished a total of " + group.getSize()*100 + " pest control games");
+//			lines.add((numOfFightKilnCleared.get() >= 1 ? "<str>" : "") + "1 player completed fight kiln");
 			lines.add("");
 			lines.add("");
 			lines.add("~~Rewards~~");
@@ -191,11 +191,11 @@ public class RanksInterfaces {
 			});
 			if(!allPlayersHaveTotalLevels.get())
 				deservesCompletionist.set(false);
-			if(numOfReaperKills.get() < group.getSize()*100)
-				deservesCompletionist.set(false);
+//			if(numOfReaperKills.get() < group.getSize()*100)
+//				deservesCompletionist.set(false);
 			ArrayList<String> lines = new ArrayList<>();
 			lines.add((allPlayersHaveTotalLevels.get() ? "<str>" : "") + "All players have all 120s");
-			lines.add((numOfReaperKills.get() >= group.getSize()*100 ? "<str>" : "") + "Has done " + group.getPlayers().size()*100 + " reaper tasks");
+//			lines.add((numOfReaperKills.get() >= group.getSize()*100 ? "<str>" : "") + "Has done " + group.getPlayers().size()*100 + " reaper tasks");
 			lines.add("");
 			lines.add("");
 			lines.add("~~Rewards~~");

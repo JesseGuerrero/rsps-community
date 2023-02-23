@@ -233,10 +233,10 @@ public class AdventurerDIntroduction extends Conversation {
 											return;
 										}
 										int groupPrestige = group.getPrestigeManager().getPrestige();
-										if(groupPrestige != GIM.getIndividualPrestige(player)) {
-											player.sendMessage("You must be " + ranks[groupPrestige] + " to join this group...");
-											return;
-										}
+//										if(groupPrestige != GIM.getIndividualPrestige(player)) {
+//											player.sendMessage("You must be " + ranks[groupPrestige] + " to join this group...");
+//											return;
+//										}
 										Player founder = World.getPlayerByUsername(group.getFounderUsername());
 										founder.getTempAttribs().setB("GIM Join Request_"+player.getUsername(), true);
 										player.getTempAttribs().setB("GIM Group Request_"+groupName, true);
