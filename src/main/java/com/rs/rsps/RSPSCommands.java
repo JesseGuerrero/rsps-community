@@ -1,8 +1,8 @@
 package com.rs.rsps;
 
 import com.rs.Settings;
+import com.rs.engine.command.Commands;
 import com.rs.game.content.skills.magic.Magic;
-import com.rs.game.engine.command.Commands;
 import com.rs.lib.game.Rights;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.annotations.ServerStartupEvent;

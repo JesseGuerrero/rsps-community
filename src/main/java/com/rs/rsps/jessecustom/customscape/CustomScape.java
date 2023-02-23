@@ -2,12 +2,12 @@ package com.rs.rsps.jessecustom.customscape;
 
 import com.rs.Settings;
 import com.rs.cache.loaders.Bonus;
+import com.rs.engine.dialogue.Dialogue;
+import com.rs.engine.quest.Quest;
 import com.rs.game.World;
 import com.rs.game.content.ItemConstants;
 import com.rs.game.content.quests.shieldofarrav.ShieldOfArrav;
 import com.rs.game.content.skills.dungeoneering.npcs.DungeonNPC;
-import com.rs.game.engine.dialogue.Dialogue;
-import com.rs.game.engine.quest.Quest;
 import com.rs.game.model.entity.Entity;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.npc.combat.NPCCombatDefinitions;

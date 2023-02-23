@@ -1,8 +1,8 @@
 package com.rs.rsps.jessecustom;
 
-import com.rs.game.engine.dialogue.Conversation;
-import com.rs.game.engine.dialogue.Dialogue;
-import com.rs.game.engine.dialogue.statements.SimpleStatement;
+import com.rs.engine.dialogue.Conversation;
+import com.rs.engine.dialogue.Dialogue;
+import com.rs.engine.dialogue.statements.SimpleStatement;
 import com.rs.game.model.entity.player.Player;
 import com.rs.rsps.jessecustom.customscape.CustomScape;
 import com.rs.rsps.jessecustom.groupironman.GIM;
