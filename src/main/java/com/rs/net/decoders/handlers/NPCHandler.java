@@ -28,7 +28,6 @@ import com.rs.game.content.quests.piratestreasure.CustomsOfficerPiratesTreasureD
 import com.rs.game.content.quests.piratestreasure.PiratesTreasure;
 import com.rs.game.content.skills.construction.EstateAgentDialogue;
 import com.rs.game.content.skills.construction.ServantDialogue;
-import com.rs.game.content.skills.hunter.FlyingEntityHunter;
 import com.rs.game.content.skills.slayer.npcs.ConditionalDeath;
 import com.rs.game.content.skills.slayer.npcs.MutatedZygomite;
 import com.rs.game.content.skills.summoning.Familiar;
@@ -42,7 +41,7 @@ import com.rs.game.content.world.unorganized_dialogue.FremennikShipmaster;
 import com.rs.game.content.world.unorganized_dialogue.GeneralStore;
 import com.rs.game.content.world.unorganized_dialogue.TanningD;
 import com.rs.game.content.world.unorganized_dialogue.skillmasters.GenericSkillcapeOwnerD;
-import com.rs.game.engine.quest.Quest;
+import com.rs.engine.quest.Quest;
 import com.rs.game.ge.GE;
 import com.rs.game.model.entity.interactions.StandardEntityInteraction;
 import com.rs.game.model.entity.npc.NPC;
@@ -178,9 +177,7 @@ public class NPCHandler {
 			else if (npc.getId() == 5915)
 				player.startConversation(new ClanItemClaim(player, 20709));
 			else if (npc.getId() == 2824 || npc.getId() == 1041 || npc.getId() == 804)
-				player.startConversation(new TanningD(player, npc.getId() == 1041));
-			else if (npc.getName().toLowerCase().contains("impling"))
-				FlyingEntityHunter.captureFlyingEntity(player, npc);
+				player.startConversation(new TanningD(player, npc.getId() == 1041, npc.getId()));
 			else if (PluginManager.handle(new NPCClickEvent(player, npc, 1, true))) {
 
 			} else if (npc instanceof Pet pet) {
@@ -298,7 +295,7 @@ public class NPCHandler {
 			else if (npc.getId() == 5915)
 				player.startConversation(new ClanItemClaim(player, 20709));
 			else if (npc.getId() == 2824 || npc.getId() == 1041)
-				player.startConversation(new TanningD(player, npc.getId() == 1041));
+				player.startConversation(new TanningD(player, npc.getId() == 1041, npc.getId()));
 			else if (npc.getId() == 1843)
 				player.setNextWorldTile(WorldTile.of(2836, 10142, 0));
 			else if (npc.getId() == 1844)

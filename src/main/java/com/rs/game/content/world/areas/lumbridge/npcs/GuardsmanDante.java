@@ -1,7 +1,7 @@
 package com.rs.game.content.world.areas.lumbridge.npcs;
 
-import com.rs.game.engine.dialogue.Conversation;
-import com.rs.game.engine.dialogue.HeadE;
+import com.rs.engine.dialogue.Conversation;
+import com.rs.engine.dialogue.HeadE;
 import com.rs.game.model.entity.player.Player;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.handlers.NPCClickHandler;
@@ -10,7 +10,7 @@ import com.rs.plugin.handlers.NPCClickHandler;
 public class GuardsmanDante extends Conversation {
 
     //Identify NPC by ID
-    private static int npcId = 7885;
+    private static final int npcId = 7885;
 
     public static NPCClickHandler GuardsmanDante = new NPCClickHandler(new Object[]{npcId}, e -> {
     	 switch (e.getOption()) {

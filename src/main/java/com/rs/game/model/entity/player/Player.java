@@ -37,7 +37,7 @@ import com.rs.cache.loaders.EnumDefinitions;
 import com.rs.cache.loaders.ItemDefinitions;
 import com.rs.cache.loaders.LoyaltyRewardDefinitions.Reward;
 import com.rs.cache.loaders.ObjectType;
-import com.rs.cores.CoresManager;
+import com.rs.engine.thread.TaskExecutor;
 import com.rs.db.WorldDB;
 import com.rs.game.World;
 import com.rs.game.World.DropMethod;
@@ -54,7 +54,6 @@ import com.rs.game.content.bosses.godwars.GodwarsController;
 import com.rs.game.content.bosses.godwars.zaros.Nex;
 import com.rs.game.content.clans.ClansManager;
 import com.rs.game.content.combat.CombatDefinitions;
-import com.rs.game.content.combat.PlayerCombat;
 import com.rs.game.content.death.DeathOfficeController;
 import com.rs.game.content.death.GraveStone;
 import com.rs.game.content.holidayevents.christmas.christ19.Christmas2019.Location;
@@ -88,17 +87,17 @@ import com.rs.game.content.transportation.FadingScreen;
 import com.rs.game.content.tutorialisland.GamemodeSelection;
 import com.rs.game.content.tutorialisland.TutorialIslandController;
 import com.rs.game.content.world.Musician;
-import com.rs.game.engine.book.Book;
-import com.rs.game.engine.cutscene.Cutscene;
-import com.rs.game.engine.dialogue.Conversation;
-import com.rs.game.engine.dialogue.Dialogue;
-import com.rs.game.engine.dialogue.HeadE;
-import com.rs.game.engine.dialogue.Options;
-import com.rs.game.engine.dialogue.statements.SimpleStatement;
-import com.rs.game.engine.miniquest.Miniquest;
-import com.rs.game.engine.miniquest.MiniquestManager;
-import com.rs.game.engine.quest.Quest;
-import com.rs.game.engine.quest.QuestManager;
+import com.rs.engine.book.Book;
+import com.rs.engine.cutscene.Cutscene;
+import com.rs.engine.dialogue.Conversation;
+import com.rs.engine.dialogue.Dialogue;
+import com.rs.engine.dialogue.HeadE;
+import com.rs.engine.dialogue.Options;
+import com.rs.engine.dialogue.statements.SimpleStatement;
+import com.rs.engine.miniquest.Miniquest;
+import com.rs.engine.miniquest.MiniquestManager;
+import com.rs.engine.quest.Quest;
+import com.rs.engine.quest.QuestManager;
 import com.rs.game.ge.GE;
 import com.rs.game.ge.Offer;
 import com.rs.game.model.WorldProjectile;
@@ -1426,13 +1425,22 @@ public class Player extends Entity {
 			sendMessage("This lodestone doesn't respond.");
 			return;
 		}
-		lodestones[stone.ordinal()] = true;
-		refreshLodestoneNetwork();
-
+		final WorldTile tile = object.getTile();
 		if (object != null) {
-			getPackets().sendSpotAnim(new SpotAnim(3019), object);
-			if (stone.getAchievement() != null)
-				getInterfaceManager().sendAchievementComplete(stone.getAchievement());
+			playCutscene(cs -> {
+				cs.camPos(object.getX()+1, object.getY()+6, 5000);
+				cs.camLook(object.getX(), object.getY(), 0);
+				cs.delay(2);
+				cs.action(() -> {
+					lodestones[stone.ordinal()] = true;
+					refreshLodestoneNetwork();
+					getPackets().sendSpotAnim(new SpotAnim(3019), tile);
+					if (stone.getAchievement() != null)
+						getInterfaceManager().sendAchievementComplete(stone.getAchievement());
+				});
+				cs.delay(10);
+				cs.camPosResetSoft();
+			});
 		}
 	}
 
@@ -1729,7 +1737,7 @@ public class Player extends Entity {
 			return;
 		stopAll(false, true, !(getInteractionManager().getInteraction() instanceof PlayerCombatInteraction));
 		if ((inCombat(10000) || hasBeenHit(10000) || getEmotesManager().isAnimating() || isLocked()) && tryCount < 6) {
-			CoresManager.schedule(() -> {
+			TaskExecutor.schedule(() -> {
 				try {
 					finishing = false;
 					if (isDead() || isDying())
@@ -3649,7 +3657,7 @@ public class Player extends Entity {
 		return false;
 	}
 
-	public void startConversation(com.rs.game.engine.dialogue.Dialogue dialogue) {
+	public void startConversation(com.rs.engine.dialogue.Dialogue dialogue) {
 		startConversation(new Conversation(dialogue.finish()));
 	}
 
@@ -4239,7 +4247,7 @@ public class Player extends Entity {
 	}
 
 	public void simpleDialogue(String message) {
-		startConversation(new com.rs.game.engine.dialogue.Dialogue(new SimpleStatement(message)));
+		startConversation(new com.rs.engine.dialogue.Dialogue(new SimpleStatement(message)));
 	}
 
 	public void setUsername(String username) {

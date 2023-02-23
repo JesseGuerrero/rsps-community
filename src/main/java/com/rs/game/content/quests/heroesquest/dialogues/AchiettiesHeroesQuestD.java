@@ -4,14 +4,15 @@ import static com.rs.game.content.quests.heroesquest.HeroesQuest.GET_ITEMS;
 import static com.rs.game.content.quests.heroesquest.HeroesQuest.NOT_STARTED;
 
 import com.rs.game.content.quests.heroesquest.HeroesQuest;
-import com.rs.game.engine.dialogue.Conversation;
-import com.rs.game.engine.dialogue.Dialogue;
-import com.rs.game.engine.dialogue.HeadE;
-import com.rs.game.engine.dialogue.Options;
-import com.rs.game.engine.quest.Quest;
+import com.rs.engine.dialogue.Conversation;
+import com.rs.engine.dialogue.Dialogue;
+import com.rs.engine.dialogue.HeadE;
+import com.rs.engine.dialogue.Options;
+import com.rs.engine.quest.Quest;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.Item;
 import com.rs.plugin.annotations.PluginEventHandler;
+import com.rs.plugin.handlers.NPCClickHandler;
 
 @PluginEventHandler
 public class AchiettiesHeroesQuestD extends Conversation {
@@ -109,4 +110,21 @@ public class AchiettiesHeroesQuestD extends Conversation {
 	public static boolean hasAllItems(Player p) {
 		return p.getInventory().containsItems(new Item(2149, 1), new Item(1579, 1), new Item(1583, 1));
 	}
+
+	public static NPCClickHandler handleAchietties = new NPCClickHandler(new Object[] { 796 }, e -> {
+		if (e.getPlayer().isQuestComplete(Quest.HEROES_QUEST)) {
+			e.getPlayer().startConversation(new Conversation(e.getPlayer()) {
+				int NPC = e.getNPCId();
+
+				{
+					addNPC(NPC, HeadE.CALM_TALK, "Greetings, welcome to the heroes guild!");
+					addPlayer(HeadE.HAPPY_TALKING, "Thank you...");
+					addNPC(NPC, HeadE.CALM_TALK, "You're welcome.");
+					create();
+				}
+			});
+		} else {
+			e.getPlayer().startConversation(new AchiettiesHeroesQuestD(e.getPlayer()).getStart());
+		}
+	});
 }

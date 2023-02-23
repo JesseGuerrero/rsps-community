@@ -22,11 +22,11 @@ import com.rs.game.content.quests.knightssword.SquireKnightsSwordD;
 import com.rs.game.content.quests.piratestreasure.RedbeardFrankPiratesTreasureD;
 import com.rs.game.content.skills.agility.Agility;
 import com.rs.game.content.world.AgilityShortcuts;
-import com.rs.game.engine.dialogue.Conversation;
-import com.rs.game.engine.dialogue.Dialogue;
-import com.rs.game.engine.dialogue.HeadE;
-import com.rs.game.engine.dialogue.Options;
-import com.rs.game.engine.quest.Quest;
+import com.rs.engine.dialogue.Conversation;
+import com.rs.engine.dialogue.Dialogue;
+import com.rs.engine.dialogue.HeadE;
+import com.rs.engine.dialogue.Options;
+import com.rs.engine.quest.Quest;
 import com.rs.game.model.entity.pathing.Direction;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.WorldObject;
@@ -82,22 +82,6 @@ public class Falador {
 					}
 				});
 				create();
-			}
-		});
-	});
-
-	public static NPCClickHandler handleChemist = new NPCClickHandler(new Object[] { 367 }, e -> {
-		e.getPlayer().startConversation(new Conversation(e.getPlayer()) {
-			{
-				addNPC(e.getNPCId(), HeadE.CHEERFUL, "Hello, what are you after?");
-				addOptions("What would you like to say?", new Options() {
-					@Override
-					public void create() {
-						option("About the Achievement System...",
-								new AchievementSystemDialogue(player, e.getNPCId(), SetReward.FALADOR_SHIELD)
-								.getStart());
-					}
-				});
 			}
 		});
 	});
