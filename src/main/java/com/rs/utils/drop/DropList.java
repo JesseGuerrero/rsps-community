@@ -101,12 +101,20 @@ public class DropList {
 		modifier *= Settings.getConfig().getDropModifier();
 
 		double roll = Utils.clampD(Utils.randomD() * modifier, -100, MAX_ROLL);
+		double roll2 = Utils.clampD(Utils.randomD() * 0.5, -100, MAX_ROLL);
+		double roll3 = Utils.clampD(Utils.randomD() * 0.4, -100, MAX_ROLL);
 		for (DropEntry drop : drops) {
+			if(drop.getTable() != null && drop.getTable().getRate() < 1.0/150.0 && drop.getTable().getRate() > 0.0)
+				roll = roll2;
+			else if(drop.getTable() != null && drop.getTable().getRate() < 1.0/800.0 && drop.getTable().getRate() > 0.0)
+				roll = roll3;
 			if ((!drop.isAlways() && roll < drop.getMin()) || (!drop.isAlways() && roll >= drop.getMax()))
 				continue;
 			DropTable table = drop.getTable();
 			if (table == null)
 				continue;
+
+
 			if (table.getRollTable() != null) {
 				if (killer != null)
 					switch(table.getRollTable().getNames()[0]) {
