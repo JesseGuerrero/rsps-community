@@ -1023,7 +1023,8 @@ public class Player extends Entity {
 					if (!(combat.getAction().getTarget() instanceof Player))
 						idleLog();
 				} else
-					logout(true);
+					if(!CustomScripts.isInfiniteLogout())
+						logout(true);
 			}
 			if (disconnected && !finishing)
 				finish(0);
@@ -2328,8 +2329,10 @@ public class Player extends Entity {
 					reset();
 					if (source instanceof Player opp && opp.hasRights(Rights.ADMIN))
 						setNextWorldTile(Settings.getConfig().getPlayerRespawnTile());
-					else
-						controllerManager.startController(new DeathOfficeController(deathTile, hasSkull()));
+					else {
+						if (!CustomScripts.deathCofferIsSuccessful(getSelf()))
+							controllerManager.startController(new DeathOfficeController(deathTile, hasSkull()));
+					}
 				} else if (loop == 3) {
 					setNextAnimation(new Animation(-1));
 				} else if (loop == 4) {
@@ -2340,6 +2343,10 @@ public class Player extends Entity {
 				loop++;
 			}
 		}, 0, 1);
+	}
+
+	public Player getSelf() {
+		return this;
 	}
 
 	public WorldTile getRandomGraveyardTile() {
@@ -2362,6 +2369,7 @@ public class Player extends Entity {
 		WorldDB.getPlayers().save(this);
 		for (Item item : items[0])
 			inventory.addItem(item);
+		if(CustomScripts.dontConvertItemsOnDeathTileDrop())
 		for (Item item : items[1]) {
 			if (item == null)
 				continue;
@@ -2371,20 +2379,20 @@ public class Player extends Entity {
 					deg = d;
 					break;
 				}
-			if (deg != null)
-				if (deg.getBrokenId() != -1) {
-					item.setId(deg.getBrokenId());
-					item.deleteMetaData();
-				} else {
-					item.setAmount(ItemDefinitions.getDefs(item.getId()).getValue());
-					item.setId(995);
-					item.deleteMetaData();
-				}
+				if (deg != null && CustomScripts.chargesLostOnDeath())
+					if (deg.getBrokenId() != -1) {
+						item.setId(deg.getBrokenId());
+						item.deleteMetaData();
+					} else {
+						item.setAmount(ItemDefinitions.getDefs(item.getId()).getValue());
+						item.setId(995);
+						item.deleteMetaData();
+					}
 		}
 		if (items[1].length != 0)
 			if (noGravestone)
 				for (Item item : items[1])
-					World.addGroundItem(item, deathTile, killer == null ? this : killer, true, 210, (killer == null || killer == this) ? DropMethod.NORMAL : DropMethod.TURN_UNTRADEABLES_TO_COINS);
+					World.addGroundItem(item, deathTile, killer == null ? this : killer, true, 210, (killer == null || killer == this) ? DropMethod.NORMAL : CustomScripts.untradeablesDropNormal()/*DropMethod.TURN_UNTRADEABLES_TO_COINS*/);
 			else
 				new GraveStone(this, deathTile, items[1]);
 	}
@@ -3158,6 +3166,7 @@ public class Player extends Entity {
 		sendMessage("Welcome to " + Settings.getConfig().getServerName() + ".");
 		if (!Settings.getConfig().getLoginMessage().isEmpty())
 			sendMessage(Settings.getConfig().getLoginMessage());
+		CustomScripts.giveToolsLoadestones(this);
 		getAppearance().generateAppearanceData();
 	}
 
