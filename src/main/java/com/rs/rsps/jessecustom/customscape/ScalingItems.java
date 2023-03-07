@@ -305,9 +305,10 @@ public class ScalingItems {
 			scale*=4;
 		if(id == 13447 || id == 8133)
 			scale*=8;
-		if(e.getNPC().getCombatDefinitions().getCombatLevel() <= 25 && Arrays.asList(getMagicAttackScalingItemsByID()).contains(e.getItem().getId())) {
-			scale /= 20;
-		}
+		if(e.getNPC().getCombatDefinitions().getCombatLevel() <= 25)
+			scale /= 25;
+		if(e.getNPC().getCombatDefinitions().getCombatLevel() <= 10)
+			scale = 1;
 		if(Settings.getConfig().isDebug())
 			e.getPlayer().sendMessage("scale " + scale);
 		CustomScape.scaleEquipmentBonus(e.getItem(), scale);
