@@ -177,7 +177,22 @@ public class CustomScape {
 
 	}
 
-
+	public static boolean handleCombineHitBonuses(Player player, Item used, Item usedWith) {
+		int usedId = used.getId(), usedWithId = usedWith.getId();
+		if(usedId == usedWithId && used.containsMetaData() && usedWith.containsMetaData() && used.getMetaData().get("HitBonus") != null && usedWith.getMetaData().get("HitBonus") != null) {			player.startConversation(new Dialogue()
+					.addOptions("Combine items into one?", options -> {
+								options.add("No", () -> {});
+								options.add("Yes", () -> {
+									double hitBonusTotal = used.getMetaDataD("HitBonus") + usedWith.getMetaDataD("HitBonus");
+									usedWith.addMetaData("HitBonus", hitBonusTotal);
+									used.addMetaData("HitBonus", (double)0);
+								});
+							}
+					));
+			return true;
+		}
+		return false;
+	}
 
 	public static void increaseWeaponStats(Player p, NPC killedNPC) {
 		if(!isPlayerCustomScape(p))

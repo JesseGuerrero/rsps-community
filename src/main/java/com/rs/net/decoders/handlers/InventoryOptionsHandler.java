@@ -18,6 +18,7 @@ package com.rs.net.decoders.handlers;
 
 import com.rs.cache.loaders.ItemDefinitions;
 import com.rs.cache.loaders.ObjectType;
+import com.rs.engine.dialogue.Dialogue;
 import com.rs.game.World;
 import com.rs.game.content.Lamps;
 import com.rs.game.content.minigames.fightkiln.FightKilnController;
@@ -75,6 +76,8 @@ import com.rs.utils.ItemConfig;
 import com.rs.utils.Ticks;
 import com.rs.utils.drop.DropTable;
 
+import static com.rs.rsps.jessecustom.customscape.CustomScape.handleCombineHitBonuses;
+
 public class InventoryOptionsHandler {
 		
 	public static boolean handleItemOnItem(Player player, Item used, Item usedWith, int fromSlot, int toSlot) {
@@ -85,7 +88,8 @@ public class InventoryOptionsHandler {
 
 		if (GodSwordCreation.handleGodSword(player, usedWithId, usedId) || WeaponPoison.poison(player, used, usedWith, false))
 			return true;
-
+		if(handleCombineHitBonuses(player, used, usedWith))
+			return true;
 		if (PrayerBooks.isGodBook(usedId, false) || PrayerBooks.isGodBook(usedWithId, false)) {
 			PrayerBooks.bindPages(player, used.getName().contains(" page ") ? usedWithId : usedId);
 			return true;
