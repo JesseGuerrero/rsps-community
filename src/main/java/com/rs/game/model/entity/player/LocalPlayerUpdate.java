@@ -17,6 +17,7 @@
 package com.rs.game.model.entity.player;
 
 import java.security.MessageDigest;
+import java.util.Arrays;
 
 import com.rs.Settings;
 import com.rs.game.World;
@@ -211,7 +212,7 @@ public final class LocalPlayerUpdate {
 				stream.writeBits(1, 1); // needs update
 				stream.writeBits(1, 0); // no masks update needeed
 				stream.writeBits(2, 0); // request remove
-				regionHashes[playerIndex] = p.getLastWorldTile() == null ? p.getRegionHash() : p.getLastWorldTile().getRegionHash();
+				regionHashes[playerIndex] = p.getLastTile() == null ? p.getRegionHash() : p.getLastTile().getRegionHash();
 				int hash = p.getRegionHash();
 				if (hash == regionHashes[playerIndex])
 					stream.writeBits(1, 0);
@@ -230,10 +231,10 @@ public final class LocalPlayerUpdate {
 					stream.writeBits(1, 1); // needs update
 					stream.writeBits(1, needUpdate ? 1 : 0);
 					stream.writeBits(2, 3);
-					int xOffset = p.getX() - p.getLastWorldTile().getX();
-					int yOffset = p.getY() - p.getLastWorldTile().getY();
-					int planeOffset = p.getPlane() - p.getLastWorldTile().getPlane();
-					if (Math.abs(p.getX() - p.getLastWorldTile().getX()) <= 14 && Math.abs(p.getY() - p.getLastWorldTile().getY()) <= 14) {
+					int xOffset = p.getX() - p.getLastTile().getX();
+					int yOffset = p.getY() - p.getLastTile().getY();
+					int planeOffset = p.getPlane() - p.getLastTile().getPlane();
+					if (Math.abs(p.getX() - p.getLastTile().getX()) <= 14 && Math.abs(p.getY() - p.getLastTile().getY()) <= 14) {
 						stream.writeBits(1, 0);
 						if (xOffset < 0)
 							xOffset += 32;
@@ -324,7 +325,7 @@ public final class LocalPlayerUpdate {
 			applyGraphicsMask2(p, block);
 		}
 
-		if (added || (p.getNextFaceWorldTile() != null && p.getNextRunDirection() == null && p.getNextWalkDirection() == null)) {
+		if (added || (p.getNextFaceTile() != null && p.getNextRunDirection() == null && p.getNextWalkDirection() == null)) {
 			maskData |= 0x20;
 			applyFaceDirectionMask(p, block);
 		}
@@ -520,12 +521,12 @@ public final class LocalPlayerUpdate {
 	}
 
 	private void applyForceMovementMask(Player p, OutputStream data) {
-		data.writeByteC(p.getNextForceMovement().getToFirstTile().getX() - p.getX());
-		data.write128Byte(p.getNextForceMovement().getToFirstTile().getY() - p.getY());
-		data.writeByte128(p.getNextForceMovement().getToSecondTile() == null ? 0 : p.getNextForceMovement().getToSecondTile().getX() - p.getX());
-		data.writeByteC(p.getNextForceMovement().getToSecondTile() == null ? 0 : p.getNextForceMovement().getToSecondTile().getY() - p.getY());
-		data.writeShortLE128(p.getNextForceMovement().getFirstTileTicketDelay() * 30); //30 = client frames per game tick
-		data.writeShortLE(p.getNextForceMovement().getToSecondTile() == null ? 0 : p.getNextForceMovement().getSecondTileTicketDelay() * 30);
+		data.writeByteC(p.getNextForceMovement().getDiffX1());
+		data.write128Byte(p.getNextForceMovement().getDiffY1());
+		data.writeByte128(p.getNextForceMovement().getDiffX2());
+		data.writeByteC(p.getNextForceMovement().getDiffY2());
+		data.writeShortLE128(p.getNextForceMovement().getStartClientCycles());
+		data.writeShortLE(p.getNextForceMovement().getSpeedClientCycles());
 		data.writeShort128(p.getNextForceMovement().getDirection());
 	}
 
@@ -541,11 +542,11 @@ public final class LocalPlayerUpdate {
 		outPlayersIndexesCount = 0;
 		for (int playerIndex = 1; playerIndex < 2048; playerIndex++) {
 			slotFlags[playerIndex] >>= 1;
-		Player player = localPlayers[playerIndex];
-		if (player == null)
-			outPlayersIndexes[outPlayersIndexesCount++] = playerIndex;
-		else
-			localPlayersIndexes[localPlayersIndexesCount++] = playerIndex;
+			Player player = localPlayers[playerIndex];
+			if (player == null)
+				outPlayersIndexes[outPlayersIndexesCount++] = playerIndex;
+			else
+				localPlayersIndexes[localPlayersIndexesCount++] = playerIndex;
 		}
 	}
 

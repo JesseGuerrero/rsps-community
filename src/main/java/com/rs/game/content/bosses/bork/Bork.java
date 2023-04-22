@@ -16,7 +16,6 @@
 //
 package com.rs.game.content.bosses.bork;
 
-import com.rs.engine.thread.TaskExecutor;
 import com.rs.game.World;
 import com.rs.game.model.entity.Entity;
 import com.rs.game.model.entity.npc.NPC;
@@ -24,7 +23,7 @@ import com.rs.game.model.entity.player.Player;
 import com.rs.game.tasks.WorldTask;
 import com.rs.game.tasks.WorldTasks;
 import com.rs.lib.game.Animation;
-import com.rs.lib.game.WorldTile;
+import com.rs.lib.game.Tile;
 import com.rs.lib.util.Logger;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.handlers.NPCInstanceHandler;
@@ -35,7 +34,7 @@ public class Bork extends NPC {
 
 	public static long deadTime;
 
-	public Bork(int id, WorldTile tile, boolean spawned) {
+	public Bork(int id, Tile tile, boolean spawned) {
 		super(id, tile, spawned);
 		setLureDelay(0);
 		setForceAgressive(true);
@@ -43,7 +42,7 @@ public class Bork extends NPC {
 
 	@Override
 	public void sendDeath(Entity source) {
-		for(NPC npc : World.getNPCsInRegion(source.getRegionId()))
+		for(NPC npc : World.getNPCsInChunkRange(source.getChunkId(), 3))
 			if(npc.getId() == 7135)
 				npc.sendDeath(source);
 		deadTime = System.currentTimeMillis() + (1000 * 60 * 60);
@@ -84,13 +83,13 @@ public class Bork extends NPC {
 			setLocation(getRespawnTile());
 			finish();
 		}
-		TaskExecutor.schedule(() -> {
+		WorldTasks.schedule(Ticks.fromHours(1), () -> {
 			try {
 				spawn();
 			} catch (Throwable e) {
-				Logger.handle(Bork.class, "setRespawnTask", e);
+				Logger.handle(Bork.class, "Bork::setRespawnTask", e);
 			}
-		}, Ticks.fromHours(1));
+		});
 	}
 
 	public static String convertToTime() {
@@ -102,7 +101,7 @@ public class Bork extends NPC {
 		return (int) (deadTime - System.currentTimeMillis() / 60000);
 	}
 
-	public static boolean atBork(WorldTile tile) {
+	public static boolean atBork(Tile tile) {
 		if ((tile.getX() >= 3083 && tile.getX() <= 3120) && (tile.getY() >= 5522 && tile.getY() <= 5550))
 			return true;
 		return false;

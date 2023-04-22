@@ -36,9 +36,7 @@ import com.rs.game.content.skills.thieving.PickPocketableNPC;
 import com.rs.game.content.transportation.BoatingD;
 import com.rs.game.content.transportation.TravelMethods;
 import com.rs.game.content.transportation.TravelMethods.Carrier;
-import com.rs.game.content.world.unorganized_dialogue.ClanItemClaim;
 import com.rs.game.content.world.unorganized_dialogue.FremennikShipmaster;
-import com.rs.game.content.world.unorganized_dialogue.GeneralStore;
 import com.rs.game.content.world.unorganized_dialogue.TanningD;
 import com.rs.game.content.world.unorganized_dialogue.skillmasters.GenericSkillcapeOwnerD;
 import com.rs.engine.quest.Quest;
@@ -49,7 +47,7 @@ import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.Animation;
 import com.rs.lib.game.Item;
 import com.rs.lib.game.Rights;
-import com.rs.lib.game.WorldTile;
+import com.rs.lib.game.Tile;
 import com.rs.lib.util.Logger;
 import com.rs.plugin.PluginManager;
 import com.rs.plugin.events.NPCClickEvent;
@@ -110,12 +108,12 @@ public class NPCHandler {
 				return;
 			if (npc.getId() == 2825)
 				player.sendOptionDialogue("Would you like to travel to Braindeath Island?", ops -> {
-					ops.add("Yes", () -> player.setNextWorldTile(WorldTile.of(2163, 5112, 1)));
+					ops.add("Yes", () -> player.setNextTile(Tile.of(2163, 5112, 1)));
 					ops.add("No");
 				});
 			else if (npc.getId() == 2826)
 				player.sendOptionDialogue("Would you like to travel back to Port Phasmatys?", ops -> {
-					ops.add("Yes", () -> player.setNextWorldTile(WorldTile.of(3680, 3536, 0)));
+					ops.add("Yes", () -> player.setNextTile(Tile.of(3680, 3536, 0)));
 					ops.add("No");
 				});
 			else if (npc.getId() == 9707)
@@ -160,22 +158,12 @@ public class NPCHandler {
 				player.startConversation(new GenericSkillcapeOwnerD(player, 9713, Skillcapes.Dungeoneering));
 			else if (npc.getId() == 9708 || npc.getId() == 14847)
 				player.startConversation(new FremennikShipmaster(player, npc.getId(), false));
-			else if (npc.getId() == 528 || npc.getId() == 529)
-				player.startConversation(new GeneralStore(player, npc, "edgeville_general_store"));
-			else if (npc.getId() == 522 || npc.getId() == 523)
-				player.startConversation(new GeneralStore(player, npc, "varrock_general_store"));
-			else if (npc.getId() == 520 || npc.getId() == 521)
-				player.startConversation(new GeneralStore(player, npc, "lumbridge_general_store"));
 			else if (npc.getId() == 6715 || npc.getId() == 14862)
 				player.startConversation(new EstateAgentDialogue(player, npc.getId()));
 			else if (npc.getId() == 3344 || npc.getId() == 3345)
 				MutatedZygomite.transform(player, npc);
 			else if (npc.getId() == 4236 || npc.getId() == 4238 || npc.getId() == 4240 || npc.getId() == 4242 || npc.getId() == 4244)
 				player.startConversation(new ServantDialogue(player, npc));
-			else if (npc.getId() == 13633)
-				player.startConversation(new ClanItemClaim(player, 20708));
-			else if (npc.getId() == 5915)
-				player.startConversation(new ClanItemClaim(player, 20709));
 			else if (npc.getId() == 2824 || npc.getId() == 1041 || npc.getId() == 804)
 				player.startConversation(new TanningD(player, npc.getId() == 1041, npc.getId()));
 			else if (PluginManager.handle(new NPCClickEvent(player, npc, 1, true))) {
@@ -290,16 +278,12 @@ public class NPCHandler {
 				StealingCreationShop.openInterface(player);
 			else if (npc.getId() == 14849 && npc instanceof ConditionalDeath cd)
 				cd.useHammer(player);
-			else if (npc.getId() == 13633)
-				player.startConversation(new ClanItemClaim(player, 20708));
-			else if (npc.getId() == 5915)
-				player.startConversation(new ClanItemClaim(player, 20709));
 			else if (npc.getId() == 2824 || npc.getId() == 1041)
 				player.startConversation(new TanningD(player, npc.getId() == 1041, npc.getId()));
 			else if (npc.getId() == 1843)
-				player.setNextWorldTile(WorldTile.of(2836, 10142, 0));
+				player.setNextTile(Tile.of(2836, 10142, 0));
 			else if (npc.getId() == 1844)
-				player.setNextWorldTile(WorldTile.of(2839, 10131, 0));
+				player.setNextTile(Tile.of(2839, 10131, 0));
 			else if (npc.getId() == 1419)
 				GE.open(player);
 			else if (npc.getId() == 2676 || npc.getId() == 599)

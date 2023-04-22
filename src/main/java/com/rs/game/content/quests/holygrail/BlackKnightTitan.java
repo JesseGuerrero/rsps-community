@@ -23,14 +23,14 @@ import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.pathing.Direction;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.tasks.WorldTasks;
-import com.rs.lib.game.WorldTile;
+import com.rs.lib.game.Tile;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.handlers.NPCClickHandler;
 import com.rs.plugin.handlers.NPCInstanceHandler;
 
 @PluginEventHandler
 public class BlackKnightTitan extends NPC {
-	public BlackKnightTitan(int id, WorldTile tile, boolean permaDeath) {
+	public BlackKnightTitan(int id, Tile tile, boolean permaDeath) {
 		super(id, tile, permaDeath);
 	}
 
@@ -41,14 +41,14 @@ public class BlackKnightTitan extends NPC {
 
 	@Override
 	public void sendDeath(final Entity source) {
-		if(source instanceof Player p && p.getEquipment().getWeaponId() == 35) {
+		if(source instanceof Player player && player.getEquipment().getWeaponId() == 35) {
 			super.sendDeath(source);
-			p.sendMessage("Well done, you have defeated the Black Knight Titan!");
-			boolean isRun = p.getRun();
-			p.setRunHidden(false);
-			p.addWalkSteps(WorldTile.of(p.getX() >= 2791 ? 2790 : 2792, 4722, 0), 4, false);
+			player.sendMessage("Well done, you have defeated the Black Knight Titan!");
+			boolean isRun = player.getRun();
+			player.setRunHidden(false);
+			player.addWalkSteps(Tile.of(player.getX() >= 2791 ? 2790 : 2792, 4722, 0), 4, false);
 			WorldTasks.delay(2, () -> {
-				p.setRunHidden(isRun);
+				player.setRunHidden(isRun);
 			});
 			return;
 		}

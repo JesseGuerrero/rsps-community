@@ -14,7 +14,7 @@ import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.entity.player.Skills;
 import com.rs.lib.Constants;
 import com.rs.lib.game.Item;
-import com.rs.lib.game.WorldTile;
+import com.rs.lib.game.Tile;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.handlers.ItemAddedToInventoryHandler;
 import com.rs.plugin.handlers.ItemClickHandler;
@@ -89,11 +89,20 @@ public class HeroesQuest extends QuestOutline {
 					lines.add("");
 				} else {
 					if (ShieldOfArrav.hasGang(player)) {
-						lines.add("To get the master thieves armband you");
-						if (ShieldOfArrav.isPhoenixGang(player))
+						if (ShieldOfArrav.isPhoenixGang(player)) {
+							lines.add("To get the master thieves armband you");
 							lines.add("should talk to Straven for a mission...");
-						if (ShieldOfArrav.isBlackArmGang(player))
-							lines.add("should talk to Katrine for a mission...");
+						}
+						if (ShieldOfArrav.isBlackArmGang(player)) {
+							if(player.getQuestManager().getAttribs(Quest.HEROES_QUEST).getB("black_arm_trick")) {
+								lines.add("The black arm gang has given me a mission to steal Pete's");
+								lines.add("candle sticks. I am to sneak in as a guard in black armour");
+								lines.add("by giving my paper ID then finding the chest with the sticks.");
+							} else {
+								lines.add("To get the master thieves armband you");
+								lines.add("should talk to Katrine for a mission...");
+							}
+						}
 					} else {
 						lines.add("Error, you don't have a gang, contact an admin!");
 					}
@@ -141,7 +150,7 @@ public class HeroesQuest extends QuestOutline {
 			return;
 		else {
 			e.cancel();
-			World.addGroundItem(new Item(1583, 1), WorldTile.of(p.getTile()));
+			World.addGroundItem(new Item(1583, 1), Tile.of(p.getTile()));
 			p.startConversation(new Dialogue().addSimple("The feather is too hot to pick up with your bare hands..."));
 		}
 	});
@@ -159,7 +168,7 @@ public class HeroesQuest extends QuestOutline {
 		Player p = e.getPlayer();
 		if (e.getOption().equalsIgnoreCase("drop")) {
 			p.getInventory().removeItems(e.getItem());
-			World.addGroundItem(e.getItem(), WorldTile.of(e.getPlayer().getTile()), e.getPlayer());
+			World.addGroundItem(e.getItem(), Tile.of(e.getPlayer().getTile()), e.getPlayer());
 			e.getPlayer().soundEffect(2739);
 			return;
 		}

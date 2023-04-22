@@ -37,7 +37,6 @@ import com.rs.cache.loaders.EnumDefinitions;
 import com.rs.cache.loaders.ItemDefinitions;
 import com.rs.cache.loaders.LoyaltyRewardDefinitions.Reward;
 import com.rs.cache.loaders.ObjectType;
-import com.rs.engine.thread.TaskExecutor;
 import com.rs.db.WorldDB;
 import com.rs.game.World;
 import com.rs.game.World.DropMethod;
@@ -100,7 +99,7 @@ import com.rs.engine.quest.Quest;
 import com.rs.engine.quest.QuestManager;
 import com.rs.game.ge.GE;
 import com.rs.game.ge.Offer;
-import com.rs.game.model.WorldProjectile;
+import com.rs.game.map.ChunkManager;
 import com.rs.game.model.entity.Entity;
 import com.rs.game.model.entity.ForceTalk;
 import com.rs.game.model.entity.Hit;
@@ -125,7 +124,6 @@ import com.rs.game.model.entity.player.managers.PrayerManager;
 import com.rs.game.model.entity.player.social.FCManager;
 import com.rs.game.model.item.ItemsContainer;
 import com.rs.game.model.object.GameObject;
-import com.rs.game.region.Region;
 import com.rs.game.tasks.WorldTask;
 import com.rs.game.tasks.WorldTasks;
 import com.rs.lib.Constants;
@@ -136,7 +134,7 @@ import com.rs.lib.game.PublicChatMessage;
 import com.rs.lib.game.Rights;
 import com.rs.lib.game.SpotAnim;
 import com.rs.lib.game.VarManager;
-import com.rs.lib.game.WorldTile;
+import com.rs.lib.game.Tile;
 import com.rs.lib.model.Account;
 import com.rs.lib.model.Social;
 import com.rs.lib.model.clan.Clan;
@@ -173,6 +171,8 @@ import com.rs.utils.MachineInformation;
 import com.rs.utils.Ticks;
 import com.rs.utils.record.Recorder;
 import com.rs.utils.reflect.ReflectionAnalysis;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSets;
 
 public class Player extends Entity {
 
@@ -214,8 +214,8 @@ public class Player extends Entity {
 	private transient int pvpCombatLevelThreshhold = -1;
 	private transient String[] playerOptions = new String[10];
 	private transient Set<Sound> sounds = new HashSet<Sound>();
-	
-	private WorldTile lastNonDynamicTile;
+
+	private Tile lastNonDynamicTile;
 
 	private int hw07Stage;
 
@@ -258,6 +258,7 @@ public class Player extends Entity {
 	// transient stuff
 	private transient Session session;
 	private transient long clientLoadedMapRegion;
+	private transient Set<Integer> mapChunksNeedInit;
 	private transient ScreenMode screenMode;
 	private transient int screenWidth;
 	private transient int screenHeight;
@@ -291,7 +292,7 @@ public class Player extends Entity {
 	private Set<Reward> favoritedLoyaltyRewards;
 
 	private Map<Tools, Integer> toolbelt;
-	
+
 	private transient ArrayList<String> attackedBy = new ArrayList<>();
 	private transient Recorder recorder;
 
@@ -345,7 +346,7 @@ public class Player extends Entity {
 	private transient boolean largeSceneView;
 	private transient String lastNpcInteractedName = null;
 	private transient Account account;
-	
+
 	private transient boolean tileMan;
 	private transient int tilesAvailable;
 	private transient Set<Integer> tilesUnlocked;
@@ -420,7 +421,7 @@ public class Player extends Entity {
 	private int crystalSeedRepairs;
 	private int tinySeedRepairs;
 
-	public WorldTile lastEssTele;
+	public Tile lastEssTele;
 
 	private boolean[] prayerBook;
 
@@ -586,15 +587,9 @@ public class Player extends Entity {
 
 	private House house;
 
-	private transient boolean nextTickUnlock;
-
-	public void unlockNextTick() {
-		nextTickUnlock = true;
-	}
-
 	// creates Player and saved classes
 	public Player(Account account) {
-		super(WorldTile.of(Settings.getConfig().getPlayerStartTile()));
+		super(Tile.of(Settings.getConfig().getPlayerStartTile()));
 		this.account = account;
 		username = account.getUsername();
 		setHitpoints(100);
@@ -640,8 +635,10 @@ public class Player extends Entity {
 	}
 
 	public void init(Session session, Account account, int screenMode, int screenWidth, int screenHeight, MachineInformation machineInformation) {
+		if (mapChunksNeedInit == null)
+			mapChunksNeedInit = IntSets.synchronize(new IntOpenHashSet());
 		if (getTile() == null)
-			setTile(WorldTile.of(Settings.getConfig().getPlayerStartTile()));
+			setTile(Tile.of(Settings.getConfig().getPlayerStartTile()));
 		this.session = session;
 		this.account = account;
 		uuid = getUsername().hashCode();
@@ -703,7 +700,7 @@ public class Player extends Entity {
 		if (pouchesType == null)
 			pouchesType = new boolean[4];
 		World.addPlayer(this);
-		World.updateEntityRegion(this);
+		ChunkManager.updateChunks(this);
 		Logger.info(Player.class, "init", "Initiated player: " + account.getUsername());
 
 		// Do not delete >.>, useful for security purpose. this wont waste that
@@ -847,45 +844,23 @@ public class Player extends Entity {
 		getAppearance().generateAppearanceData();
 	}
 
-	public void refreshRegionItems() {
-		for (int regionId : getMapRegionsIds()) {
-			List<GroundItem> floorItems = World.getRegion(regionId).getAllGroundItems();
-			if (floorItems == null)
-				continue;
-			for (GroundItem item : floorItems)
-				getPackets().removeGroundItem(item);
-			for (GroundItem item : floorItems) {
-				if (item.isPrivate() && item.getVisibleToId() != getUuid())
-					continue;
-				getPackets().sendGroundItem(item);
-			}
-		}
-	}
-
-	public void refreshSpawnedObjects() {
-		for (int regionId : getMapRegionsIds()) {
-			for (GameObject object : new ArrayList<>(World.getRegion(regionId).getRemovedObjects().values()))
-				getPackets().sendRemoveObject(object);
-			for (GameObject object : World.getRegion(regionId).getSpawnedObjects())
-				getPackets().sendAddObject(object);
-			List<GameObject> all =  World.getRegion(regionId).getAllObjects();
-			if (all == null)
-				continue;
-			for (GameObject object : all)
-				if (object.getMeshModifier() != null)
-					getPackets().sendCustomizeObject(object.getMeshModifier());
+	public void initNewChunks() {
+		for (int chunkId : getMapChunksNeedInit()) {
+			ChunkManager.getChunk(chunkId).init(this);
 		}
 	}
 
 	// now that we inited we can start showing game
 	public void start() {
 		loadMapRegions();
+		getMapChunksNeedInit().addAll(getMapChunkIds());
 		started = true;
+		Logger.info(Player.class, "start", "Started player: " + account.getUsername());
 		run();
 
 		if (getBool("isLoggedOutInDungeon")) {
 			if (getDungManager().getParty() == null) {
-				setNextWorldTile(WorldTile.of(DungeonConstants.OUTSIDE, 2));
+				setNextTile(Tile.of(DungeonConstants.OUTSIDE, 2));
 				this.reset();
 				getEquipment().reset();
 				getInventory().reset();
@@ -983,10 +958,10 @@ public class Player extends Entity {
 			docileTimer = System.currentTimeMillis();
 		else
 			docileTimer = System.currentTimeMillis()-(lastLoggedIn-docileTimer);
-		boolean wasAtDynamicRegion = isAtDynamicRegion();
+		boolean wasAtDynamicRegion = isHasNearbyInstancedChunks();
 		super.loadMapRegions();
 		setClientHasntLoadedMapRegion();
-		if (isAtDynamicRegion()) {
+		if (isHasNearbyInstancedChunks()) {
 			getPackets().sendDynamicMapRegion(!started);
 			if (!wasAtDynamicRegion)
 				localNPCUpdate.reset();
@@ -1001,15 +976,6 @@ public class Player extends Entity {
 	public boolean isDocile() {
 		return (System.currentTimeMillis() - docileTimer) >= 600000L;
 	}
-
-	public void processProjectiles() {
-		for (int regionId : getMapRegionsIds()) {
-			Region region = World.getRegion(regionId);
-			for (WorldProjectile projectile : region.getProjectiles())
-				getPackets().sendProjectile(projectile);
-		}
-	}
-
 	@Override
 	public void processEntity() {
 		try {
@@ -1028,13 +994,13 @@ public class Player extends Entity {
 			}
 			if (disconnected && !finishing)
 				finish(0);
-			
+
 			timePlayed++;
 			timeLoggedOut = System.currentTimeMillis();
 
 			if (getTickCounter() % FarmPatch.FARMING_TICK == 0)
 				tickFarming();
-			
+
 			if (getTickCounter() % FarmPatch.FARMING_TICK == 0) {
 				getKeldagrimBrewery().process();
 				getPhasmatysBrewery().process();
@@ -1051,7 +1017,7 @@ public class Player extends Entity {
 			Logger.handle(Player.class, "processEntity:Player", e);
 		}
 	}
-	
+
 	private void processTimePlayedTasks() {
 		if (timePlayed % 500 == 0) {
 			if (getDailyI("loyaltyTicks") < 12) {
@@ -1121,7 +1087,7 @@ public class Player extends Entity {
 									getInventory().addItem(4207, 1);
 									sendMessage("<col=FF0000>Your " + ItemDefinitions.getDefs(deg.getItemId()).getName() + " has reverted to a crystal seed!");
 								} else {
-									World.addGroundItem(new Item(4207), WorldTile.of(getX(), getY(), getPlane()));
+									World.addGroundItem(new Item(4207), Tile.of(getX(), getY(), getPlane()));
 									sendMessage("<col=FF0000>Your " + ItemDefinitions.getDefs(deg.getItemId()).getName() + " has reverted to a crystal seed and fallen to the floor!");
 								}
 								break;
@@ -1166,7 +1132,7 @@ public class Player extends Entity {
 		getInventory().processRefresh();
 		getVars().syncVarsToClient();
 		skills.updateXPDrops();
-		
+
 		for (Sound sound : sounds)
 			if (sound != null)
 				getPackets().sendSound(sound);
@@ -1200,11 +1166,6 @@ public class Player extends Entity {
 	@Override
 	public void processMovement() {
 		super.processMovement();
-		if (nextTickUnlock) {
-			unlock();
-			nextTickUnlock = false;
-		}
-		//Magic.teleControllersCheck(this, this);
 	}
 
 	@Override
@@ -1262,11 +1223,10 @@ public class Player extends Entity {
 	}
 
 	public void run() {
-		if(CustomScripts.updateRightsOnRun(this))
-			if (getAccount().getRights() == null) {
-				setRights(Rights.PLAYER);
-				LobbyCommunicator.updateRights(this);
-			}
+		if (getAccount().getRights() == null) {
+			setRights(Rights.PLAYER);
+			LobbyCommunicator.updateRights(this);
+		}
 		LobbyCommunicator.addWorldPlayer(account, response -> {
 			if (response == null || !response)
 				forceLogout();
@@ -1344,12 +1304,12 @@ public class Player extends Entity {
 			machineInformation.sendSuggestions(this);
 		notes.init();
 
-		int farmingTicksMissed = getTicksSinceLastLogout() / FarmPatch.FARMING_TICK;
+		long farmingTicksMissed = getTicksSinceLastLogout() / FarmPatch.FARMING_TICK;
 		if (farmingTicksMissed > 768)
 			farmingTicksMissed = 768;
 		if (farmingTicksMissed <= 0)
 			farmingTicksMissed = 0;
-		for (int i = 0;i < farmingTicksMissed;i++)
+		for (long i = 0;i < farmingTicksMissed;i++)
 			tickFarming();
 
 		for (FarmPatch p : getPatches().values())
@@ -1370,8 +1330,7 @@ public class Player extends Entity {
 				setStarter(1);
 			if (!getUsername().startsWith("cli_bot")) {
 				PlayerLook.openCharacterCustomizing(this);
-//				startConversation(new GamemodeSelection(this));
-				startConversation(new GamemodeSelectionCustom(this));
+				startConversation(new GamemodeSelection(this));
 			} else
 				setChosenAccountType(true);
 		}
@@ -1426,7 +1385,7 @@ public class Player extends Entity {
 			sendMessage("This lodestone doesn't respond.");
 			return;
 		}
-		final WorldTile tile = object.getTile();
+		final Tile tile = object.getTile();
 		if (object != null) {
 			playCutscene(cs -> {
 				cs.camPos(object.getX()+1, object.getY()+6, 5000);
@@ -1682,8 +1641,7 @@ public class Player extends Entity {
 	/**
 	 * Logs the player out.
 	 *
-	 * @param lobby
-	 *            If we're logging out to the lobby.
+	 * @param lobby: If we're logging out to the lobby.
 	 */
 	public void logout(boolean lobby) {
 		if (!running)
@@ -1738,7 +1696,7 @@ public class Player extends Entity {
 			return;
 		stopAll(false, true, !(getInteractionManager().getInteraction() instanceof PlayerCombatInteraction));
 		if ((inCombat(10000) || hasBeenHit(10000) || getEmotesManager().isAnimating() || isLocked()) && tryCount < 6) {
-			TaskExecutor.schedule(() -> {
+			WorldTasks.schedule(Ticks.fromSeconds(10), () -> {
 				try {
 					finishing = false;
 					if (isDead() || isDying())
@@ -1748,7 +1706,7 @@ public class Player extends Entity {
 				} catch (Throwable e) {
 					Logger.handle(Player.class, "finish", e);
 				}
-			}, Ticks.fromSeconds(10));
+			});
 			return;
 		}
 		realFinish();
@@ -1775,13 +1733,11 @@ public class Player extends Entity {
 		WorldDB.getPlayers().save(this, () -> {
 			LobbyCommunicator.removeWorldPlayer(this);
 			World.removePlayer(this);
-			World.updateEntityRegion(this);
+			ChunkManager.updateChunks(this);
 			WorldDB.getHighscores().save(this);
-			if(GIM.isGIM(this))
-				WorldDB.getGIMHighscores().save(this);
 			Logger.info(Player.class, "realFinish", "Finished Player: " + getUsername());
 		});
-		World.updateEntityRegion(this);
+		ChunkManager.updateChunks(this);
 	}
 
 	public long getLastLoggedIn() {
@@ -1856,27 +1812,27 @@ public class Player extends Entity {
 	public void visualizeChunk(int chunkId) {
 		int[] oldChunk = MapUtils.decode(Structure.CHUNK, chunkId);
 		for (int i = 0;i < 8;i++)
-			getPackets().sendGroundItem(new GroundItem(new Item(14486, 1), WorldTile.of((oldChunk[0] << 3) + i, (oldChunk[1] << 3), getPlane())));
+			getPackets().sendGroundItem(new GroundItem(new Item(14486, 1), Tile.of((oldChunk[0] << 3) + i, (oldChunk[1] << 3), getPlane())));
 		for (int i = 0;i < 8;i++)
-			getPackets().sendGroundItem(new GroundItem(new Item(14486, 1), WorldTile.of((oldChunk[0] << 3), (oldChunk[1] << 3) + i, getPlane())));
+			getPackets().sendGroundItem(new GroundItem(new Item(14486, 1), Tile.of((oldChunk[0] << 3), (oldChunk[1] << 3) + i, getPlane())));
 		for (int i = 0;i < 8;i++)
-			getPackets().sendGroundItem(new GroundItem(new Item(14486, 1), WorldTile.of((oldChunk[0] << 3) + i, (oldChunk[1] << 3) + 7, getPlane())));
+			getPackets().sendGroundItem(new GroundItem(new Item(14486, 1), Tile.of((oldChunk[0] << 3) + i, (oldChunk[1] << 3) + 7, getPlane())));
 		for (int i = 0;i < 8;i++)
-			getPackets().sendGroundItem(new GroundItem(new Item(14486, 1), WorldTile.of((oldChunk[0] << 3) + 7, (oldChunk[1] << 3) + i, getPlane())));
+			getPackets().sendGroundItem(new GroundItem(new Item(14486, 1), Tile.of((oldChunk[0] << 3) + 7, (oldChunk[1] << 3) + i, getPlane())));
 	}
 
 	public void devisualizeChunk(int chunkId) {
 		int[] oldChunk = MapUtils.decode(Structure.CHUNK, chunkId);
 		for (int i = 0;i < 8;i++)
-			getPackets().removeGroundItem(new GroundItem(new Item(14486, 1), WorldTile.of((oldChunk[0] << 3) + i, (oldChunk[1] << 3), getPlane())));
+			getPackets().removeGroundItem(new GroundItem(new Item(14486, 1), Tile.of((oldChunk[0] << 3) + i, (oldChunk[1] << 3), getPlane())));
 		for (int i = 0;i < 8;i++)
-			getPackets().removeGroundItem(new GroundItem(new Item(14486, 1), WorldTile.of((oldChunk[0] << 3), (oldChunk[1] << 3) + i, getPlane())));
+			getPackets().removeGroundItem(new GroundItem(new Item(14486, 1), Tile.of((oldChunk[0] << 3), (oldChunk[1] << 3) + i, getPlane())));
 		for (int i = 0;i < 8;i++)
-			getPackets().removeGroundItem(new GroundItem(new Item(14486, 1), WorldTile.of((oldChunk[0] << 3) + i, (oldChunk[1] << 3) + 7, getPlane())));
+			getPackets().removeGroundItem(new GroundItem(new Item(14486, 1), Tile.of((oldChunk[0] << 3) + i, (oldChunk[1] << 3) + 7, getPlane())));
 		for (int i = 0;i < 8;i++)
-			getPackets().removeGroundItem(new GroundItem(new Item(14486, 1), WorldTile.of((oldChunk[0] << 3) + 7, (oldChunk[1] << 3) + i, getPlane())));
+			getPackets().removeGroundItem(new GroundItem(new Item(14486, 1), Tile.of((oldChunk[0] << 3) + 7, (oldChunk[1] << 3) + i, getPlane())));
 	}
-	
+
 	public void sendOptionDialogue(Consumer<Options> options) {
 		startConversation(new Dialogue().addOptions(options));
 	}
@@ -1964,11 +1920,11 @@ public class Player extends Entity {
 	public ScreenMode getScreenMode() {
 		return screenMode;
 	}
-	
+
 	public void setScreenMode(ScreenMode mode) {
 		this.screenMode = mode;
 	}
-	
+
 	public boolean resizeable() {
 		return screenMode.resizeable();
 	}
@@ -2209,101 +2165,14 @@ public class Player extends Entity {
 	@Override
 	public void sendDeath(final Entity source) {
 		incrementCount("Deaths");
-		if (prayer.hasPrayersOn() && !getTempAttribs().getB("startedDuel"))
-			if (prayer.active(Prayer.RETRIBUTION)) {
-				setNextSpotAnim(new SpotAnim(437));
-				final Player target = this;
-				if (isAtMultiArea())
-					for (int regionId : getMapRegionsIds()) {
-						Set<Integer> playersIndexes = World.getRegion(regionId).getPlayerIndexes();
-						if (playersIndexes != null)
-							for (int playerIndex : playersIndexes) {
-								Player player = World.getPlayers().get(playerIndex);
-								if (player == null || !player.hasStarted() || player.isDead() || player.hasFinished() || !player.withinDistance(getTile(), 1) || !player.isCanPvp() || !target.getControllerManager().canHit(player))
-									continue;
-								player.applyHit(new Hit(target, Utils.getRandomInclusive((int) (skills.getLevelForXp(Constants.PRAYER) * 2.5)), HitLook.TRUE_DAMAGE));
-							}
-						Set<Integer> npcsIndexes = World.getRegion(regionId).getNPCsIndexes();
-						if (npcsIndexes != null)
-							for (int npcIndex : npcsIndexes) {
-								NPC npc = World.getNPCs().get(npcIndex);
-								if (npc == null || npc.isDead() || npc.hasFinished() || !npc.withinDistance(this, 1) || !npc.getDefinitions().hasAttackOption() || !target.getControllerManager().canHit(npc))
-									continue;
-								npc.applyHit(new Hit(target, Utils.getRandomInclusive((int) (skills.getLevelForXp(Constants.PRAYER) * 2.5)), HitLook.TRUE_DAMAGE));
-							}
-					}
-				else if (source != null && source != this && !source.isDead() && !source.hasFinished() && source.withinDistance(getTile(), 1))
-					source.applyHit(new Hit(target, Utils.getRandomInclusive((int) (skills.getLevelForXp(Constants.PRAYER) * 2.5)), HitLook.TRUE_DAMAGE));
-				WorldTasks.schedule(new WorldTask() {
-					@Override
-					public void run() {
-						World.sendSpotAnim(target, new SpotAnim(438), WorldTile.of(target.getX() - 1, target.getY(), target.getPlane()));
-						World.sendSpotAnim(target, new SpotAnim(438), WorldTile.of(target.getX() + 1, target.getY(), target.getPlane()));
-						World.sendSpotAnim(target, new SpotAnim(438), WorldTile.of(target.getX(), target.getY() - 1, target.getPlane()));
-						World.sendSpotAnim(target, new SpotAnim(438), WorldTile.of(target.getX(), target.getY() + 1, target.getPlane()));
-						World.sendSpotAnim(target, new SpotAnim(438), WorldTile.of(target.getX() - 1, target.getY() - 1, target.getPlane()));
-						World.sendSpotAnim(target, new SpotAnim(438), WorldTile.of(target.getX() - 1, target.getY() + 1, target.getPlane()));
-						World.sendSpotAnim(target, new SpotAnim(438), WorldTile.of(target.getX() + 1, target.getY() - 1, target.getPlane()));
-						World.sendSpotAnim(target, new SpotAnim(438), WorldTile.of(target.getX() + 1, target.getY() + 1, target.getPlane()));
-					}
-				});
-			} else if (prayer.active(Prayer.WRATH)) {
-				World.sendProjectile(this, WorldTile.of(getX() + 2, getY() + 2, getPlane()), 2260, 24, 0, 41, 35, 30, 0);
-				World.sendProjectile(this, WorldTile.of(getX() + 2, getY(), getPlane()), 2260, 41, 0, 41, 35, 30, 0);
-				World.sendProjectile(this, WorldTile.of(getX() + 2, getY() - 2, getPlane()), 2260, 41, 0, 41, 35, 30, 0);
 
-				World.sendProjectile(this, WorldTile.of(getX() - 2, getY() + 2, getPlane()), 2260, 41, 0, 41, 35, 30, 0);
-				World.sendProjectile(this, WorldTile.of(getX() - 2, getY(), getPlane()), 2260, 41, 0, 41, 35, 30, 0);
-				World.sendProjectile(this, WorldTile.of(getX() - 2, getY() - 2, getPlane()), 2260, 41, 0, 41, 35, 30, 0);
+		if (prayer.hasPrayersOn() && !getTempAttribs().getB("startedDuel")) {
+			if (prayer.active(Prayer.RETRIBUTION))
+				retribution(source);
+			if (prayer.active(Prayer.WRATH))
+				wrath(source);
+		}
 
-				World.sendProjectile(this, WorldTile.of(getX(), getY() + 2, getPlane()), 2260, 41, 0, 41, 35, 30, 0);
-				World.sendProjectile(this, WorldTile.of(getX(), getY() - 2, getPlane()), 2260, 41, 0, 41, 35, 30, 0);
-				final Player target = this;
-				WorldTasks.schedule(new WorldTask() {
-					@Override
-					public void run() {
-						setNextSpotAnim(new SpotAnim(2259));
-
-						if (isAtMultiArea())
-							for (int regionId : getMapRegionsIds()) {
-								Set<Integer> playersIndexes = World.getRegion(regionId).getPlayerIndexes();
-								if (playersIndexes != null)
-									for (int playerIndex : playersIndexes) {
-										Player player = World.getPlayers().get(playerIndex);
-										if (player == null || !player.hasStarted() || player.isDead() || player.hasFinished() || !player.isCanPvp() || !player.withinDistance(target.getTile(), 2) || !target.getControllerManager().canHit(player))
-											continue;
-										player.applyHit(new Hit(target, Utils.getRandomInclusive((skills.getLevelForXp(Constants.PRAYER) * 3)), HitLook.TRUE_DAMAGE));
-									}
-								Set<Integer> npcsIndexes = World.getRegion(regionId).getNPCsIndexes();
-								if (npcsIndexes != null)
-									for (int npcIndex : npcsIndexes) {
-										NPC npc = World.getNPCs().get(npcIndex);
-										if (npc == null || npc.isDead() || npc.hasFinished() || !npc.withinDistance(target, 2) || !npc.getDefinitions().hasAttackOption() || !target.getControllerManager().canHit(npc))
-											continue;
-										npc.applyHit(new Hit(target, Utils.getRandomInclusive((skills.getLevelForXp(Constants.PRAYER) * 3)), HitLook.TRUE_DAMAGE));
-									}
-							}
-						else if (source != null && source != target && !source.isDead() && !source.hasFinished() && source.withinDistance(target.getTile(), 2))
-							source.applyHit(new Hit(target, Utils.getRandomInclusive((skills.getLevelForXp(Constants.PRAYER) * 3)), HitLook.TRUE_DAMAGE));
-
-						World.sendSpotAnim(target, new SpotAnim(2260), WorldTile.of(getX() + 2, getY() + 2, getPlane()));
-						World.sendSpotAnim(target, new SpotAnim(2260), WorldTile.of(getX() + 2, getY(), getPlane()));
-						World.sendSpotAnim(target, new SpotAnim(2260), WorldTile.of(getX() + 2, getY() - 2, getPlane()));
-
-						World.sendSpotAnim(target, new SpotAnim(2260), WorldTile.of(getX() - 2, getY() + 2, getPlane()));
-						World.sendSpotAnim(target, new SpotAnim(2260), WorldTile.of(getX() - 2, getY(), getPlane()));
-						World.sendSpotAnim(target, new SpotAnim(2260), WorldTile.of(getX() - 2, getY() - 2, getPlane()));
-
-						World.sendSpotAnim(target, new SpotAnim(2260), WorldTile.of(getX(), getY() + 2, getPlane()));
-						World.sendSpotAnim(target, new SpotAnim(2260), WorldTile.of(getX(), getY() - 2, getPlane()));
-
-						World.sendSpotAnim(target, new SpotAnim(2260), WorldTile.of(getX() + 1, getY() + 1, getPlane()));
-						World.sendSpotAnim(target, new SpotAnim(2260), WorldTile.of(getX() + 1, getY() - 1, getPlane()));
-						World.sendSpotAnim(target, new SpotAnim(2260), WorldTile.of(getX() - 1, getY() + 1, getPlane()));
-						World.sendSpotAnim(target, new SpotAnim(2260), WorldTile.of(getX() - 1, getY() - 1, getPlane()));
-					}
-				});
-			}
 		refreshDyingTime();
 		setNextAnimation(new Animation(-1));
 		if (!controllerManager.sendDeath())
@@ -2312,10 +2181,10 @@ public class Player extends Entity {
 		stopAll();
 		if (summFamiliar != null)
 			summFamiliar.sendDeath(this);
-		WorldTile lastTile = WorldTile.of(getTile());
-		if (isAtDynamicRegion())
+		Tile lastTile = Tile.of(getTile());
+		if (isHasNearbyInstancedChunks())
 			lastTile = getRandomGraveyardTile();
-		final WorldTile deathTile = lastTile;
+		final Tile deathTile = lastTile;
 		WorldTasks.schedule(new WorldTask() {
 			int loop;
 
@@ -2328,7 +2197,7 @@ public class Player extends Entity {
 				else if (loop == 2) {
 					reset();
 					if (source instanceof Player opp && opp.hasRights(Rights.ADMIN))
-						setNextWorldTile(Settings.getConfig().getPlayerRespawnTile());
+						setNextTile(Settings.getConfig().getPlayerRespawnTile());
 					else {
 						if (!CustomScripts.deathCofferIsSuccessful(getSelf()))
 							controllerManager.startController(new DeathOfficeController(deathTile, hasSkull()));
@@ -2351,14 +2220,45 @@ public class Player extends Entity {
 
 	public WorldTile getRandomGraveyardTile() {
 		return WorldTile.of(WorldTile.of(2745, 3474, 0), 4);
+	public void retribution(Entity source) {
+		setNextSpotAnim(new SpotAnim(437));
+		for (Direction dir : Direction.values())
+			World.sendSpotAnim(Tile.of(getX() - dir.getDx(), getY() - dir.getDy(), getPlane()), new SpotAnim(438, 20, 10, dir.getId()));
+		if (isAtMultiArea()) {
+			for (Player player : queryNearbyPlayersByTileRange(1, player -> !player.isDead() && player.isCanPvp() && player.withinDistance(getTile(), 1) || getControllerManager().canHit(player)))
+				player.applyHit(new Hit(this, Utils.getRandomInclusive((int) (skills.getLevelForXp(Constants.PRAYER) * 2.5)), HitLook.TRUE_DAMAGE));
+			for (NPC npc : queryNearbyNPCsByTileRange(1, npc -> !npc.isDead() && npc.withinDistance(this, 1) && npc.getDefinitions().hasAttackOption() && getControllerManager().canHit(npc)))
+				npc.applyHit(new Hit(this, Utils.getRandomInclusive((int) (skills.getLevelForXp(Constants.PRAYER) * 2.5)), HitLook.TRUE_DAMAGE));
+		} else if (source != null && source != this && !source.isDead() && !source.hasFinished() && source.withinDistance(getTile(), 1))
+			source.applyHit(new Hit(this, Utils.getRandomInclusive((int) (skills.getLevelForXp(Constants.PRAYER) * 2.5)), HitLook.TRUE_DAMAGE));
+	}
+
+	public void wrath(Entity source) {
+		for (Direction dir : Direction.values())
+			World.sendProjectile(this, Tile.of(getX() + (dir.getDx()*2), getY() + (dir.getDy()*2), getPlane()), 2261, 0, 0, 15, 0.4, 35, 15,
+				proj -> World.sendSpotAnim(proj.getToTile(), new SpotAnim(2260)));
+		setNextSpotAnim(new SpotAnim(2259));
+		WorldTasks.schedule(() -> {
+			if (isAtMultiArea()) {
+				for (Player player : queryNearbyPlayersByTileRange(1, player -> !player.isDead() && player.isCanPvp() && player.withinDistance(getTile(), 2) || getControllerManager().canHit(player)))
+					player.applyHit(new Hit(this, Utils.getRandomInclusive((skills.getLevelForXp(Constants.PRAYER) * 3)), HitLook.TRUE_DAMAGE));
+				for (NPC npc : queryNearbyNPCsByTileRange(1, npc -> !npc.isDead() && npc.withinDistance(this, 2) && npc.getDefinitions().hasAttackOption() && getControllerManager().canHit(npc)))
+					npc.applyHit(new Hit(this, Utils.getRandomInclusive((skills.getLevelForXp(Constants.PRAYER) * 3)), HitLook.TRUE_DAMAGE));
+			} else if (source != null && source != this && !source.isDead() && !source.hasFinished() && source.withinDistance(getTile(), 2))
+				source.applyHit(new Hit(this, Utils.getRandomInclusive((skills.getLevelForXp(Constants.PRAYER) * 3)), HitLook.TRUE_DAMAGE));
+		});
+	}
+
+	public Tile getRandomGraveyardTile() {
+		return Tile.of(Tile.of(2745, 3474, 0), 4);
 	}
 
 	public void sendItemsOnDeath(Player killer, boolean dropItems) {
 		Integer[][] slots = GraveStone.getItemSlotsKeptOnDeath(this, true, dropItems, prayer.isProtectingItem());
-		sendItemsOnDeath(killer, WorldTile.of(getTile()), WorldTile.of(getTile()), true, slots);
+		sendItemsOnDeath(killer, Tile.of(getTile()), Tile.of(getTile()), true, slots);
 	}
 
-	public void sendItemsOnDeath(Player killer, WorldTile deathTile, WorldTile respawnTile, boolean noGravestone, Integer[][] slots) {
+	public void sendItemsOnDeath(Player killer, Tile deathTile, Tile respawnTile, boolean noGravestone, Integer[][] slots) {
 		if (hasRights(Rights.ADMIN) || Settings.getConfig().isDebug())
 			return;
 		auraManager.removeAura();
@@ -2435,7 +2335,7 @@ public class Player extends Entity {
 				getInventory().addItem(item);
 		for (Item item : containedItems)
 			if (ItemConstants.isTradeable(item))
-				World.addGroundItem(item, getLastWorldTile(), killer == null ? this : killer, true, 60);
+				World.addGroundItem(item, getLastTile(), killer == null ? this : killer, true, 60);
 			else {
 				ItemDegrade deg = null;
 				for(ItemDegrade d : ItemDegrade.values())
@@ -2448,13 +2348,13 @@ public class Player extends Entity {
 					if (!ItemConstants.isTradeable(broken) && (killer != null && killer != this)) {
 						Item money = new Item(995, 1);
 						money.setAmount(item.getDefinitions().getValue());
-						World.addGroundItem(money, getLastWorldTile(), killer == null ? this : killer, true, 60);
+						World.addGroundItem(money, getLastTile(), killer == null ? this : killer, true, 60);
 					} else
-						World.addGroundItem(broken, getLastWorldTile(), killer == null ? this : killer, true, 60);
+						World.addGroundItem(broken, getLastTile(), killer == null ? this : killer, true, 60);
 				} else {
 					Item money = new Item(995, 1);
 					money.setAmount(item.getDefinitions().getValue());
-					World.addGroundItem(money, getLastWorldTile(), killer == null ? this : killer, true, 60);
+					World.addGroundItem(money, getLastTile(), killer == null ? this : killer, true, 60);
 				}
 			}
 		getAppearance().generateAppearanceData();
@@ -2499,7 +2399,7 @@ public class Player extends Entity {
 			if (item.getId() != 1)
 				getInventory().addItem(item);
 		for (Item item : containedItems)
-			World.addGroundItem(item, getLastWorldTile(), this, false, 60);
+			World.addGroundItem(item, getLastTile(), this, false, 60);
 	}
 
 	public void increaseKillCount(Player killed) {
@@ -2541,26 +2441,26 @@ public class Player extends Entity {
 		return prayer;
 	}
 
-	public void useStairs(WorldTile dest) {
+	public void useStairs(Tile dest) {
 		useStairs(-1, dest, 1, 2);
 	}
 
-	public void useStairs(int animId, WorldTile dest) {
+	public void useStairs(int animId, Tile dest) {
 		useStairs(animId, dest, 1, 2, null);
 	}
-	
-	public void useStairs(int animId, final WorldTile dest, int useDelay, int totalDelay) {
+
+	public void useStairs(int animId, final Tile dest, int useDelay, int totalDelay) {
 		useStairs(animId, dest, useDelay, totalDelay, null);
 	}
-	
-	public void promptUpDown(int emoteId, String up, WorldTile upTile, String down, WorldTile downTile) {
+
+	public void promptUpDown(int emoteId, String up, Tile upTile, String down, Tile downTile) {
 		startConversation(new Dialogue().addOptions(ops -> {
 			ops.add(up, () -> useStairs(emoteId, upTile, 2, 3));
 			ops.add(down, () -> useStairs(emoteId, downTile, 2, 3));
 		}));
 	}
-	
-	public void promptUpDown(String up, WorldTile upTile, String down, WorldTile downTile) {
+
+	public void promptUpDown(String up, Tile upTile, String down, Tile downTile) {
 		promptUpDown(-1, up, upTile, down, downTile);
 	}
 
@@ -2596,17 +2496,17 @@ public class Player extends Entity {
 			addWalkSteps(getX() >= object.getX() ? object.getX() - 1 : object.getX(), object.getY(), -1, false);
 	}
 
-	public void useStairs(int emoteId, final WorldTile dest, int useDelay, int totalDelay, final String message) {
+	public void useStairs(int emoteId, final Tile dest, int useDelay, int totalDelay, final String message) {
 		useStairs(emoteId, dest, useDelay, totalDelay, message, false);
 	}
 
-	public void useStairs(int emoteId, final WorldTile dest, int useDelay, int totalDelay, final String message, final boolean resetAnimation) {
+	public void useStairs(int emoteId, final Tile dest, int useDelay, int totalDelay, final String message, final boolean resetAnimation) {
 		stopAll();
 		lock(totalDelay);
 		if (emoteId != -1)
 			setNextAnimation(new Animation(emoteId));
 		if (useDelay == 0)
-			setNextWorldTile(dest);
+			setNextTile(dest);
 		else {
 			WorldTasks.schedule(new WorldTask() {
 				@Override
@@ -2615,7 +2515,7 @@ public class Player extends Entity {
 						return;
 					if (resetAnimation)
 						setNextAnimation(new Animation(-1));
-					setNextWorldTile(dest);
+					setNextTile(dest);
 					if (message != null)
 						sendMessage(message);
 				}
@@ -2762,7 +2662,7 @@ public class Player extends Entity {
 	public int setDeathCount(int deathCount) {
 		return this.deathCount = deathCount;
 	}
-	
+
 	public void setCloseChatboxInterfaceEvent(Runnable closeInterfacesEvent) {
 		this.closeChatboxInterfaceEvent = closeInterfacesEvent;
 	}
@@ -2770,7 +2670,7 @@ public class Player extends Entity {
 	public void setCloseInterfacesEvent(Runnable closeInterfacesEvent) {
 		this.closeInterfacesEvent = closeInterfacesEvent;
 	}
-	
+
 	public void setFinishConversationEvent(Runnable finishConversationEvent) {
 		this.finishConversationEvent = finishConversationEvent;
 	}
@@ -2878,17 +2778,8 @@ public class Player extends Entity {
 	}
 
 	public void sendPublicChatMessage(PublicChatMessage message) {
-		for (int regionId : getMapRegionsIds()) {
-			Set<Integer> playersIndexes = World.getRegion(regionId).getPlayerIndexes();
-			if (playersIndexes == null)
-				continue;
-			for (Integer playerIndex : playersIndexes) {
-				Player p = World.getPlayers().get(playerIndex);
-				if (p == null || !p.hasStarted() || p.hasFinished() || p.getLocalPlayerUpdate().getLocalPlayers()[getIndex()] == null)
-					continue;
-				p.getPackets().sendPublicMessage(this, message);
-			}
-		}
+		for (Player p : queryNearbyPlayersByTileRange(16, p -> p.getLocalPlayerUpdate().getLocalPlayers()[getIndex()] != null))
+			p.getPackets().sendPublicMessage(this, message);
 	}
 
 	public int[] getCompletionistCapeCustomized() {
@@ -2944,7 +2835,7 @@ public class Player extends Entity {
 	public Familiar getFamiliar() {
 		return summFamiliar;
 	}
-	
+
 	public Pouch getFamiliarPouch() {
 		if (summFamiliar == null)
 			return null;
@@ -3145,12 +3036,12 @@ public class Player extends Entity {
 		this.starter = starter;
 	}
 
-	public void ladder(final WorldTile toTile) {
+	public void ladder(final Tile toTile) {
 		setNextAnimation(new Animation(828));
 		WorldTasks.schedule(new WorldTask() {
 			@Override
 			public void run() {
-				setNextWorldTile(toTile);
+				setNextTile(toTile);
 			}
 		}, 1);
 	}
@@ -3277,25 +3168,25 @@ public class Player extends Entity {
 		if (npc.getId() >= 6247 && npc.getId() <= 6259) {
 			((GodwarsController) getControllerManager().getController()).sendKill(GodwarsController.SARADOMIN);
 			if (dropKey)
-				World.addGroundItem(new Item(20124, 1), WorldTile.of(npc.getCoordFaceX(npc.getSize()), npc.getCoordFaceY(npc.getSize()), npc.getPlane()), this, false, 60);
+				World.addGroundItem(new Item(20124, 1), Tile.of(npc.getCoordFaceX(npc.getSize()), npc.getCoordFaceY(npc.getSize()), npc.getPlane()), this, false, 60);
 			return;
 		}
 		if (npc.getId() >= 6260 && npc.getId() <= 6283) {
 			((GodwarsController) getControllerManager().getController()).sendKill(GodwarsController.BANDOS);
 			if (dropKey)
-				World.addGroundItem(new Item(20122, 1), WorldTile.of(npc.getCoordFaceX(npc.getSize()), npc.getCoordFaceY(npc.getSize()), npc.getPlane()), this, false, 60);
+				World.addGroundItem(new Item(20122, 1), Tile.of(npc.getCoordFaceX(npc.getSize()), npc.getCoordFaceY(npc.getSize()), npc.getPlane()), this, false, 60);
 			return;
 		}
 		if (npc.getId() >= 6222 && npc.getId() <= 6246) {
 			((GodwarsController) getControllerManager().getController()).sendKill(GodwarsController.ARMADYL);
 			if (dropKey)
-				World.addGroundItem(new Item(20121, 1), WorldTile.of(npc.getCoordFaceX(npc.getSize()), npc.getCoordFaceY(npc.getSize()), npc.getPlane()), this, false, 60);
+				World.addGroundItem(new Item(20121, 1), Tile.of(npc.getCoordFaceX(npc.getSize()), npc.getCoordFaceY(npc.getSize()), npc.getPlane()), this, false, 60);
 			return;
 		}
 		if (npc.getId() >= 6203 && npc.getId() <= 6221) {
 			((GodwarsController) getControllerManager().getController()).sendKill(GodwarsController.ZAMORAK);
 			if (dropKey)
-				World.addGroundItem(new Item(20123, 1), WorldTile.of(npc.getCoordFaceX(npc.getSize()), npc.getCoordFaceY(npc.getSize()), npc.getPlane()), this, false, 60);
+				World.addGroundItem(new Item(20123, 1), Tile.of(npc.getCoordFaceX(npc.getSize()), npc.getCoordFaceY(npc.getSize()), npc.getPlane()), this, false, 60);
 			return;
 		}
 		if (npc.getId() >= 13447 && npc.getId() <= 13459) {
@@ -3308,7 +3199,7 @@ public class Player extends Entity {
 		book.open(this);
 	}
 
-	public void useLadder(WorldTile tile) {
+	public void useLadder(Tile tile) {
 		useLadder(828, tile);
 	}
 
@@ -3319,12 +3210,12 @@ public class Player extends Entity {
 			getVars().setVar(394, 0);
 	}
 
-	public void useLadder(int anim, final WorldTile tile) {
+	public void useLadder(int anim, final Tile tile) {
 		lock();
 		setNextAnimation(new Animation(anim));
 		WorldTasks.scheduleTimer(tick -> {
 			if (tick == 1)
-				setNextWorldTile(tile);
+				setNextTile(tile);
 			if (tick == 2) {
 				unlock();
 				return false;
@@ -3540,23 +3431,23 @@ public class Player extends Entity {
 	public void setBossTask(BossTask bossTask) {
 		this.bossTask = bossTask;
 	}
-	
+
 	public void simpleDialogue(String... message) {
 		startConversation(new Dialogue().addSimple(message));
 	}
-	
+
 	public void npcDialogue(int npcId, HeadE emote, String message) {
 		startConversation(new Dialogue().addNPC(npcId, emote, message));
 	}
-	
+
 	public void npcDialogue(NPC npc, HeadE emote, String message) {
 		startConversation(new Dialogue().addNPC(npc, emote, message));
 	}
-	
+
 	public void itemDialogue(int itemId, String message) {
 		startConversation(new Dialogue().addItem(itemId, message));
 	}
-	
+
 	public void playerDialogue(HeadE emote, String message) {
 		startConversation(new Dialogue().addPlayer(emote, message));
 	}
@@ -3569,9 +3460,8 @@ public class Player extends Entity {
 			eligible.add(this);
 			return eligible;
 		}
-		for (Integer pId : World.getRegion(npc.getRegionId()).getPlayerIndexes()) {
-			Player player = World.getPlayers().get(pId);
-			if (player == null || !player.isRunning() || !player.isLootSharing() || !fc.getUsernames().contains(player.getUsername()))
+		for (Player player : World.getPlayersInChunkRange(npc.getChunkId(), 4)) {
+			if (!player.isRunning() || !player.isLootSharing() || !fc.getUsernames().contains(player.getUsername()))
 				continue;
 			if (fc.getRank(player.getAccount()).ordinal() >= fc.getSettings().getRankToLS().ordinal()) //TODO friend rank may need to be coded differently?
 				eligible.add(player);
@@ -3625,7 +3515,7 @@ public class Player extends Entity {
 		return ipAddresses;
 	}
 
-	public void walkToAndExecute(WorldTile startTile, Runnable event) {
+	public void walkToAndExecute(Tile startTile, Runnable event) {
 		Route route = RouteFinder.find(getX(), getY(), getPlane(), getSize(), new FixedTileStrategy(startTile.getX(), startTile.getY()), true);
 		int last = -1;
 		if (route.getStepCount() == -1)
@@ -3634,7 +3524,7 @@ public class Player extends Entity {
 			if (!addWalkSteps(route.getBufferX()[i], route.getBufferY()[i], 25, true, true))
 				break;
 		if (last != -1) {
-			WorldTile tile = WorldTile.of(route.getBufferX()[last], route.getBufferY()[last], getPlane());
+			Tile tile = Tile.of(route.getBufferX()[last], route.getBufferY()[last], getPlane());
 			getSession().writeToQueue(new MinimapFlag(tile.getXInScene(getSceneBaseChunkId()), tile.getYInScene(getSceneBaseChunkId())));
 		} else
 			getSession().writeToQueue(new MinimapFlag());
@@ -3715,22 +3605,22 @@ public class Player extends Entity {
 					return false;
 				tilesAvailable--;
 				tilesUnlocked.add(tileHash);
-				markTile(WorldTile.of(tileHash));
+				markTile(Tile.of(tileHash));
 			}
 		}
 		return true;
 	}
-	
-	public void markTile(WorldTile tile) {
+
+	public void markTile(Tile tile) {
 		getPackets().sendAddObject(new GameObject(21777, ObjectType.GROUND_DECORATION, 0, tile));
 		//model 4162 = orange square
 		//model 2636 = white dot?
-		
+
 	}
-	
+
 	public void updateTilemanTiles() {
 		for (int i : tilesUnlocked) {
-			WorldTile tile = WorldTile.of(i);
+			Tile tile = Tile.of(i);
 			if (Utils.getDistance(getTile(), tile) < 64)
 				markTile(tile);
 		}
@@ -3896,11 +3786,11 @@ public class Player extends Entity {
 		return false;
 	}
 
-	public void addWalkSteps(WorldTile toTile, int maxSteps, boolean clip) {
+	public void addWalkSteps(Tile toTile, int maxSteps, boolean clip) {
 		addWalkSteps(toTile.getX(), toTile.getY(), maxSteps, clip);
 	}
 
-	public void passThrough(WorldTile tile) {
+	public void passThrough(Tile tile) {
 		final boolean running = getRun();
 		setRunHidden(false);
 		lock(5);
@@ -3931,7 +3821,7 @@ public class Player extends Entity {
 			if (controller == null || !(controller instanceof WarriorsGuild guild))
 				return;
 			guild.inCyclopse = false;
-			setNextWorldTile(WarriorsGuild.CYCLOPS_LOBBY);
+			setNextTile(WarriorsGuild.CYCLOPS_LOBBY);
 			warriorPoints[index] = 0;
 		} else if (warriorPoints[index] > 65535)
 			warriorPoints[index] = 65535;
@@ -4035,15 +3925,15 @@ public class Player extends Entity {
 	public Clan getClan() {
 		return ClansManager.getClan(getAccount().getSocial().getClanName());
 	}
-	
+
 	public void getClan(Consumer<Clan> cb) {
 		ClansManager.getClan(getAccount().getSocial().getClanName(), cb);
 	}
-	
+
 	public Clan getGuestClan() {
 		return ClansManager.getClan(getAccount().getSocial().getGuestedClanChat());
 	}
-	
+
 	public void getGuestClan(Consumer<Clan> cb) {
 		ClansManager.getClan(getAccount().getSocial().getGuestedClanChat(), cb);
 	}
@@ -4262,13 +4152,13 @@ public class Player extends Entity {
 	public void setUsername(String username) {
 		this.username = username;
 	}
-	
+
 	public int getInvisibleSkillBoost(int skill) {
 		int boost = 0;
-		
+
 		if (Arrays.stream(Skills.SKILLING).anyMatch(check -> check == skill) && hasEffect(Effect.DUNG_HS_SCROLL_BOOST))
 			boost += getTempAttribs().getI("hsDungScrollTier", 0);
-		
+
 		switch(skill) {
 		case Skills.WOODCUTTING:
 			if (getFamiliarPouch() == Pouch.BEAVER)
@@ -4309,7 +4199,7 @@ public class Player extends Entity {
 				boost += 7;
 			break;
 		}
-		
+
 		return boost;
 	}
 
@@ -4329,74 +4219,75 @@ public class Player extends Entity {
 		this.pvpCombatLevelThreshhold = pvpCombatLevelThreshhold;
 		getAppearance().generateAppearanceData();
 	}
-	
+
 	public Sound playSound(Sound sound) {
 		if (sound.getId() == -1)
 			return null;
 		sounds.add(sound);
 		return sound;
 	}
-	
+
 	private Sound playSound(int soundId, int delay, SoundType type) {
 		return playSound(new Sound(soundId, delay, type));
 	}
-	
+
 	public void jingle(int jingleId, int delay) {
 		playSound(jingleId, delay, SoundType.JINGLE);
 	}
-	
+
 	public void jingle(int jingleId) {
 		playSound(jingleId, 0, SoundType.JINGLE);
 	}
-	
+
 	public void musicTrack(int trackId, int delay, int volume) {
 		playSound(trackId, delay, SoundType.MUSIC).volume(volume);
 	}
-	
+
 	public void musicTrack(int trackId, int delay) {
 		playSound(trackId, delay, SoundType.MUSIC);
 	}
-	
+
 	public void musicTrack(int trackId) {
 		musicTrack(trackId, 100);
 	}
-	
+
 	public void soundEffect(int soundId, int delay) {
 		playSound(soundId, delay, SoundType.EFFECT);
 	}
-	
+
 	public void soundEffect(int soundId) {
 		soundEffect(soundId, 0);
 	}
-	
+
 	public void voiceEffect(int voiceId, int delay) {
 		playSound(voiceId, delay, SoundType.VOICE);
 	}
-	
+
 	public void voiceEffect(int voiceId) {
 		voiceEffect(voiceId, 0);
 	}
-	
+
 	public Map<Integer, MachineInformation> getMachineMap() {
 		return machineMap;
 	}
-	
+
 	public MachineInformation getMachineInfo() {
 		return machineInformation;
 	}
-	
+
 	private void checkWasInDynamicRegion() {
-		if (lastNonDynamicTile != null && (getControllerManager().getController() == null || !getControllerManager().getController().reenableDynamicRegion())) {
-			setNextWorldTile(WorldTile.of(lastNonDynamicTile));
+		if (!getBool("dontTeleFromInstanceOnLogin") && lastNonDynamicTile != null && (getControllerManager().getController() == null || !getControllerManager().getController().reenableDynamicRegion())) {
+			setNextTile(Tile.of(lastNonDynamicTile));
 			clearLastNonDynamicTile();
 		}
+		getSavingAttributes().remove("dontTeleFromInstanceOnLogin");
 	}
-	
+
 	public void clearLastNonDynamicTile() {
 		lastNonDynamicTile = null;
 	}
 
-	public void setLastNonDynamicTile(WorldTile lastNonDynamicTile) {
+	public void setLastNonDynamicTile(Tile lastNonDynamicTile) {
 		this.lastNonDynamicTile = lastNonDynamicTile;
 	}
 
@@ -4407,15 +4298,15 @@ public class Player extends Entity {
 	public boolean isQuestComplete(Quest quest, String actionString) {
 		return getQuestManager().isComplete(quest, actionString);
 	}
-	
+
 	public boolean isQuestComplete(Quest quest) {
 		return isQuestComplete(quest, null);
 	}
-	
+
 	public boolean isMiniquestComplete(Miniquest quest, String actionString) {
 		return getMiniquestManager().isComplete(quest, actionString);
 	}
-	
+
 	public boolean isMiniquestComplete(Miniquest quest) {
 		return isMiniquestComplete(quest, null);
 	}
@@ -4442,5 +4333,9 @@ public class Player extends Entity {
 	public void setBasNoReset(int bas) {
 		super.setBasNoReset(bas);
 		getAppearance().generateAppearanceData();
+	}
+
+	public Set<Integer> getMapChunksNeedInit() {
+		return mapChunksNeedInit;
 	}
 }

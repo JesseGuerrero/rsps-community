@@ -29,7 +29,7 @@ import com.rs.engine.quest.QuestOutline;
 import com.rs.game.model.entity.npc.NPC;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.Item;
-import com.rs.lib.game.WorldTile;
+import com.rs.lib.game.Tile;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.handlers.ItemOnItemHandler;
 import com.rs.plugin.handlers.ItemOnNPCHandler;
@@ -68,7 +68,6 @@ public class PrinceAliRescue extends QuestOutline {
 	public final static int PASTE = 2424;
 
 	public final static int ROPE = 954;
-	//    public final static int
 
 	//NPCS
 	public final static int NED = 918;
@@ -82,7 +81,7 @@ public class PrinceAliRescue extends QuestOutline {
 	public final static int PRINCE_ALI2 = 921;
 
 	//Places
-	public final static int JAIL_REGION_ID = 12338;
+	public final static int JAIL_REGION_ID = 12338; //Update to new logic
 	@Override
 	public int getCompletedStage() {
 		return 5;
@@ -160,7 +159,7 @@ public class PrinceAliRescue extends QuestOutline {
 	}
 
 	public static ObjectClickHandler handleJailCellDoor = new ObjectClickHandler(new Object[] { 3436 }, e -> {
-		if(e.getObject().getTile().matches(WorldTile.of(3128, 3243, 0))) {
+		if(e.getObject().getTile().matches(Tile.of(3128, 3243, 0))) {
 			if (e.getPlayer().getInventory().containsItem(BRONZE_KEY, 1))
 				handleDoor(e.getPlayer(), e.getObject());
 			else
@@ -174,7 +173,7 @@ public class PrinceAliRescue extends QuestOutline {
 
 
 		if(e.getPlayer().getInventory().containsItem(BRONZE_KEY, 1)) {
-			for(NPC npc : World.getNPCsInRegion(e.getPlayer().getRegionId()))
+			for(NPC npc : World.getNPCsInChunkRange(e.getPlayer().getChunkId(), 2))
 				if(npc.getId() == LADY_KELI) {
 					e.getPlayer().sendMessage("You'd better get rid of Lady Keli before trying to go through there.");
 					return;

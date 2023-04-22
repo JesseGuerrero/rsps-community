@@ -390,7 +390,10 @@ public class ItemConstants {
 	}
 
 	public static boolean isDungItem(int itemId) {
-		if (itemId >= 15750 && itemId <= 18329)
+		if (itemId < 15750)
+			return false;
+		//General dung items, dung pouches, dung only kinship rings
+		if ((itemId >= 15750 && itemId <= 18329) || (itemId >= 18511 && itemId <= 18570) || (itemId >= 18817 && itemId <= 18829))
 			return true;
 		return false;
 	}
@@ -405,24 +408,24 @@ public class ItemConstants {
 		if (/*item.getMetaData() != null*/!CustomScape.isTradeable(item))
 			return false;
 		switch(item.getId()) {
-		//tradeable non-exchangeable item exceptions
-		case 995:
-		case 1706:
-		case 1707:
-		case 1708:
-		case 1709:
-		case 1710:
-		case 1711:
-		case 20653:
-		case 20654:
-		case 20655:
-		case 20656:
-		case 20657:
-		case 20658:
-		case ShieldOfArrav.CERTIFICATE_LEFT:
-		case ShieldOfArrav.CERTIFICATE_RIGHT:
-		case ShieldOfArrav.WEAPONS_KEY:
-			return true;
+			//tradeable non-exchangeable item exceptions
+			case 995:
+			case 1706:
+			case 1707:
+			case 1708:
+			case 1709:
+			case 1710:
+			case 1711:
+			case 20653:
+			case 20654:
+			case 20655:
+			case 20656:
+			case 20657:
+			case 20658:
+			case 11173:
+			case 11174:
+			case 759:
+				return true;
 		}
 		if ((!item.getDefinitions().isStackable() && item.getDefinitions().getCertId() == -1) || item.getDefinitions().isDestroyItem() || item.getDefinitions().isLended())
 			return false;

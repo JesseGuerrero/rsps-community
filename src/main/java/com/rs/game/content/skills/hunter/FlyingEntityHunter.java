@@ -27,7 +27,7 @@ import com.rs.game.model.entity.player.Skills;
 import com.rs.lib.Constants;
 import com.rs.lib.game.Animation;
 import com.rs.lib.game.Item;
-import com.rs.lib.game.WorldTile;
+import com.rs.lib.game.Tile;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.handlers.ItemClickHandler;
@@ -200,7 +200,7 @@ public class FlyingEntityHunter {
 				return;
 			}
 		} else if (e.getPlayer().getSkills().getLevel(Constants.HUNTER) < entity.getLevel()+10) {
-			e.getPlayer().sendMessage("You need a hunter level of " + entity.getLevel() + 10 + " in order to capture a " + e.getNPC().getName().toLowerCase() + " barehanded.");
+			e.getPlayer().sendMessage("You need a hunter level of " + (entity.getLevel() + 10) + " in order to capture a " + e.getNPC().getName().toLowerCase() + " barehanded.");
 			return;
 		}
 		e.getPlayer().lock(2);
@@ -219,7 +219,7 @@ public class FlyingEntityHunter {
 		e.getPlayer().sendMessage("...you stumble and miss the " + e.getNPC().getName().toLowerCase());
 		if (!e.getNPC().hasEffect(Effect.FREEZE)) {
 			e.getNPC().resetWalkSteps();
-			WorldTile fleeTo = e.getNPC().getRespawnTile();
+			Tile fleeTo = e.getNPC().getRespawnTile();
 			fleeTo.transform(Utils.random(-10, 10), Utils.random(-10, 10));
 			DumbRouteFinder.addDumbPathfinderSteps(e.getNPC(), fleeTo, 10, e.getNPC().getClipType());
 		}

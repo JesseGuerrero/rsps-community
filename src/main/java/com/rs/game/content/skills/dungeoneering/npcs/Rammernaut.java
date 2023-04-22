@@ -31,7 +31,7 @@ import com.rs.game.model.entity.player.Player;
 import com.rs.game.tasks.WorldTask;
 import com.rs.game.tasks.WorldTasks;
 import com.rs.lib.game.Animation;
-import com.rs.lib.game.WorldTile;
+import com.rs.lib.game.Tile;
 import com.rs.lib.util.Utils;
 import com.rs.utils.WorldUtil;
 
@@ -41,7 +41,7 @@ public class Rammernaut extends DungeonBoss {
 	private int count;
 	private boolean requestSpecNormalAttack;
 
-	public Rammernaut(WorldTile tile, DungeonManager manager, RoomReference reference) {
+	public Rammernaut(Tile tile, DungeonManager manager, RoomReference reference) {
 		super(DungeonUtils.getClosestToCombatLevel(Utils.range(9767, 9780), manager.getBossLevel()), tile, manager, reference);
 		setForceFollowClose(true);
 	}
@@ -71,33 +71,21 @@ public class Rammernaut extends DungeonBoss {
 				player.sendMessage("Your prayers have been disabled.");
 				player.setProtectionPrayBlock(2);
 			}
-			final NPC npc = this;
-			WorldTasks.schedule(new WorldTask() {
-				private int ticks;
-				private WorldTile tile;
-
-				@Override
-				public void run() {
-					ticks++;
-					if (ticks == 1) {
-						byte[] dirs = Utils.getDirection(getFaceAngle());
-						for (int distance = 6; distance >= 0; distance--) {
-							tile = WorldTile.of(WorldTile.of(entity.getX() + (dirs[0] * distance), entity.getY() + (dirs[1] * distance), entity.getPlane()));
-							if (World.floorFree(tile.getPlane(), tile.getX(), tile.getY()) && getManager().isAtBossRoom(tile))
-								break;
-							if (distance == 0)
-								tile = WorldTile.of(entity.getTile());
-						}
-						entity.faceEntity(npc);
-						entity.setNextAnimation(new Animation(10070));
-						entity.setNextForceMovement(new ForceMovement(entity.getTile(), 0, tile, 2, entity.getFaceAngle()));
-					} else if (ticks == 2) {
-						entity.setNextWorldTile(tile);
-						stop();
-						return;
-					}
+			WorldTasks.schedule(1, () -> {
+				Tile tile = null;
+				byte[] dirs = Utils.getDirection(getFaceAngle());
+				for (int distance = 6; distance >= 0; distance--) {
+					tile = Tile.of(Tile.of(entity.getX() + (dirs[0] * distance), entity.getY() + (dirs[1] * distance), entity.getPlane()));
+					if (World.floorFree(tile.getPlane(), tile.getX(), tile.getY()) && getManager().isAtBossRoom(tile))
+						break;
+					if (distance == 0)
+						tile = Tile.of(entity.getTile());
 				}
-			}, 0, 0);
+				if (tile == null)
+					return;
+				entity.faceEntity(this);
+				entity.forceMove(tile, 10070, 5, 60);
+			});
 		}
 	}
 

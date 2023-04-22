@@ -27,12 +27,14 @@ import com.rs.engine.dialogue.Dialogue;
 import com.rs.engine.dialogue.HeadE;
 import com.rs.engine.dialogue.Options;
 import com.rs.engine.quest.Quest;
+import com.rs.game.model.entity.Entity;
 import com.rs.game.model.entity.pathing.Direction;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.WorldObject;
-import com.rs.lib.game.WorldTile;
+import com.rs.lib.game.Tile;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
+import com.rs.plugin.annotations.ServerStartupEvent;
 import com.rs.plugin.handlers.NPCClickHandler;
 import com.rs.plugin.handlers.ObjectClickHandler;
 import com.rs.plugin.handlers.PlayerStepHandler;
@@ -41,7 +43,7 @@ import com.rs.utils.shop.ShopsHandler;
 @PluginEventHandler
 public class Falador {
 
-	public static PlayerStepHandler musicArtisansWorkshop = new PlayerStepHandler(new WorldTile[] { WorldTile.of(3035, 3339, 0), WorldTile.of(3035, 3338, 0), WorldTile.of(3034, 3339, 0), WorldTile.of(3034, 3338, 0) }, e -> {
+	public static PlayerStepHandler musicArtisansWorkshop = new PlayerStepHandler(new Tile[] { Tile.of(3035, 3339, 0), Tile.of(3035, 3338, 0), Tile.of(3034, 3339, 0), Tile.of(3034, 3338, 0) }, e -> {
 		if(e.getTile().getX() == 3035 && e.getStep().getDir() == Direction.EAST) {
 			e.getPlayer().getMusicsManager().playSpecificAmbientSong(582, true);
 			return;
@@ -50,7 +52,7 @@ public class Falador {
 			e.getPlayer().getMusicsManager().nextAmbientSong();
 	});
 
-	public static PlayerStepHandler musicRisingSunInn = new PlayerStepHandler(new WorldTile[] { WorldTile.of(2956, 3378, 0), WorldTile.of(2956, 3379, 0), WorldTile.of(2961, 3372, 0), WorldTile.of(2962, 3372, 0) }, e -> {
+	public static PlayerStepHandler musicRisingSunInn = new PlayerStepHandler(new Tile[] { Tile.of(2956, 3378, 0), Tile.of(2956, 3379, 0), Tile.of(2961, 3372, 0), Tile.of(2962, 3372, 0) }, e -> {
 		if(e.getTile().getY() == 3378 && e.getStep().getDir() == Direction.SOUTH) {
 			e.getPlayer().getMusicsManager().playSpecificAmbientSong(718, true);
 			return;
@@ -105,6 +107,11 @@ public class Falador {
 			}
 		});
 	});
+
+	@ServerStartupEvent
+	public static void addLoSOverrides() {
+		Entity.addLOSOverrides(2290);
+	}
 
 	public static NPCClickHandler handleSirTiffy = new NPCClickHandler(new Object[] { 2290 }, e -> {
 		ShopsHandler.openShop(e.getPlayer(), "initiate_rank_armory");
@@ -218,9 +225,9 @@ public class Falador {
 
 	public static ObjectClickHandler handleFistOfGuthixEntrance = new ObjectClickHandler(new Object[] { 20608, 30203 }, e -> {
 		if(e.getObjectId() == 20608)
-			e.getPlayer().useStairs(-1, WorldTile.of(1677, 5598, 0), 1, 1);
+			e.getPlayer().useStairs(-1, Tile.of(1677, 5598, 0), 1, 1);
 		if(e.getObjectId() == 30203)
-			e.getPlayer().useStairs(-1, WorldTile.of(2969, 9672, 0), 1, 1);
+			e.getPlayer().useStairs(-1, Tile.of(2969, 9672, 0), 1, 1);
 	});
 
 	public static ObjectClickHandler handleCrumblingWallShortcut = new ObjectClickHandler(new Object[] { 11844 }, e -> {
@@ -232,11 +239,11 @@ public class Falador {
 	public static ObjectClickHandler handleCabbagePatchStile = new ObjectClickHandler(new Object[] { 7527 }, e -> {
 		Player p = e.getPlayer();
 		WorldObject obj = e.getObject();
-		if(!obj.getTile().matches(WorldTile.of(3063, 3282, 0)))
+		if(!obj.getTile().matches(Tile.of(3063, 3282, 0)))
 			return;
 		if(p.getY() > obj.getY())
-			AgilityShortcuts.climbOver(p, WorldTile.of(obj.getX(), obj.getY()-1, obj.getPlane()));
+			AgilityShortcuts.climbOver(p, Tile.of(obj.getX(), obj.getY()-1, obj.getPlane()));
 		if(p.getY() < obj.getY())
-			AgilityShortcuts.climbOver(p, WorldTile.of(obj.getX(), obj.getY()+1, obj.getPlane()));
+			AgilityShortcuts.climbOver(p, Tile.of(obj.getX(), obj.getY()+1, obj.getPlane()));
 	});
 }

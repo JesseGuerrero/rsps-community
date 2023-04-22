@@ -33,7 +33,7 @@ import com.rs.game.model.object.GameObject;
 import com.rs.lib.Constants;
 import com.rs.lib.game.Animation;
 import com.rs.lib.game.Item;
-import com.rs.lib.game.WorldTile;
+import com.rs.lib.game.Tile;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.handlers.ButtonClickHandler;
 import com.rs.plugin.handlers.ItemClickHandler;
@@ -50,12 +50,7 @@ public class TribalTotem extends QuestOutline {
 	public final static int GET_TOTEM = 3;
 	public final static int QUEST_COMPLETE = 4;
 
-
-	protected final static String LOCK_PASS_ATTR = "LOCK_PASS";
-	protected final static String DISARMED_STAIRS_ATTR = "DISARMED_STAIRS";
-	protected final static String CHANGED_CRATE_ATTR = "CHANGED_CRATE";
-
-
+	//Item
 	public static final int TOTEM = 1857;
 
 	@Override
@@ -131,12 +126,12 @@ public class TribalTotem extends QuestOutline {
 	public static ObjectClickHandler handleLockDoorInMansion = new ObjectClickHandler(new Object[] { 2705 }, e -> {
 		Player p = e.getPlayer();
 		GameObject obj = e.getObject();
-		if (p.getX() < obj.getX() || p.isQuestComplete(Quest.TRIBAL_TOTEM) || (p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).getO(LOCK_PASS_ATTR) != null
-				&& ((String) p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).getO(LOCK_PASS_ATTR)).equalsIgnoreCase("KURT"))) {
+		if (p.getX() < obj.getX() || p.isQuestComplete(Quest.TRIBAL_TOTEM) || (p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).getO("LOCK_PASS") != null
+				&& ((String) p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).getO("LOCK_PASS")).equalsIgnoreCase("KURT"))) {
 			handleDoor(p, obj);
 			return;
 		}
-		p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).setO(LOCK_PASS_ATTR, "AAAA");
+		p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).setO("LOCK_PASS", "AAAA");
 		p.getInterfaceManager().sendInterface(285);//Door lock tribal totem
 	});
 
@@ -147,15 +142,15 @@ public class TribalTotem extends QuestOutline {
 		GameObject obj = e.getObject();
 		if(e.getOption().equalsIgnoreCase("climb-up"))
 			if(p.isQuestComplete(Quest.TRIBAL_TOTEM)
-					|| p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).getB(DISARMED_STAIRS_ATTR))
-				p.useStairs(-1, WorldTile.of(p.getX()-3, obj.getY(), p.getPlane() + 1), 0, 1);
+					|| p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).getB("DISARMED_STAIRS"))
+				p.useStairs(-1, Tile.of(p.getX()-3, obj.getY(), p.getPlane() + 1), 0, 1);
 			else {
 				p.applyHit(new Hit(25, Hit.HitLook.TRUE_DAMAGE));
 				p.sendMessage("You activate the trap stairs!");
-				p.setNextWorldTile(WorldTile.of(2638, 9721, 0));
+				p.setNextTile(Tile.of(2638, 9721, 0));
 			}
 		if(e.getOption().equalsIgnoreCase("investigate"))
-			if(p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).getB(DISARMED_STAIRS_ATTR))
+			if(p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).getB("DISARMED_STAIRS"))
 				p.sendMessage("It is already disarmed");
 			else if(p.getSkills().getLevel(Constants.THIEVING) < 21)
 				p.startConversation(new Conversation(e.getPlayer()) {
@@ -166,7 +161,7 @@ public class TribalTotem extends QuestOutline {
 					}
 				});
 			else {
-				p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).setB(DISARMED_STAIRS_ATTR, true);
+				p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).setB("DISARMED_STAIRS", true);
 				p.sendMessage("You disarm the trap...");
 			}
 	});
@@ -181,7 +176,7 @@ public class TribalTotem extends QuestOutline {
 		Player p = e.getPlayer();
 		switch(e.getComponentId()) {
 		case 18 -> {//Enter pass
-			if(((String)p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).getO(LOCK_PASS_ATTR)).equalsIgnoreCase("KURT")) {
+			if(((String)p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).getO("LOCK_PASS")).equalsIgnoreCase("KURT")) {
 				p.sendMessage("Correct password.");
 				p.closeInterfaces();
 			} else
@@ -233,7 +228,7 @@ public class TribalTotem extends QuestOutline {
 		}
 		}
 		String newPass = ""+LETTERS.charAt(p.getTempAttribs().getI("ttLockCombo1")) + LETTERS.charAt(p.getTempAttribs().getI("ttLockCombo2")) + LETTERS.charAt(p.getTempAttribs().getI("ttLockCombo3")) + LETTERS.charAt(p.getTempAttribs().getI("ttLockCombo4"));
-		p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).setO(LOCK_PASS_ATTR, newPass);
+		p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).setO("LOCK_PASS", newPass);
 	});
 
 	public static ObjectClickHandler handleMansionTotemChest = new ObjectClickHandler(new Object[] { 2709 }, e -> {
@@ -263,7 +258,7 @@ public class TribalTotem extends QuestOutline {
 	public static ObjectClickHandler handleRPDTCrateMansion = new ObjectClickHandler(new Object[] { 2708 }, e -> {
 		Player p = e.getPlayer();
 		GameObject obj = e.getObject();
-		if(obj.getTile().matches(WorldTile.of(2650, 3272, 0)))
+		if(obj.getTile().matches(Tile.of(2650, 3272, 0)))
 			if(p.getQuestManager().getStage(Quest.TRIBAL_TOTEM) == REDIRECT_TELE_STONE)
 				p.startConversation(new Conversation(e.getPlayer()) {
 					{
@@ -283,7 +278,7 @@ public class TribalTotem extends QuestOutline {
 		Player p = e.getPlayer();
 		if(e.getItem().getId() == 1858) { //address label
 			p.getInventory().removeItems(new Item(1858, 1));
-			p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).setB(CHANGED_CRATE_ATTR, true);
+			p.getQuestManager().getAttribs(Quest.TRIBAL_TOTEM).setB("CHANGED_CRATE", true);
 			p.sendMessage("You switch the address labels... The stone now goes to the mansion.");
 		}
 	});
