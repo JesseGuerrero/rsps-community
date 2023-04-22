@@ -17,7 +17,7 @@ import com.rs.game.model.entity.player.Player;
 import com.rs.lib.Constants;
 import com.rs.lib.game.Item;
 import com.rs.lib.game.Rights;
-import com.rs.lib.game.WorldTile;
+import com.rs.lib.game.Tile;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.ItemOnItemEvent;
 import com.rs.plugin.events.ItemOnNPCEvent;
@@ -35,7 +35,7 @@ public class CustomScripts {
 
 
 	public static Master highestSlayerMaster(Player player, Master master) {
-		if (player.withinDistance(WorldTile.of(3161, 3461, 0))) {
+		if (player.withinDistance(Tile.of(3161, 3461, 0))) {
 			for (int i = Master.values().length - 1; i >= 0; i--) {
 				if (player.getSkills().getCombatLevelWithSummoning() >= Master.values()[i].requiredCombatLevel
 						&& player.getSkills().getLevelForXp(Constants.SLAYER) >= Master.values()[i].reqSlayerLevel) {
@@ -252,7 +252,7 @@ public class CustomScripts {
 
 	public static boolean deathCofferIsSuccessful(Player player) {
 //		if(player.isIronMan()) {
-//			player.setNextWorldTile(Settings.getConfig().getPlayerRespawnTile());
+//			player.setNextTile(Settings.getConfig().getPlayerRespawnTile());
 //			player.lock(3);
 //			player.startConversation(new Dialogue().addNPC(15661, HeadE.CALM, "Given you have earned everything yourself(iron) you get a free pass...").addPlayer(HeadE.HAPPY_TALKING, "Thanks!"));
 //			return true;
@@ -264,7 +264,7 @@ public class CustomScripts {
 		if(player.getI("death coffer") >= 10_000) {
 			player.reset();
 			player.save("death coffer", player.getI("death coffer") - 10_000);
-			player.setNextWorldTile(Settings.getConfig().getPlayerRespawnTile());
+			player.setNextTile(Settings.getConfig().getPlayerRespawnTile());
 			player.lock(3);
 			player.startConversation(new Dialogue().addNPC(15661, HeadE.CALM, "This has cost you 10K coins").addPlayer(HeadE.HAPPY_TALKING, "Thanks!"));
 			return true;

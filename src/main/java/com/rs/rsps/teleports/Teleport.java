@@ -2,23 +2,23 @@ package com.rs.rsps.teleports;
 
 import com.rs.game.content.skills.magic.Magic;
 import com.rs.game.model.entity.player.Player;
-import com.rs.lib.game.WorldTile;
+import com.rs.lib.game.Tile;
 
 import java.util.function.Consumer;
 
 public class Teleport {
 	
 	private String name;
-	private WorldTile tile;
+	private Tile tile;
 	private Consumer<Player> onTeleport;
 	
-	public Teleport(String name, WorldTile tile, Consumer<Player> onTeleport) {
+	public Teleport(String name, Tile tile, Consumer<Player> onTeleport) {
 		this.name = name;
 		this.tile = tile;
 		this.onTeleport = onTeleport;
 	}
 	
-	public Teleport(String name, WorldTile tile) {
+	public Teleport(String name, Tile tile) {
 		this(name, tile, null);
 	}
 	
@@ -26,7 +26,7 @@ public class Teleport {
 		return name;
 	}
 
-	public WorldTile getTile() {
+	public Tile getTile() {
 		return tile;
 	}
 	

@@ -26,7 +26,7 @@ import com.rs.game.model.entity.npc.combat.NPCCombatDefinitions;
 import com.rs.game.model.entity.player.Player;
 import com.rs.lib.game.Animation;
 import com.rs.lib.game.SpotAnim;
-import com.rs.lib.game.WorldTile;
+import com.rs.lib.game.Tile;
 import com.rs.lib.util.Utils;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.handlers.NPCInstanceHandler;
@@ -44,7 +44,7 @@ public class ScalingCorporealBeast extends NPC {
 
 	private ScalingDarkEnergyCore core;
 
-	public ScalingCorporealBeast(int id, WorldTile tile, boolean spawned, double scale) {
+	public ScalingCorporealBeast(int id, Tile tile, boolean spawned, double scale) {
 		super(id, tile, spawned);
 		setCapDamage(1000);
 		setLureDelay(3000);

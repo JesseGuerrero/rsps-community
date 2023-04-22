@@ -238,14 +238,14 @@ public class House {
 				}
 			}
 			player.startConversation(new Dialogue().
-				addOptions("Do you really want to remove the room?", ops -> {
-					ops.add("Yes")
-						.addOptions("You can't get anything back? Remove room?", conf -> {
-							conf.add("Yes, get rid of my money already!", () -> player.getHouse().removeRoom(room));
-							conf.add("No.");
-						});
-					ops.add("No");
-				}));
+					addOptions("Do you really want to remove the room?", ops -> {
+						ops.add("Yes")
+								.addOptions("You can't get anything back? Remove room?", conf -> {
+									conf.add("Yes, get rid of my money already!", () -> player.getHouse().removeRoom(room));
+									conf.add("No.");
+								});
+						ops.add("No");
+					}));
 		} else {
 			if (roomX == 0 || roomY == 0 || roomX == 7 || roomY == 7) {
 				player.simpleDialogue("You can't create a room here.");
@@ -412,22 +412,22 @@ public class House {
 		if (roomTo == null) {
 			if (buildMode) {
 				player.startConversation(new Dialogue()
-					.addOptions("This "+(up ? "ladder" : "trapdoor")+" does not lead anywhere. Do you want to build a room at the " + (up ? "top" : "bottom") + "?", ops -> {
-						ops.add("Yes.").addOptions("Select a room", conf -> {
-							conf.add((room.getZ() == 1 && !up) ? "Oubliette" : "Throne room", () -> {
-								Room r = (room.getZ() == 1 && !up) ? Room.OUTBLIETTE : Room.THRONE_ROOM;
-								Builds ladderTrap = (room.getZ() == 1 && !up) ? Builds.OUB_LADDER : Builds.TRAPDOOR;
-								RoomReference newRoom = new RoomReference(r, room.getX(), room.getY(), room.getZ() + (up ? 1 : -1), room.getRotation());
-								int slot = room.getLadderTrapSlot();
-								if (slot != -1) {
-									newRoom.addObject(ladderTrap, slot);
-									player.getHouse().createRoom(newRoom);
-								}
+						.addOptions("This "+(up ? "ladder" : "trapdoor")+" does not lead anywhere. Do you want to build a room at the " + (up ? "top" : "bottom") + "?", ops -> {
+							ops.add("Yes.").addOptions("Select a room", conf -> {
+								conf.add((room.getZ() == 1 && !up) ? "Oubliette" : "Throne room", () -> {
+									Room r = (room.getZ() == 1 && !up) ? Room.OUTBLIETTE : Room.THRONE_ROOM;
+									Builds ladderTrap = (room.getZ() == 1 && !up) ? Builds.OUB_LADDER : Builds.TRAPDOOR;
+									RoomReference newRoom = new RoomReference(r, room.getX(), room.getY(), room.getZ() + (up ? 1 : -1), room.getRotation());
+									int slot = room.getLadderTrapSlot();
+									if (slot != -1) {
+										newRoom.addObject(ladderTrap, slot);
+										player.getHouse().createRoom(newRoom);
+									}
+								});
+								conf.add("Nevermind.");
 							});
-							conf.add("Nevermind.");
-						});
-						ops.add("No.");
-					}));
+							ops.add("No.");
+						}));
 			} else
 				player.sendMessage("This does not lead anywhere.");
 			// start dialogue
@@ -489,36 +489,36 @@ public class House {
 		if (roomTo == null) {
 			if (buildMode) {
 				player.startConversation(new Dialogue()
-					.addOptions("These stairs do not lead anywhere. Do you want to build a room at the " + (up ? "top" : "bottom") + "?", ops -> {
-						ops.add("Yes.").addOptions("Select a room", conf -> {
-							conf.add("Skill hall", () -> {
-								RoomReference newRoom = new RoomReference(up ? Room.HALL_SKILL_DOWN : Room.HALL_SKILL, room.getX(), room.getY(), room.getZ() + (up ? 1 : -1), room.getRotation());
-								int slot = room.getStaircaseSlot();
-								if (slot != -1) {
-									newRoom.addObject(up ? Builds.STAIRCASE_DOWN : Builds.STAIRCASE, slot);
-									player.getHouse().createRoom(newRoom);
-								}
-							});
-							conf.add("Quest hall", () -> {
-								RoomReference newRoom = new RoomReference(up ? Room.HALL_QUEST_DOWN : Room.HALL_QUEST, room.getX(), room.getY(), room.getZ() + (up ? 1 : -1), room.getRotation());
-								int slot = room.getStaircaseSlot();
-								if (slot != -1) {
-									newRoom.addObject(up ? Builds.STAIRCASE_DOWN_1 : Builds.STAIRCASE_1, slot);
-									player.getHouse().createRoom(newRoom);
-								}
-							});
-							if (room.getZ() == 1 && !up)
-								conf.add("Dungeon stairs room", () -> {
-									RoomReference newRoom = new RoomReference(Room.DUNGEON_STAIRS, room.getX(), room.getY(), room.getZ() + (up ? 1 : -1), room.getRotation());
+						.addOptions("These stairs do not lead anywhere. Do you want to build a room at the " + (up ? "top" : "bottom") + "?", ops -> {
+							ops.add("Yes.").addOptions("Select a room", conf -> {
+								conf.add("Skill hall", () -> {
+									RoomReference newRoom = new RoomReference(up ? Room.HALL_SKILL_DOWN : Room.HALL_SKILL, room.getX(), room.getY(), room.getZ() + (up ? 1 : -1), room.getRotation());
 									int slot = room.getStaircaseSlot();
 									if (slot != -1) {
-										newRoom.addObject(Builds.STAIRCASE_2, slot);
+										newRoom.addObject(up ? Builds.STAIRCASE_DOWN : Builds.STAIRCASE, slot);
 										player.getHouse().createRoom(newRoom);
 									}
 								});
-						});
-						ops.add("No.");
-					}));
+								conf.add("Quest hall", () -> {
+									RoomReference newRoom = new RoomReference(up ? Room.HALL_QUEST_DOWN : Room.HALL_QUEST, room.getX(), room.getY(), room.getZ() + (up ? 1 : -1), room.getRotation());
+									int slot = room.getStaircaseSlot();
+									if (slot != -1) {
+										newRoom.addObject(up ? Builds.STAIRCASE_DOWN_1 : Builds.STAIRCASE_1, slot);
+										player.getHouse().createRoom(newRoom);
+									}
+								});
+								if (room.getZ() == 1 && !up)
+									conf.add("Dungeon stairs room", () -> {
+										RoomReference newRoom = new RoomReference(Room.DUNGEON_STAIRS, room.getX(), room.getY(), room.getZ() + (up ? 1 : -1), room.getRotation());
+										int slot = room.getStaircaseSlot();
+										if (slot != -1) {
+											newRoom.addObject(Builds.STAIRCASE_2, slot);
+											player.getHouse().createRoom(newRoom);
+										}
+									});
+							});
+							ops.add("No.");
+						}));
 			} else
 				player.sendMessage("These stairs do not lead anywhere.");
 			// start dialogue
@@ -667,31 +667,31 @@ public class House {
 		final int reqVal = requirementsValue;
 
 		Dialogue buildD = new Dialogue()
-			.addNext(new Statement() {
-				@Override
-				public void send(Player player) {
-					player.getPackets().sendVarc(841, reqVal);
-					player.getPackets().sendItems(398, itemArray);
-					player.getPackets().setIFEvents(new IFEvents(1306, 55, -1, -1).enableContinueButton()); // exit
-					// button
-					for (int i = 0; i < itemArray.length; i++)
-						player.getPackets().setIFEvents(new IFEvents(1306, 8 + 7 * i, 4, 4).enableContinueButton());
-					// options
-					player.getInterfaceManager().sendInterface(1306);
-					player.getTempAttribs().setO("OpenedBuild", build);
-					player.getTempAttribs().setO("OpenedBuildObject", object);
-				}
+				.addNext(new Statement() {
+					@Override
+					public void send(Player player) {
+						player.getPackets().sendVarc(841, reqVal);
+						player.getPackets().sendItems(398, itemArray);
+						player.getPackets().setIFEvents(new IFEvents(1306, 55, -1, -1).enableContinueButton()); // exit
+						// button
+						for (int i = 0; i < itemArray.length; i++)
+							player.getPackets().setIFEvents(new IFEvents(1306, 8 + 7 * i, 4, 4).enableContinueButton());
+						// options
+						player.getInterfaceManager().sendInterface(1306);
+						player.getTempAttribs().setO("OpenedBuild", build);
+						player.getTempAttribs().setO("OpenedBuildObject", object);
+					}
 
-				@Override
-				public int getOptionId(int componentId) {
-					return componentId == 55 ? Integer.MAX_VALUE : (componentId - 8) / 7;
-				}
+					@Override
+					public int getOptionId(int componentId) {
+						return componentId == 55 ? Integer.MAX_VALUE : (componentId - 8) / 7;
+					}
 
-				@Override
-				public void close(Player player) {
-					player.closeInterfaces();
-				}
-			});
+					@Override
+					public void close(Player player) {
+						player.closeInterfaces();
+					}
+				});
 
 		for (int i = 0;i < itemArray.length;i++) {
 			final int index = i;

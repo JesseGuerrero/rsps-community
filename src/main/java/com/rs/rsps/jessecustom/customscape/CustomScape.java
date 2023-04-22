@@ -15,7 +15,7 @@ import com.rs.game.model.entity.player.Equipment;
 import com.rs.game.model.entity.player.Player;
 import com.rs.game.model.item.ItemsContainer;
 import com.rs.lib.game.Item;
-import com.rs.lib.game.WorldTile;
+import com.rs.lib.game.Tile;
 import com.rs.plugin.annotations.PluginEventHandler;
 import com.rs.plugin.events.LoginEvent;
 import com.rs.plugin.events.ObjectClickEvent;
@@ -141,7 +141,7 @@ public class CustomScape {
 		Player player = e.getPlayer();
 		if(e.getPlayer().isKalphiteLairSetted()) {
 //				if(!CustomScape.isPlayerCustomScape(e.getPlayer())) {
-//					e.getPlayer().setNextWorldTile(WorldTile.of(3508, 9494, 0));
+//					e.getPlayer().setNextTile(Tile.of(3508, 9494, 0));
 //					return;
 //				}
 //				if(e.getPlayer().getInventory().getAmountOf(995) >= 5_000) {
@@ -150,20 +150,20 @@ public class CustomScape {
 //								option.add("Yes", ()->{
 //									player.getControllerManager().startController(new KalphiteQueenScalingInstanceController());
 //								});
-//								option.add("No", () -> {e.getPlayer().setNextWorldTile(WorldTile.of(3508, 9494, 0));});
+//								option.add("No", () -> {e.getPlayer().setNextTile(Tile.of(3508, 9494, 0));});
 //							})
 //					);
 //					return;
 //				}
 //				e.getPlayer().sendMessage("You need 5k coins for an instance");
-			e.getPlayer().setNextWorldTile(WorldTile.of(3508, 9494, 0));
+			e.getPlayer().setNextTile(Tile.of(3508, 9494, 0));
 		}
 	});
 
 
 
 /*else if (id == 48803 && player.isKalphiteLairSetted())
-				player.setNextWorldTile(WorldTile.of(3508, 9494, 0));*/
+				player.setNextTile(Tile.of(3508, 9494, 0));*/
 
 	public static boolean isBindedItem(Item item) {
 		String name = item.getName();
@@ -322,7 +322,7 @@ public class CustomScape {
 
 	public static void createCorpScalingDialogue(Player player) {
 		if(!isPlayerCustomScape(player)) {
-			player.setNextWorldTile(WorldTile.of(2921, player.getY(), 2));
+			player.setNextTile(Tile.of(2921, player.getY(), 2));
 			return;
 		}
 		if (player.getInventory().getAmountOf(995) >= 5_000) {
@@ -332,11 +332,11 @@ public class CustomScape {
 							player.getInventory().removeItems(new Item(995, 5000));
 //							player.getControllerManager().startController(new CorporealBeastScalingInstanceController());
 						});
-						option.add("No", ()->{player.setNextWorldTile(WorldTile.of(2921, player.getY(), 2));});
+						option.add("No", ()->{player.setNextTile(Tile.of(2921, player.getY(), 2));});
 					}));
 		} else {
 			player.sendMessage("You need 5k coins for an instance");
-			player.setNextWorldTile(WorldTile.of(2921, player.getY(), 2));
+			player.setNextTile(Tile.of(2921, player.getY(), 2));
 		}
 
 	}

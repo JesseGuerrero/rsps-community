@@ -18,7 +18,7 @@ package com.rs.rsps.jessecustom.bosses.godwars;
 
 import com.rs.game.content.bosses.godwars.GodWarMinion;
 import com.rs.game.model.entity.npc.combat.NPCCombatDefinitions;
-import com.rs.lib.game.WorldTile;
+import com.rs.lib.game.Tile;
 
 import java.util.HashMap;
 import java.util.Map;
