@@ -43,8 +43,8 @@ public class LunarIsle {
                 })
             );
             case "Trade" -> {
-                if (e.getPlayer().isQuestComplete(Quest.LUNAR_DIPLOMACY))
-                    ShopsHandler.openShop(e.getPlayer(), "baba_yagas_magic_shop");
+//                if (e.getPlayer().isQuestComplete(Quest.LUNAR_DIPLOMACY))
+				ShopsHandler.openShop(e.getPlayer(), "baba_yagas_magic_shop");
             }
         }
     });
