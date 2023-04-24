@@ -1369,10 +1369,10 @@ public class Player extends Entity {
 	}
 
 	public boolean unlockedLodestone(Lodestone stone) {
-//		if (stone == Lodestone.BANDIT_CAMP)
-//			return isQuestComplete(Quest.DESERT_TREASURE);
-//		if (stone == Lodestone.LUNAR_ISLE)
-//			return isQuestComplete(Quest.LUNAR_DIPLOMACY);
+		if (stone == Lodestone.BANDIT_CAMP)
+			return true;//return isQuestComplete(Quest.DESERT_TREASURE);
+		if (stone == Lodestone.LUNAR_ISLE)
+			return true;//return isQuestComplete(Quest.LUNAR_DIPLOMACY);
 		return lodestones[stone.ordinal()];
 	}
 
