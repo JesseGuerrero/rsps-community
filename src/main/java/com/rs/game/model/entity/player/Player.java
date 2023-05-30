@@ -122,6 +122,7 @@ import com.rs.net.encoders.WorldEncoder;
 import com.rs.plugin.PluginManager;
 import com.rs.plugin.events.*;
 import com.rs.rsps.jessecustom.CustomScripts;
+import com.rs.rsps.jessecustom.GamemodeSelectionCustom;
 import com.rs.utils.AccountLimiter;
 import com.rs.utils.MachineInformation;
 import com.rs.utils.Ticks;
@@ -1294,7 +1295,7 @@ public class Player extends Entity {
 				setStarter(1);
 			if (!getUsername().startsWith("cli_bot")) {
 				PlayerLook.openCharacterCustomizing(this);
-				startConversation(new GamemodeSelection(this));
+				startConversation(new GamemodeSelectionCustom(this));
 			} else
 				setChosenAccountType(true);
 		}
