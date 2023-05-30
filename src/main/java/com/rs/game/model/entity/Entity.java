@@ -782,6 +782,7 @@ public abstract class Entity {
 				case 14864: //Ayleth Beaststalker
 				case 14858: //Alison Elmshaper
 				case 14883: //Marcus Everburn
+				case 1512: //GIM Tutor
 					return true;
 			}
 			switch(npc.getName()) {
